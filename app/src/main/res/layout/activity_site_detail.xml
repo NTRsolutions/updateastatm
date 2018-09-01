@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/llCircle"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/_2dp"
+        app:cardElevation="@dimen/_10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#078f4b"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/vew"
+                android:layout_width="match_parent"
+                android:layout_height="1sp"
+                android:layout_marginBottom="2dp"
+                android:background="#cccccc" />
+
+            <LinearLayout
+                android:id="@+id/extraHeaderComp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+
+                <TextView
+                    android:id="@+id/tvLastUpdated"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginLeft="@dimen/_8dp"
+                    android:gravity="left"
+                    android:maxLines="1"
+                    android:text="Last Updated: 22/10/2015 23:15 AM"
+                    android:textColor="#ffffff"
+                    android:textSize="@dimen/_12dp" />
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+
+    <TextView
+        android:id="@+id/tvSiteName"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:background="#ffffff"
+        android:elevation="@dimen/_5dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:padding="@dimen/_8dp"
+        android:scrollHorizontally="true"
+        android:textColor="#000000"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5dp"
+        android:background="#ffffff"
+        android:elevation="@dimen/_4dp"
+        android:orientation="horizontal"
+        android:weightSum="150">
+
+        <TextView
+            android:id="@+id/tvUptime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="48"
+            android:gravity="center_horizontal|center_vertical"
+            android:padding="@dimen/_5dp"
+            android:elevation="@dimen/_5dp"
+            android:text="Uptime"
+            android:textColor="#000000"
+            android:textSize="11sp" />
+
+        <View
+            android:id="@+id/viewVertical1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_weight="1"
+            android:background="#cccccc" />
+
+        <TextView
+            android:id="@+id/tvVisit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="48"
+            android:gravity="center_horizontal|center_vertical"
+            android:padding="@dimen/_5dp"
+            android:elevation="@dimen/_5dp"
+            android:text="Visit"
+            android:textColor="#000000"
+            android:textSize="11sp" />
+
+        <View
+            android:id="@+id/viewVertical2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_weight="1"
+            android:background="#cccccc" />
+
+        <TextView
+            android:id="@+id/tvEBRunHour"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="48"
+            android:gravity="center_horizontal|center_vertical"
+            android:padding="@dimen/_5dp"
+            android:elevation="@dimen/_5dp"
+            android:text="EB Run Hour"
+            android:textColor="#000000"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="#ed4a05"
+        android:elevation="@dimen/_6dp"
+        android:orientation="horizontal"
+        android:padding="@dimen/_5dp"
+        android:weightSum="5">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/time"
+                android:gravity="center_horizontal"
+                android:text="Date"
+                android:textColor="#ffffff"
+                android:textSize="11sp" />
+
+            <View
+                android:id="@+id/view3"
+                android:layout_width="60dp"
+                android:layout_height="0.5sp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="2dp"
+                android:background="#cccccc" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="Time"
+                android:textColor="#ffffff"
+                android:textSize="11sp" />
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/status"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="Site On"
+                android:textColor="#ffffff"
+                android:textSize="11sp" />
+
+            <View
+                android:id="@+id/view4"
+                android:layout_width="60dp"
+                android:layout_height="0.5sp"
+                android:layout_gravity="center_horizontal"
+                android:background="#cccccc" />
+
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="Batt. Volt"
+                android:textColor="#ffffff"
+                android:textSize="11sp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawablePadding="6dp"
+                android:drawableTop="@drawable/volt"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="BCI"
+                android:textColor="#ffffff"
+                android:textSize="11sp" />
+
+            <View
+                android:id="@+id/view5"
+                android:layout_width="60dp"
+                android:layout_height="0.5sp"
+                android:layout_gravity="center_horizontal"
+                android:background="#cccccc" />
+
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="BDI"
+                android:textColor="#ffffff"
+                android:textSize="11sp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/load"
+                android:gravity="center_horizontal|center_vertical"
+                android:singleLine="true"
+                android:text="INV O/p Volt."
+                android:textColor="#ffffff"
+                android:textSize="11sp" />
+
+            <View
+                android:id="@+id/view6"
+                android:layout_width="60dp"
+                android:layout_height="0.5sp"
+                android:layout_gravity="center_horizontal"
+                android:background="#cccccc" />
+
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="Load Current"
+                android:textColor="#ffffff"
+                android:textSize="11sp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/solar"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="Solar Current"
+                android:textColor="#ffffff"
+                android:textSize="11sp" />
+
+            <View
+                android:id="@+id/view7"
+                android:layout_width="60dp"
+                android:layout_height="0.5sp"
+                android:layout_gravity="center_horizontal"
+                android:background="#cccccc" />
+
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="Alarm Code"
+                android:textColor="#ffffff"
+                android:textSize="11sp" />
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/lvSiteDetails"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp">
+
+    </ListView>
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/llSiteDetailTable"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#f2f2f2"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</LinearLayout>

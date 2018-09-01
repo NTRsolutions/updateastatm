@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvTitlePlannedActivity"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvRemainingDistance"
+        android:layout_marginLeft="5dp"
+        android:text="Planned Activities"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="invisible" />
+
+    <ListView
+        android:id="@+id/lvPlannedActivities"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvTitlePlannedActivity"
+        android:layout_marginBottom="2dp">
+
+    </ListView>
+
+    <LinearLayout
+        android:id="@+id/llSiteSearch"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="10"
+        android:layout_below="@+id/llActionBar"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:gravity="center_horizontal|center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="8"
+            android:orientation="vertical">
+
+            <AutoCompleteTextView
+                android:id="@+id/tvSiteId"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/edittext_center_bg"
+                android:hint="Site Id"
+                android:padding="10dp" />
+
+            <AutoCompleteTextView
+                android:id="@+id/tvSiteName"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/edittext_center_bg"
+                android:hint="Site Name"
+                android:padding="10dp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imgRefresh"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_weight="2"
+            android:layout_marginTop="12dp"
+            android:src="@drawable/refresh_button" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnDone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/button_login"
+        android:padding="10dp"
+        android:text="Done" />
+
+
+</LinearLayout>

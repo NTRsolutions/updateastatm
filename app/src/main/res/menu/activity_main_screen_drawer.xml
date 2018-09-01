@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/home_icon"
+            android:title="HOME" />
+        <item
+            android:id="@+id/nav_tvActivitySheet"
+            android:icon="@drawable/activity_sheet"
+            android:title="Activity Monitor" />
+        <item
+            android:id="@+id/nav_tvActivityEntryReport"
+            android:icon="@drawable/activity_entry_report"
+            android:title="Activity Status Report" />
+        <item
+            android:id="@+id/nav_tvTransit"
+            android:icon="@drawable/transit"
+            android:title="Transit" />
+        <item
+            android:id="@+id/nav_tvExpenseScreen"
+            android:icon="@drawable/expense_icon_1"
+            android:title="Expenses" />
+        <item
+            android:id="@+id/nav_tvComplaint"
+            android:icon="@drawable/complaint_icon"
+            android:title="Complaint" />
+        <item
+            android:id="@+id/nav_tvAbout"
+            android:icon="@drawable/about_icon"
+            android:title="About" />
+
+    </group>
+
+
+</menu>

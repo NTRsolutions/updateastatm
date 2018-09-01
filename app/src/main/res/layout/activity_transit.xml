@@ -1,0 +1,290 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/headerCardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/_2dp"
+        app:cardElevation="@dimen/_10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#078f4b"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/vew"
+                android:layout_width="match_parent"
+                android:layout_height="1sp"
+                android:layout_marginBottom="2dp"
+                android:background="#cccccc" />
+
+            <TextView
+                android:id="@+id/tvCurrentDate"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/llActionBar"
+                android:layout_marginLeft="@dimen/_6dp"
+                android:background="#078f4b"
+                android:padding="@dimen/_2dp"
+                android:text=""
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+    <TextView
+        android:id="@+id/tvSelectedSiteName"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/headerCardview"
+        android:padding="@dimen/_7dp"
+        android:text=""
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvRemainingDistance"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvSelectedSiteName"
+        android:layout_marginBottom="@dimen/_2dp"
+        android:padding="@dimen/_7dp"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/llRow1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvRemainingDistance"
+        android:layout_margin="@dimen/_6dp"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+
+        <android.support.v7.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="@dimen/_5dp"
+            app:cardElevation="@dimen/_8dp"
+            app:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/tranist_Button_color">
+
+                <TextView
+                    android:id="@+id/btnStartHome"
+                    style="@style/DefaultButtonText"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/tranist_Button_color"
+                    android:drawablePadding="-50dp"
+                    android:drawableTop="@drawable/start_home"
+                    android:paddingTop="@dimen/_30dp"
+                    android:text="Start Home"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/startHomeTick"
+                    android:layout_width="@dimen/_30dp"
+                    android:layout_height="@dimen/_30dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/ic_tick_inside_circle"
+                    android:visibility="visible" />
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="@dimen/_5dp"
+            app:cardElevation="@dimen/_8dp"
+            app:cardUseCompatPadding="true">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/tranist_Button_color">
+
+                <TextView
+                    android:id="@+id/btnReachedSite"
+                    style="@style/DefaultButtonText"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/tranist_Button_color"
+                    android:drawablePadding="-50dp"
+                    android:drawableTop="@drawable/reached_site"
+                    android:paddingTop="30dp"
+                    android:text="Reached Site"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/rechedSiteTick"
+                    android:layout_width="@dimen/_30dp"
+                    android:layout_height="@dimen/_30dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="@dimen/_5dp"
+                    android:layout_marginTop="@dimen/_15dp"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/ic_tick_inside_circle"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llRow2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/llRow1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="@dimen/_5dp"
+            app:cardElevation="@dimen/_8dp"
+            app:cardUseCompatPadding="true">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/tranist_Button_color">
+
+                <TextView
+                    android:id="@+id/btnLeftSite"
+                    style="@style/DefaultButtonText"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_150dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:background="@color/tranist_Button_color"
+                    android:drawablePadding="-50dp"
+                    android:drawableTop="@drawable/left_site"
+                    android:paddingTop="30dp"
+                    android:text="Left Site"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/leftSiteTick"
+                    android:layout_width="@dimen/_30dp"
+                    android:layout_height="@dimen/_30dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/ic_tick_inside_circle"
+                    android:visibility="gone" />
+
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="@dimen/_5dp"
+            app:cardElevation="@dimen/_8dp"
+            app:cardUseCompatPadding="true">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/tranist_Button_color">
+
+                <TextView
+                    android:id="@+id/btnReachedHome"
+                    style="@style/DefaultButtonText"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:background="@color/tranist_Button_color"
+                    android:drawablePadding="-50dp"
+                    android:drawableTop="@drawable/reached_home"
+                    android:paddingTop="30dp"
+                    android:text="Reached Home"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/reachedHomeTick"
+                    android:layout_width="@dimen/_30dp"
+                    android:layout_height="@dimen/_30dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="@dimen/_5dp"
+                    android:layout_marginTop="@dimen/_15dp"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/ic_tick_inside_circle"
+                    android:visibility="gone" />
+
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnAddSiteData"
+        android:layout_width="@dimen/_200dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/llRow2"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="@dimen/_15dp"
+        android:background="@drawable/button_login"
+        android:gravity="center_horizontal"
+        android:padding="@dimen/_15dp"
+        android:text="Add Site Address"
+        android:textColor="#ffffff"
+        android:textSize="16sp" />
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btnSyncData"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/_15dp"
+        android:backgroundTint="@color/white"
+        android:src="@drawable/ic_cloud_computing" />
+
+
+</RelativeLayout>
+
+
+
+

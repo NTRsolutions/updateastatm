@@ -1,0 +1,457 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#078f4b"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <TextView
+            android:id="@+id/tvUserName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="2"
+            android:drawableLeft="@drawable/user_icon"
+            android:drawablePadding="2dp"
+            android:gravity="center_vertical"
+
+            android:padding="3dp"
+            android:textColor="#ffffff"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/tvVersionNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical|center_horizontal"
+                android:padding="3dp"
+                android:text=""
+                android:textColor="#ffffff"
+                android:textSize="14sp" />
+            <!--
+            <TextView
+                android:id="@+id/tvVersionNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical|center_horizontal"
+                android:padding="3dp"
+                android:text="@string/version_number"
+                android:textColor="#ffffff"
+                android:textSize="14sp" />-->
+
+            <!-- <TextView
+                 android:id="@+id/tvSort"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_weight="1"
+                 android:gravity="center_vertical|center_horizontal"
+                 android:padding="3dp"
+                 android:textColor="#ffffff"
+                 android:textSize="14sp" />-->
+
+            <View
+                android:id="@+id/view"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:background="#cccccc" />
+
+            <TextView
+                android:id="@+id/tvFilter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_weight="1"
+                android:gravity="center_vertical|center_horizontal"
+                android:padding="3dp"
+                android:text="Filter"
+                android:textColor="#ffffff"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <HorizontalScrollView
+        android:id="@+id/hsvHeader"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/llActionBar">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginTop="15dp"
+            android:background="#ffffff"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvPlannedExecuted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|center_vertical"
+                android:padding="5dp"
+                android:text="Planned/Executed: "
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+            <View
+                android:id="@+id/viewVertical1"
+                android:layout_width="2dp"
+                android:layout_height="20sp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:background="#cccccc" />
+
+            <TextView
+                android:id="@+id/tvOnTheWay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|center_vertical"
+                android:padding="5dp"
+                android:text="On The Way: "
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+            <View
+                android:id="@+id/viewVertical2"
+                android:layout_width="2dp"
+                android:layout_height="20sp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:background="#cccccc" />
+
+            <TextView
+                android:id="@+id/tvReachedSite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|center_vertical"
+                android:padding="5dp"
+                android:text="Reached Site: "
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+            <View
+                android:id="@+id/viewVertical3"
+                android:layout_width="2dp"
+                android:layout_height="20sp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:background="#cccccc" />
+
+            <TextView
+                android:id="@+id/tvLeftSite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|center_vertical"
+                android:padding="5dp"
+                android:text="Left Site: "
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+            <View
+                android:id="@+id/viewVertical4"
+                android:layout_width="2dp"
+                android:layout_height="20sp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:background="#cccccc" />
+
+            <TextView
+                android:id="@+id/tvUnknown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|center_vertical"
+                android:padding="5dp"
+                android:text="Unknown: "
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+            <View
+                android:id="@+id/viewVertical5"
+                android:layout_width="2dp"
+                android:layout_height="20sp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:background="#cccccc" />
+
+            <TextView
+                android:id="@+id/tvCircleName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|center_vertical"
+                android:padding="5dp"
+                android:text="Circle Name: "
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+            <View
+                android:id="@+id/viewVertical6"
+                android:layout_width="2dp"
+                android:layout_height="20sp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:background="#cccccc" />
+
+            <TextView
+                android:id="@+id/tvAttendance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|center_vertical"
+                android:padding="5dp"
+                android:paddingRight="5dp"
+                android:text="Attendance/Leave: "
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:id="@+id/searchButtonLL"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/llFilter"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <AutoCompleteTextView
+            android:id="@+id/etSearch"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/llFilter"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/search_edittext_style"
+            android:drawablePadding="2dp"
+            android:drawableRight="@drawable/search_icon"
+            android:hint="Search"
+            android:padding="5dp" />
+
+        <ImageView
+            android:id="@+id/imgRefresh"
+            android:layout_width="30dp"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/refresh_button" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="#078f4b"
+        android:orientation="horizontal"
+        android:paddingLeft="3dp"
+        android:paddingRight="3dp"
+        android:paddingTop="3dp"
+        android:weightSum="3">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:text="Site Name"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+
+            <View
+                android:id="@+id/view3"
+                android:layout_width="70dp"
+                android:layout_height="0.5sp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="2dp"
+                android:background="#cccccc" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:text="Customer"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+
+            <View
+                android:id="@+id/view4"
+                android:layout_width="70dp"
+                android:layout_height="0.5sp"
+                android:layout_gravity="center_horizontal"
+                android:background="#cccccc" />
+
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:text="Date"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawablePadding="6dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:singleLine="true"
+                android:text="IN/Out Zone"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+
+            <View
+                android:id="@+id/view5"
+                android:layout_width="70dp"
+                android:layout_height="0.5sp"
+                android:layout_gravity="center_horizontal"
+                android:background="#cccccc" />
+
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:text="TA/DA Amount"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+
+            <View
+                android:id="@+id/view6"
+                android:layout_width="70dp"
+                android:layout_height="0.5sp"
+                android:layout_gravity="center_horizontal"
+                android:background="#cccccc" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal|center_vertical"
+                android:singleLine="true"
+                android:text="Status"
+
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:text="Days Taken"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+
+            <View
+                android:id="@+id/view8"
+                android:layout_width="70dp"
+                android:layout_height="0.5sp"
+                android:layout_gravity="center_horizontal"
+                android:background="#cccccc" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal|center_vertical"
+                android:singleLine="true"
+                android:text="NOC Approval Color Code with Desc"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+
+            <View
+                android:id="@+id/view7"
+                android:layout_width="70dp"
+                android:layout_height="0.5sp"
+                android:layout_gravity="center_horizontal"
+                android:background="#cccccc" />
+
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:text="Activity"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/llActivitySheetReport"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+
+            android:background="#f2f2f2"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</LinearLayout>

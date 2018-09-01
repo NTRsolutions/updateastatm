@@ -1,0 +1,43 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:orientation="vertical">
+
+
+    <ListView
+        android:id="@+id/lvSiteAddress"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnSyncData"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1">
+
+    </ListView>
+
+    <!--<ImageView
+        android:id="@+id/btnSyncData"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10dp"
+        android:src="@drawable/upload_data"/>-->
+
+    <Button
+        android:id="@+id/btnSyncData"
+        android:layout_width="@dimen/_200dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/button_login"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/_10dp"
+        android:padding="10dp"
+        android:text="Send to NOC"
+        android:textColor="@color/white" />
+
+</LinearLayout>

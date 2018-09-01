@@ -1,0 +1,424 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/_5dp"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_3dp"
+            app:cardCornerRadius="@dimen/_6dp"
+            app:cardElevation="@dimen/_5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="@dimen/_6dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="@dimen/_5dp"
+                    android:text="Select Month"
+                    android:textSize="@dimen/_16dp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spMonth"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@drawable/custom_spinner"
+                    android:gravity="center"
+                    android:padding="@dimen/_5dp" />
+
+                <ImageView
+                    android:id="@+id/imgEmail"
+                    android:layout_width="@dimen/_45dp"
+                    android:layout_height="@dimen/_45dp"
+                    android:layout_margin="@dimen/_5dp"
+                    android:background="@drawable/ic_plane"
+                    android:padding="@dimen/_5dp" />
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_3dp"
+            app:cardCornerRadius="@dimen/_6dp"
+            app:cardElevation="@dimen/_5dp">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/material_blue_grey_900"
+                android:orientation="horizontal"
+                android:weightSum="10">
+
+                <TextView
+                    android:id="@+id/tvAdditionalBonus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:padding="@dimen/_5dp"
+                    android:text="Additional Bonus: 0"
+                    android:textAlignment="center"
+                    android:textColor="#ffffff"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAdditionalPenalty"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:padding="@dimen/_5dp"
+                    android:text="Additional Penalty: 0"
+                    android:textAlignment="center"
+                    android:textColor="#ffffff"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvGrandTotal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:padding="@dimen/_5dp"
+                    android:text="Grand Total: 0"
+                    android:textAlignment="center"
+                    android:textColor="#ffffff"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/imgRefresh"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="@dimen/_3dp"
+                    android:layout_weight="1"
+                    android:padding="@dimen/_3dp"
+                    android:src="@drawable/refresh_button" />
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_3dp"
+            app:cardCornerRadius="@dimen/_6dp"
+            app:cardElevation="@dimen/_8dp">
+
+            <HorizontalScrollView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/linearLayout1"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#015093">
+
+                        <TextView
+                            android:id="@+id/tvSNo"
+                            android:layout_width="60dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="S. No."
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvDate"
+                            android:layout_width="100dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="Date"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvSiteName"
+                            android:layout_width="200dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="Site Name"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvAttendance"
+                            android:layout_width="50dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="Attn."
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <!--<RelativeLayout
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end">
+
+                            <Button
+                                android:id="@+id/btnEmail"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="2dp"
+                                android:text="e-mail" />
+
+                            <TextView
+                                android:id="@+id/tvEmail"
+                                android:layout_width="fill_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/cell_shape"
+                                android:ellipsize="end"
+                                android:padding="5dp"
+                                android:text="Email"
+                                android:visibility="gone" />
+                        </RelativeLayout>-->
+
+                        <TextView
+                            android:id="@+id/tvDA"
+                            android:layout_width="70dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="DA"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvTA"
+                            android:layout_width="70dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="TA"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvHotel"
+                            android:layout_width="70dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="Hotel"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvBonus"
+                            android:layout_width="100dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="Bonus/Penalty"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvWaterCost"
+                            android:layout_width="100dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="Water Cost"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvOtherExp"
+                            android:layout_width="100dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="Other Exp."
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvTotal"
+                            android:layout_width="70dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="Total"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                    </LinearLayout>
+
+                    <ListView
+                        android:id="@+id/listview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/linearLayout1"
+                        android:layout_marginBottom="30dp"
+                        android:divider="@null" />
+
+                    <LinearLayout
+                        android:id="@+id/linearLayoutTotal"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:background="#015093">
+
+                        <TextView
+                            android:id="@+id/tvTotalText"
+                            android:layout_width="410dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="Total"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvDATotal"
+                            android:layout_width="70dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="3000"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvTATotal"
+                            android:layout_width="70dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="5000"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvHotelTotal"
+                            android:layout_width="70dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="@dimen/_5dp"
+                            android:singleLine="true"
+                            android:text="7000"
+                            android:textAlignment="center"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvBonusTotal"
+                            android:layout_width="100dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="5dp"
+                            android:singleLine="true"
+                            android:text="700"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvWaterCostTotal"
+                            android:layout_width="100dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="5dp"
+                            android:singleLine="true"
+                            android:text="1000"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvOtherExpTotal"
+                            android:layout_width="100dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="5dp"
+                            android:singleLine="true"
+                            android:text="800"
+                            android:textColor="#ffffff" />
+
+                        <TextView
+                            android:id="@+id/tvTotalTotal"
+                            android:layout_width="70dp"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/cell_shape"
+                            android:ellipsize="end"
+                            android:padding="5dp"
+                            android:singleLine="true"
+                            android:text="16000"
+                            android:textColor="#ffffff" />
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </HorizontalScrollView>
+
+
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+
+</RelativeLayout>
+

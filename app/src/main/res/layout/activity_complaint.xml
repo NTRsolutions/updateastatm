@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_home_fe"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/llHeader"
+        android:orientation="vertical"
+        android:padding="@dimen/_5dp">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/llHeader"
+                android:orientation="vertical">
+
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_10dp"
+                    android:layout_marginRight="@dimen/_5dp"
+                    android:layout_marginTop="@dimen/_8dp"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        app:counterOverflowTextAppearance="@style/CounterOverFlow"
+                        app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/etSiteName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:autoSizeTextType="uniform"
+                            android:hint="Enter Site Name"
+                            android:textSize="@dimen/_14dp" />
+                    </android.support.design.widget.TextInputLayout>
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_10dp"
+                    android:layout_marginRight="@dimen/_5dp"
+                    android:layout_marginTop="@dimen/_8dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            app:counterOverflowTextAppearance="@style/CounterOverFlow"
+                            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/etSiteId"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:autoSizeTextType="uniform"
+                                android:hint="Enter Site Id"
+                                android:textSize="@dimen/_14dp" />
+                        </android.support.design.widget.TextInputLayout>
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_8dp"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            app:counterOverflowTextAppearance="@style/CounterOverFlow"
+                            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                            <android.support.v7.widget.AppCompatEditText
+                                android:id="@+id/etClientName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:autoSizeTextType="uniform"
+                                android:hint="Enter Client Name"
+                                android:textSize="@dimen/_14dp" />
+                        </android.support.design.widget.TextInputLayout>
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_8dp"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            app:counterOverflowTextAppearance="@style/CounterOverFlow"
+                            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                            <android.support.v7.widget.AppCompatEditText
+                                android:id="@+id/etName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:autoSizeTextType="uniform"
+                                android:hint="Enter Name"
+                                android:textSize="@dimen/_14dp" />
+                        </android.support.design.widget.TextInputLayout>
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_8dp"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            app:counterOverflowTextAppearance="@style/CounterOverFlow"
+                            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                            <android.support.v7.widget.AppCompatEditText
+                                android:id="@+id/etMobileNum"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:autoSizeTextType="uniform"
+                                android:hint="Enter Mobile Number"
+                                android:textSize="@dimen/_14dp" />
+                        </android.support.design.widget.TextInputLayout>
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_8dp"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            app:counterOverflowTextAppearance="@style/CounterOverFlow"
+                            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                            <android.support.v7.widget.AppCompatEditText
+                                android:id="@+id/etEmail"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:autoSizeTextType="uniform"
+                                android:hint="Enter Email Id"
+                                android:textSize="@dimen/_14dp" />
+                        </android.support.design.widget.TextInputLayout>
+
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/_30dp"
+                        android:orientation="vertical"
+                        android:padding="@dimen/_4dp">
+
+                        <com.atm.ast.astatm.filepicker.FNTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="@dimen/_2dp"
+                            android:gravity="center_vertical"
+                            android:text="Complaint Type"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_14dp" />
+
+
+                        <Spinner
+                            android:id="@+id/spComplaintType"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:minHeight="@dimen/_32dp"
+                            android:popupBackground="@color/white" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_1dp"
+                            android:layout_marginRight="@dimen/_10dp"
+                            android:background="@color/backgroundColor" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/_30dp"
+                        android:orientation="vertical"
+                        android:padding="@dimen/_4dp">
+
+                        <com.atm.ast.astatm.filepicker.FNTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="@dimen/_2dp"
+                            android:gravity="center_vertical"
+                            android:text="Priority"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_14dp" />
+
+
+                        <Spinner
+                            android:id="@+id/spPriority"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:minHeight="@dimen/_32dp"
+                            android:popupBackground="@color/white" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_1dp"
+                            android:layout_marginRight="@dimen/_10dp"
+                            android:background="@color/backgroundColor" />
+
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/_30dp"
+                        android:orientation="vertical"
+                        android:padding="@dimen/_4dp">
+
+                        <com.atm.ast.astatm.filepicker.FNTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="@dimen/_2dp"
+                            android:gravity="center_vertical"
+                            android:text="Complaint Description"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_14dp" />
+
+
+                        <Spinner
+                            android:id="@+id/spComplainDescription"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:minHeight="@dimen/_32dp"
+                            android:popupBackground="@color/white" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_1dp"
+                            android:layout_marginRight="@dimen/_10dp"
+                            android:background="@color/backgroundColor" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llComplaintDescription"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_8dp"
+                        android:orientation="horizontal"
+                        android:visibility="visible"
+                        android:weightSum="2">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            app:counterOverflowTextAppearance="@style/CounterOverFlow"
+                            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                            <android.support.v7.widget.AppCompatEditText
+                                android:id="@+id/etComplaintDescriptionOthers"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:autoSizeTextType="uniform"
+                                android:hint="Complaint Description"
+                                android:textSize="@dimen/_14dp" />
+                        </android.support.design.widget.TextInputLayout>
+
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <CheckBox
+                    android:id="@+id/cbProposePlan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/_8dp"
+                    android:text="Propose Plan" />
+
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="@dimen/_230dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/_20dp"
+            android:background="@drawable/button_login"
+            android:gravity="center"
+            android:padding="@dimen/_8dp"
+            android:text="Submit"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+</LinearLayout>

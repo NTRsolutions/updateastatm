@@ -1,0 +1,866 @@
+package com.atm.ast.astatm.fragment;
+
+
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.atm.ast.astatm.R;
+import com.atm.ast.astatm.adapter.TodayPlanListAdapter;
+import com.atm.ast.astatm.adapter.UnsyncedTransitAdapter;
+import com.atm.ast.astatm.component.ASTProgressBar;
+import com.atm.ast.astatm.constants.Contants;
+import com.atm.ast.astatm.database.AtmDatabase;
+import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
+import com.atm.ast.astatm.framework.ServiceCaller;
+import com.atm.ast.astatm.model.SiteDisplayDataModel;
+import com.atm.ast.astatm.model.TransitDataModel;
+import com.atm.ast.astatm.model.newmodel.Data;
+import com.atm.ast.astatm.model.newmodel.ServiceContentData;
+import com.atm.ast.astatm.runtimepermission.PermissionUtils;
+import com.atm.ast.astatm.services.SyncTransitDataWithServer;
+import com.atm.ast.astatm.utils.ASTUIUtil;
+import com.atm.ast.astatm.utils.GPSTracker;
+import com.atm.ast.astatm.utils.SiteNotFoundPopup;
+import com.google.gson.Gson;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static android.content.Context.LOCATION_SERVICE;
+import static android.content.Context.MODE_PRIVATE;
+
+public class TransitFragment extends MainFragment {
+    FloatingActionButton btnSyncData;
+    TextView btnStartHome, btnReachedSite, btnLeftSite, btnReachedHome;
+    Button btnAddSiteData;
+    TextView tvSelectedSite, tvTestButton, tvRemainingDistance;
+    TextView tvCurrentDate;
+    String networkProvider;
+    String serviceURL;
+    public double lat = 0.0000, lon = 0.0000;
+    AtmDatabase atmDatabase;
+    ProgressDialog siteprogressbar;
+    ArrayList<Data> todayPlannedSiteArrayList;
+    SharedPreferences pref;
+    String userId, userRole, userAccess, r1;
+    String userName = "";
+    Location location;
+    String selectedButtonType = "";
+    String selectedSite;
+    public String TRANSIT_PREFERENCES = "TransitPrefs";
+    SharedPreferences transitsharedpreferences;
+    ArrayList<String> permissions = new ArrayList<>();
+    PermissionUtils permissionUtils;
+    private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 1;
+    private int REQUEST_CODE_GPS_PERMISSIONS = 2;
+
+    @Override
+    protected int fragmentLayout() {
+        return R.layout.activity_transit;
+    }
+
+    @Override
+    protected void loadView() {
+        btnStartHome = findViewById(R.id.btnStartHome);
+        btnReachedSite = findViewById(R.id.btnReachedSite);
+        btnLeftSite = findViewById(R.id.btnLeftSite);
+        btnReachedHome = findViewById(R.id.btnReachedHome);
+        btnAddSiteData = findViewById(R.id.btnAddSiteData);
+        btnSyncData = findViewById(R.id.btnSyncData);
+        tvSelectedSite = findViewById(R.id.tvSelectedSiteName);
+        tvRemainingDistance = findViewById(R.id.tvRemainingDistance);
+        tvRemainingDistance.setVisibility(View.GONE);
+        tvCurrentDate = findViewById(R.id.tvCurrentDate);
+
+    }
+
+    @Override
+    protected void setClickListeners() {
+        btnAddSiteData.setOnClickListener(this);
+        btnStartHome.setOnClickListener(this);
+        btnReachedSite.setOnClickListener(this);
+        btnLeftSite.setOnClickListener(this);
+        btnReachedHome.setOnClickListener(this);
+        btnAddSiteData.setOnClickListener(this);
+    }
+
+    @Override
+    protected void setAccessibility() {
+
+    }
+
+    @Override
+    protected void dataToView() {
+        getUserInfo();
+        String appversionName = ASTUIUtil.getAppVersionName(getContext());
+        if (appversionName != null) {
+            String formattedDate = ASTUIUtil.getCurrentDate();
+            tvCurrentDate.setText(formattedDate + " : " + appversionName);
+        }
+        atmDatabase = new AtmDatabase(getContext());
+        todayPlannedSiteArrayList = new ArrayList<>();
+        Intent intentService = new Intent(getContext(), SyncTransitDataWithServer.class);
+        //startService(intentService);
+        deletePreviousDateSiteFromDB();
+    }
+
+
+    //if previous date site exist in Db then it will delete
+
+    private void deletePreviousDateSiteFromDB() {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date();
+        String currentDateStr = formatter.format(date);
+        String preDateStr = ASTUIUtil.getCurrentDateFromPre(getContext());
+        if (preDateStr != null && !preDateStr.equals("")) {
+            try {
+                Date currentDate = formatter.parse(currentDateStr);
+                Date preDate = formatter.parse(preDateStr);
+                if (currentDate.after(preDate)) {
+                    // ASTUIUtil.showToast( "Pre Date " + preDateStr + "----current Date " + currentDateStr);
+                    atmDatabase.deleteAllRows("todaySitePlan");//delete previous date all site
+                    ASTUIUtil.saveCurrentDateToPre(currentDateStr, getContext());
+                }
+            } catch (ParseException e) {
+                //e.printStackTrace();
+            }
+        } else {
+            ASTUIUtil.saveCurrentDateToPre(currentDateStr, getContext());
+        }
+    }
+
+    //get user info from share
+    private void getUserInfo() {
+        pref = getContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+        userId = pref.getString("userId", "");
+        userName = pref.getString("userName", "");
+
+        transitsharedpreferences = getContext().getSharedPreferences(TRANSIT_PREFERENCES, MODE_PRIVATE);
+        final String selectedButton = transitsharedpreferences.getString("SELECTED_BUTTON", "");
+        selectedSite = transitsharedpreferences.getString("SITE_NAME", "");
+        if (!selectedSite.equals("")) {
+            //tvSelectedSite.setVisibility(View.VISIBLE);
+            //tvRemainingDistance.setVisibility(View.VISIBLE);
+            tvSelectedSite.setText(selectedSite + "(" + transitsharedpreferences.getString("SITE_ID", "") + ")");
+            tvRemainingDistance.setText("Distance From Site - 10 KM");
+        }
+       /* SharedPreferences.Editor editor = transitsharedpreferences.edit();
+        editor.putString("SELECTED_BUTTON", "");
+        editor.commit();*/
+        selectedButtonType = selectedButton;
+        //getTodayPlannedActivityData();
+
+        selectedButton();
+    }
+
+    //open site popup to show plan site data
+    public void getSiteIdPopup() {
+        Dialog siteIdPopupDialog = new Dialog(getContext());
+        siteIdPopupDialog.setContentView(R.layout.select_site_popup);
+        siteIdPopupDialog.setTitle("Select Site");
+        siteIdPopupDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        siteIdPopupDialog.setCanceledOnTouchOutside(false);
+        ListView lvPlannedActivities = (ListView) siteIdPopupDialog.findViewById(R.id.lvPlannedActivities);
+        TextView tvTitlePlannedActivity = (TextView) siteIdPopupDialog.findViewById(R.id.tvTitlePlannedActivity);
+        ImageView imgRefresh = (ImageView) siteIdPopupDialog.findViewById(R.id.imgRefresh);
+        TextView noSiteFound = (TextView) siteIdPopupDialog.findViewById(R.id.noSiteFound);
+        todayPlannedSiteArrayList = atmDatabase.getAllTodaySiteListData();
+        siteIdPopupDialog.show();
+        if (todayPlannedSiteArrayList != null && todayPlannedSiteArrayList.size() > 0) {
+            noSiteFound.setVisibility(View.GONE);
+            lvPlannedActivities.setVisibility(View.VISIBLE);
+            lvPlannedActivities.setAdapter(new TodayPlanListAdapter(getContext(), todayPlannedSiteArrayList));
+            tvTitlePlannedActivity.setVisibility(View.VISIBLE);
+        } else {
+            noSiteFound.setVisibility(View.VISIBLE);
+            lvPlannedActivities.setVisibility(View.GONE);
+            siteIdPopupDialog.dismiss();
+            SiteNotFoundPopup siteNotFoundPopup = new SiteNotFoundPopup();
+            PopupWindow siteNotFoundPopupWindow = new PopupWindow(getContext());
+            ASTUIUtil.showToast("Site ID not found. please Contact NOC");
+            siteNotFoundPopup.getSitePopup(siteNotFoundPopupWindow, getContext(), "Enter Site Id for sending message to NOC.", "Send", userId, "SMS", userName);
+
+        }
+        lvPlannedActivities.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                if (todayPlannedSiteArrayList != null && todayPlannedSiteArrayList.size() > 0) {
+                    String siteId = todayPlannedSiteArrayList.get(position).getSiteId() + "";
+                    SharedPreferences.Editor editor = transitsharedpreferences.edit();
+                    editor.putString("SITE_NAME", todayPlannedSiteArrayList.get(position).getSiteName());
+                    editor.putString("SITE_ID", siteId);
+                    editor.putString("SITE_NUM_ID", siteId);
+                    editor.commit();
+
+                    tvSelectedSite.setText(todayPlannedSiteArrayList.get(position).getSiteName());
+                    String transitAddress = "Unable to connect";
+                    transitAddress = getAddressThroughLatLong(lat, lon, "short");
+                    if (!siteId.equals("") && selectedButtonType.equals("1")) {
+                        getLocation();
+                        saveTransitDataIntoDB(transitAddress, siteId, "0", "0", "0", "0", "NA", "0", "0");
+                        editor.putString("SOURCE_LAT", String.valueOf(lat));
+                        editor.putString("SOURCE_LONG", String.valueOf(lon));
+                        editor.putString("DESTINATION_LAT", "");
+                        editor.putString("DESTINATION_LONG", "");
+                        editor.commit();
+                    } else {
+                        selectedButtonType = "1";//whene ever change site done
+                    }
+                    selectedButton();
+                }
+                siteIdPopupDialog.dismiss();
+            }
+        });
+
+        imgRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                siteIdPopupDialog.dismiss();
+                getTodayPlannedActivityData();
+            }
+        });
+
+    }
+
+    //save transit data into DB
+    private void saveTransitDataIntoDB(String transitAddress, String siteId, String totalTravelCost, String totalDistance, String strActualKms, String strActualTravelCost, String strRemarks, String strHotelExp, String strActualHotelExp) {
+        SharedPreferences.Editor editor = transitsharedpreferences.edit();
+        ArrayList<TransitDataModel> arrTransitData = new ArrayList<>();
+        TransitDataModel transitDataModel = new TransitDataModel();
+        transitDataModel.setSiteId(siteId);
+        transitDataModel.setUserId(userId);
+        transitDataModel.setDateTime(String.valueOf(System.currentTimeMillis()));
+        transitDataModel.setType(selectedButtonType);
+        transitDataModel.setLatitude(String.valueOf(lat));
+        transitDataModel.setLongitude(String.valueOf(lon));
+        transitDataModel.setCalculatedAmount(totalTravelCost);
+        transitDataModel.setCalcilatedDistance(totalDistance);
+        transitDataModel.setAddress(transitAddress + " - " + networkProvider);
+        transitDataModel.setActualKms(strActualKms);
+        transitDataModel.setActualAmt(strActualTravelCost);
+        transitDataModel.setRemarks(strRemarks);
+        transitDataModel.setHotelExpense(strHotelExp);
+        transitDataModel.setActualHotelExpense(strActualHotelExp);
+
+        arrTransitData.add(transitDataModel);
+        atmDatabase.addTransitData(arrTransitData);//save in data base
+
+        if (selectedButtonType.equals("4")) {
+            atmDatabase.updateTodaySiteTransitComplete(1, siteId);//update today planed site status so that it will show only uncomplete site
+        }
+        ASTUIUtil.showToast("Your Transit is saved");
+    }
+
+    //open Travel Expense Popup and set expense related data
+    public void generateTravelExpensePopup(String buttonClick) throws IOException {
+        Dialog travelClaimDialog = new Dialog(getContext());
+        travelClaimDialog.setContentView(R.layout.travel_expense_form_popup);
+        travelClaimDialog.setTitle("Travel Allowance");
+        travelClaimDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        travelClaimDialog.setCanceledOnTouchOutside(false);
+        Button btnSubmit, btnChangeSite;
+        final TextView tvTotalDistance, tvFromCity, tvTotalTravelCost, tvBaseToSiteDistance;
+        final EditText etActualTravelCost, etActualDistance, etRemarks, etActualKms, etHotelExp, etActualHotelExp;
+        ImageView btnQue;
+        final LinearLayout llHotelExp, llActualHotelExp;
+        final CheckBox chkHotelExpense;
+        final LinearLayout llHotelExpChkBox, llBaseToSiteDistance;
+        ImageView btnHotelExpRateChart;
+        btnSubmit = (Button) travelClaimDialog.findViewById(R.id.btnSubmit);
+        btnChangeSite = (Button) travelClaimDialog.findViewById(R.id.btnChangeSite);
+        tvTotalDistance = (TextView) travelClaimDialog.findViewById(R.id.tvTotalDistance);
+        tvFromCity = (TextView) travelClaimDialog.findViewById(R.id.tvFromCity);
+        tvTotalTravelCost = (TextView) travelClaimDialog.findViewById(R.id.tvTotalTravelCost);
+        tvBaseToSiteDistance = (TextView) travelClaimDialog.findViewById(R.id.tvBaseToSiteDistance);
+        etActualTravelCost = (EditText) travelClaimDialog.findViewById(R.id.etActualTravelCost);
+        etActualDistance = (EditText) travelClaimDialog.findViewById(R.id.etActualKms);
+        etRemarks = (EditText) travelClaimDialog.findViewById(R.id.etRemarks);
+        etActualKms = (EditText) travelClaimDialog.findViewById(R.id.etActualKms);
+        etHotelExp = (EditText) travelClaimDialog.findViewById(R.id.etHotelExp);
+        etActualHotelExp = (EditText) travelClaimDialog.findViewById(R.id.etActualHotelExp);
+        btnHotelExpRateChart = (ImageView) travelClaimDialog.findViewById(R.id.btnHotelExpRateChart);
+        llBaseToSiteDistance = (LinearLayout) travelClaimDialog.findViewById(R.id.llBaseToSiteDistance);
+        llHotelExpChkBox = (LinearLayout) travelClaimDialog.findViewById(R.id.llHotelExpChkBox);
+        llHotelExp = (LinearLayout) travelClaimDialog.findViewById(R.id.llHotelExp);
+        llActualHotelExp = (LinearLayout) travelClaimDialog.findViewById(R.id.llActualHotelExp);
+        chkHotelExpense = (CheckBox) travelClaimDialog.findViewById(R.id.chkHotelExpense);
+
+        btnHotelExpRateChart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    generateHotelExpenseRateChartPopup();
+                } catch (IOException e) {
+                    // e.printStackTrace();
+                }
+            }
+        });
+        btnChangeSite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSiteIdPopup();//open site popup
+                travelClaimDialog.dismiss();
+            }
+        });
+        //for button reached home
+        if (buttonClick.equals("ReachedHome")) {
+            btnChangeSite.setVisibility(View.GONE);//show only in reached site
+            llHotelExpChkBox.setVisibility(View.VISIBLE);
+            //tvBaseToSiteDistance.setVisibility(View.VISIBLE);
+            String siteId = transitsharedpreferences.getString("SITE_NUM_ID", "");
+
+            if (siteId != null && !siteId.equals("")) {
+                SharedPreferences.Editor editor = transitsharedpreferences.edit();
+                SiteDisplayDataModel siteData = atmDatabase.getSiteSearchDataBySiteId(siteId);
+                if (siteData != null) {
+                    editor.putString("SITE_BASE_DISTANCE", siteData.getBaseDistance());
+                } else {
+                    editor.putString("SITE_BASE_DISTANCE", "0");
+                }
+                editor.commit();
+            }
+        } else {
+            btnChangeSite.setVisibility(View.VISIBLE);//show only in reached site
+        }
+        tvBaseToSiteDistance.setText(transitsharedpreferences.getString("SITE_BASE_DISTANCE", ""));
+        chkHotelExpense.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (chkHotelExpense.isChecked()) {
+                    llHotelExp.setVisibility(View.VISIBLE);
+                    llActualHotelExp.setVisibility(View.VISIBLE);
+                    llBaseToSiteDistance.setVisibility(View.GONE);
+                } else {
+                    llHotelExp.setVisibility(View.GONE);
+                    llActualHotelExp.setVisibility(View.GONE);
+                    llBaseToSiteDistance.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        btnQue = (ImageView) travelClaimDialog.findViewById(R.id.btnQue);
+
+        btnQue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    generateTravelExpenseRateChartPopup();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        String currentAddress = "Unable to connect";
+        currentAddress = getAddressThroughLatLong(lat, lon, "short");
+
+        String finalFullAddress;
+        if (currentAddress.equalsIgnoreCase("Unable to connect")) {
+            finalFullAddress = "Unable to connect";
+        } else {
+            finalFullAddress = getAddressThroughLatLong(Double.parseDouble(transitsharedpreferences.getString("SOURCE_LAT", "")), Double.parseDouble(transitsharedpreferences.getString("SOURCE_LONG", "")), "");
+        }
+        setSourceAndDestinationAddress(currentAddress, tvTotalDistance, tvTotalTravelCost, tvFromCity);
+
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+                                         @Override
+                                         public void onClick(View v) {
+                                             String strHotelExp = etHotelExp.getText().toString();
+                                             String strActualHotelExp = etActualHotelExp.getText().toString();
+                                             String strActualTravelCost = etActualTravelCost.getText().toString();
+                                             String strActualKms = etActualKms.getText().toString();
+                                             String strRemarks = "NA";
+                                             strRemarks = etRemarks.getText().toString();
+                                             if (strActualKms.equals("")) {
+                                                 ASTUIUtil.showToast("Please Provide Actual KMs");
+                                             } else if (strActualTravelCost.equals("")) {
+                                                 ASTUIUtil.showToast("Please Provide Actual Travel Cost");
+                                             } else {
+                                                 if (etRemarks.equals("")) {
+                                                     strRemarks = "NA";
+                                                 }
+                                                 if (strActualKms.equals("")) {
+                                                     strActualKms = "0";
+                                                 }
+                                                 if (strHotelExp.equals("") || selectedButtonType.equals("2")) {
+                                                     strHotelExp = "0";
+                                                 }
+                                                 if (strActualHotelExp.equals("")) {
+                                                     strActualHotelExp = "0";
+                                                 }
+                                                 getLocation();
+                                                 String siteId = transitsharedpreferences.getString("SITE_NUM_ID", "");
+                                                 if (buttonClick.equals("ReachedSite")) {
+                                                     selectedButtonType = "2";
+                                                 }
+                                                 if (buttonClick.equals("ReachedHome")) {
+                                                     selectedButtonType = "4";
+                                                     SharedPreferences.Editor editor = transitsharedpreferences.edit();
+                                                     editor.putString("SITE_NAME", "");
+                                                     editor.putString("SITE_ID", "");
+                                                     editor.putString("SITE_NUM_ID", "");
+                                                     editor.putString("SOURCE_LAT", "");
+                                                     editor.putString("SOURCE_LONG", "");
+                                                     editor.putString("DESTINATION_LAT", "");
+                                                     editor.putString("DESTINATION_LONG", "");
+                                                     editor.putString("SELECTED_BUTTON", "");//for restart transit
+                                                     editor.commit();
+
+                                                     //      Intent intentReload = new Intent(getContext(), NewTransitActivity.class);
+                                                     //startActivity(intentReload);
+                                                     reloadBackScreen();
+                                                 }
+                                                 String totalDistance = tvTotalDistance.getText().toString();
+                                                 saveTransitDataIntoDB(finalFullAddress, siteId, tvTotalTravelCost.getText().toString(), totalDistance.substring(0, totalDistance.length() - 4), strActualKms, strActualTravelCost, strRemarks, strHotelExp, strActualHotelExp);
+                                                 travelClaimDialog.dismiss();
+                                                 selectedButton();
+                                             }
+                                         }
+                                     }
+        );
+        travelClaimDialog.show();
+    }
+
+    //set Source And Destination Address in UI
+    private void setSourceAndDestinationAddress(String currentAddress, TextView tvTotalDistance, TextView tvTotalTravelCost, TextView tvFromCity) {
+        String destinationLocationLat = transitsharedpreferences.getString("DESTINATION_LAT", "");
+        String destinationLocationLon = transitsharedpreferences.getString("DESTINATION_LONG", "");
+        String sourceLocationLat = transitsharedpreferences.getString("SOURCE_LAT", "");
+        String sourceLocationLon = transitsharedpreferences.getString("SOURCE_LONG", "");
+
+        double distance = 0;
+        distance = ASTUIUtil.getDistance(Double.parseDouble(sourceLocationLat), Double.parseDouble(sourceLocationLon),
+                Double.parseDouble(destinationLocationLat), Double.parseDouble(destinationLocationLon), "K");
+
+        String sourceAddress = "";
+        if (currentAddress.equalsIgnoreCase("Unable to connect")) {
+            sourceAddress = "Unable to connect";
+        } else {
+            sourceAddress = getAddressThroughLatLong(Double.parseDouble(sourceLocationLat), Double.parseDouble(sourceLocationLon), "locality");
+        }
+
+        String destinationAddress = "";
+        if (currentAddress.equalsIgnoreCase("Unable to connect")) {
+            destinationAddress = "Unable to connect";
+        } else {
+            destinationAddress = getAddressThroughLatLong(Double.parseDouble(destinationLocationLat), Double.parseDouble(destinationLocationLon), "locality");
+        }
+
+        tvTotalDistance.setText(String.valueOf((int) distance) + " Kms");
+        double perKmCost = 0;
+
+        if (distance <= 25) {
+            perKmCost = 2;
+        } else if (distance > 25 && distance <= 50) {
+            perKmCost = 1.75;
+        } else if (distance > 50 && distance <= 100) {
+            perKmCost = 1.5;
+        } else if (distance > 100 && distance <= 150) {
+            perKmCost = 1.25;
+        } else if (distance > 150) {
+            perKmCost = 1.25;
+        }
+
+        /*tvTotalTravelCost.setText(String.valueOf((int) distance * 2));*/
+        tvTotalTravelCost.setText(String.valueOf(perKmCost * distance));
+        tvFromCity.setText(sourceAddress + " - " + destinationAddress);
+
+    }
+
+    //open hotel expense rate chart popup to show hotel expense related data
+    public void generateHotelExpenseRateChartPopup() throws IOException {
+        Dialog hotelClaimRateChartDialog = new Dialog(getContext());
+        hotelClaimRateChartDialog.setContentView(R.layout.hotel_allowance_rate_chart);
+        hotelClaimRateChartDialog.setTitle("Hotel Expense Chart");
+        hotelClaimRateChartDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        hotelClaimRateChartDialog.setCanceledOnTouchOutside(false);
+
+        Button btnClose;
+        btnClose = (Button) hotelClaimRateChartDialog.findViewById(R.id.btnClose);
+
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hotelClaimRateChartDialog.dismiss();
+            }
+        });
+
+        hotelClaimRateChartDialog.show();
+    }
+
+    public void generateTravelExpenseRateChartPopup() throws IOException {
+        Dialog travelClaimRateChartDialog = new Dialog(getContext());
+        travelClaimRateChartDialog.setContentView(R.layout.travel_allowance_rate_chart);
+        travelClaimRateChartDialog.setTitle("TA Rate Chart");
+        travelClaimRateChartDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        travelClaimRateChartDialog.setCanceledOnTouchOutside(false);
+
+        Button btnClose;
+        btnClose = (Button) travelClaimRateChartDialog.findViewById(R.id.btnClose);
+
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                travelClaimRateChartDialog.dismiss();
+            }
+        });
+
+        travelClaimRateChartDialog.show();
+    }
+
+    //get current location
+    public void getLocation() {
+        GPSTracker gpsTracker = new GPSTracker(getContext());
+        location = gpsTracker.getLocation();
+
+        if (location == null) {
+            //Toast.makeText(TransitActivity.this, "Location Not Available");
+        } else {
+            lat = location.getLatitude();
+            lon = location.getLongitude();
+            networkProvider = location.getProvider();
+        }
+    }
+
+    //check destination Location save or not if saved then save source location as destination location and current location as sourse location. otherwise save current location as destination location
+    private void checkAndSaveSourceAndDestinationLocation() {
+        final String destinationLocationLat = transitsharedpreferences.getString("DESTINATION_LAT", "");
+        final String destinationLocationLon = transitsharedpreferences.getString("DESTINATION_LONG", "");
+        if (destinationLocationLat.equals("")) {
+            SharedPreferences.Editor editor = transitsharedpreferences.edit();
+            editor.putString("DESTINATION_LAT", String.valueOf(lat));
+            editor.putString("DESTINATION_LONG", String.valueOf(lon));
+            editor.commit();
+        } else {
+            SharedPreferences.Editor editor = transitsharedpreferences.edit();
+            editor.putString("SOURCE_LAT", transitsharedpreferences.getString("DESTINATION_LAT", ""));
+            editor.putString("SOURCE_LONG", transitsharedpreferences.getString("DESTINATION_LONG", ""));
+            editor.putString("DESTINATION_LAT", String.valueOf(lat));
+            editor.putString("DESTINATION_LONG", String.valueOf(lon));
+            editor.putString("SITE_BASE_DISTANCE", "0");
+            editor.commit();
+        }
+    }
+
+    // left site button click and save all info into DB
+    public void LeftSiteAlertMessage() {
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        checkAndSaveSourceAndDestinationLocation();
+                        String transitAddress = getAddressThroughLatLong(lat, lon, "short");
+                        String siteNumId = transitsharedpreferences.getString("SITE_NUM_ID", "");
+                        if (siteNumId.equals("") || siteNumId.equals(null)) {
+                            ASTUIUtil.showToast("Please Select a Site");
+                        } else {
+                            selectedButtonType = "3";
+                            saveTransitDataIntoDB(transitAddress, siteNumId, "0", "0", "0", "0", "NA", "0", "0");
+                            selectedButton();
+                        }
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage("Are you sure You Want to Submit?")
+                .setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+    }
+
+    //get address through lat long
+    private String getAddressThroughLatLong(double lat, double lon, String addresType) {
+        Location locationTransit = new Location("");
+        locationTransit.setLatitude(lat);
+        locationTransit.setLongitude(lon);
+        String address = "NA";
+        try {
+            address = ASTUIUtil.getLocationAddress(locationTransit, getContext(), addresType);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return address;
+    }
+
+    //show unsynced transit data which is store in DB
+    public void showUnsyncedTransitDataList(List<TransitDataModel> transitDataArrayList) {
+        Dialog unsyncedDialog = new Dialog(getContext());
+        unsyncedDialog.setContentView(R.layout.activity_transit_entries);
+        unsyncedDialog.setTitle("Unsynced Transit Entries");
+        unsyncedDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        unsyncedDialog.setCanceledOnTouchOutside(false);
+        ListView lvTransit = (ListView) unsyncedDialog.findViewById(R.id.lvTransit);
+        Button btnSyncData = (Button) unsyncedDialog.findViewById(R.id.btnSyncData);
+        lvTransit.setAdapter(new UnsyncedTransitAdapter(getContext(),
+                transitDataArrayList));
+        btnSyncData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentService = new Intent(getContext(), SyncTransitDataWithServer.class);
+                //startService(intentService);
+                unsyncedDialog.dismiss();
+                ASTUIUtil.showToast("Syncing with server.");
+            }
+        });
+        unsyncedDialog.show();
+    }
+
+    //show button which is selected
+    private void selectedButton() {
+        SharedPreferences.Editor editor = transitsharedpreferences.edit();
+
+        switch (selectedButtonType) {
+            case "1":
+                btnStartHome.setBackgroundColor(Color.parseColor("#FFA500"));
+                btnReachedSite.setBackgroundColor(Color.parseColor("#666699"));
+                btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
+                btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
+
+                editor.putString("SELECTED_BUTTON", "1");
+                editor.commit();
+
+                btnReachedHome.setEnabled(false);
+                btnReachedSite.setEnabled(true);
+                btnLeftSite.setEnabled(false);
+                btnStartHome.setEnabled(false);
+                break;
+            case "2":
+                btnStartHome.setBackgroundColor(Color.parseColor("#FFA500"));
+                btnReachedSite.setBackgroundColor(Color.parseColor("#078f4b"));
+                btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
+                btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
+
+                editor.putString("SELECTED_BUTTON", "2");
+                editor.commit();
+                btnReachedHome.setEnabled(false);
+                btnReachedSite.setEnabled(false);
+                btnLeftSite.setEnabled(true);
+                btnStartHome.setEnabled(false);
+
+                break;
+            case "3":
+                btnStartHome.setBackgroundColor(Color.parseColor("#FFA500"));
+                btnReachedSite.setBackgroundColor(Color.parseColor("#078f4b"));
+                btnLeftSite.setBackgroundColor(Color.parseColor("#1E90FF"));
+                btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
+
+                editor.putString("SELECTED_BUTTON", "3");
+                editor.commit();
+
+                btnReachedHome.setEnabled(true);
+                btnReachedSite.setEnabled(true);
+                btnLeftSite.setEnabled(false);
+                btnStartHome.setEnabled(false);
+
+                break;
+            case "4":
+                btnStartHome.setBackgroundColor(Color.parseColor("#FFA500"));
+                btnReachedSite.setBackgroundColor(Color.parseColor("#078f4b"));
+                btnLeftSite.setBackgroundColor(Color.parseColor("#1E90FF"));
+                btnReachedHome.setBackgroundColor(Color.parseColor("#FF4500"));
+                btnReachedHome.setEnabled(false);
+                btnReachedSite.setEnabled(false);
+                btnLeftSite.setEnabled(false);
+                btnStartHome.setEnabled(true);
+
+                //editor.putString("SELECTED_BUTTON", "4");
+                //editor.commit();
+                break;
+            default:
+                btnStartHome.setBackgroundColor(Color.parseColor("#666699"));
+                btnReachedSite.setBackgroundColor(Color.parseColor("#666699"));
+                btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
+                btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
+                btnReachedSite.setEnabled(false);
+                btnLeftSite.setEnabled(false);
+                btnReachedHome.setEnabled(false);
+                btnStartHome.setEnabled(true);
+                break;
+        }
+    }
+
+    /*
+     *
+     * Calling Web Service Today Planned ActivityData
+     */
+    private void getTodayPlannedActivityData() {
+        ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
+        _progrssBar.show();
+        ServiceCaller serviceCaller = new ServiceCaller(getContext());
+        String serviceURL = "";
+        serviceURL = Contants.BASE_URL + Contants.TODAY_PLAN_LIST_URL;
+        serviceURL += "&uid=" + userId + "&lat=" + lat + "&lon=" + lon;
+        serviceCaller.CallCommanServiceMethod(serviceURL, "getTodayPlannedActivityData", new IAsyncWorkCompletedCallback() {
+            @Override
+            public void onDone(String result, boolean isComplete) {
+                if (isComplete) {
+                    parseandsaveTodayPlannedActivityData(result);
+                } else {
+                    ASTUIUtil.showToast("Data Not Avilable");
+                }
+                _progrssBar.dismiss();
+            }
+        });
+    }
+
+
+    /*
+     *
+     * Parse and Save TodayPlannedActivityData
+     */
+
+    public void parseandsaveTodayPlannedActivityData(String result) {
+        if (result != null) {
+            ServiceContentData contentData = new Gson().fromJson(result, ServiceContentData.class);
+            if (contentData != null) {
+                if (contentData.getStatus() == 2) {
+                    if (contentData.getData() != null) {
+                        for (Data data : contentData.getData()) {
+                            atmDatabase.upsertTodaySitePlanData(data);
+                        }
+                    }
+
+                }
+
+            }
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // redirects to utils
+        permissionUtils.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+
+    private void buildAlertMessageNoGps() {
+        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), REQUEST_CODE_GPS_PERMISSIONS);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                        checkGpsEnable();
+                    }
+                });
+        final android.app.AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    //    check gps enable in device or not
+    private void checkGpsEnable() {
+        try {
+            boolean isGPSEnabled = false;
+            boolean isNetworkEnabled = false;
+            final LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
+            // getting GPS status
+            isGPSEnabled = locationManager
+                    .isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+            // getting network status
+            isNetworkEnabled = locationManager
+                    .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+            if (!isGPSEnabled && !isNetworkEnabled) {
+                buildAlertMessageNoGps();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.btnAddSiteData) {
+            //  FillSiteAddressFragment fillSiteAddressFragment = new FillSiteAddressFragment();
+            //  Bundle bundle = new Bundle();
+            //  bundle.putString("headerTxt", "Fill Site Data");
+            // bundle.putBoolean("showMenuButton", false);
+            //  getHostActivity().updateFragment(fillSiteAddressFragment, bundle);
+        } else if (view.getId() == R.id.btnStartHome) {
+            if (ASTUIUtil.checkGpsEnabled(getContext())) {
+                selectedButtonType = "1";
+                getSiteIdPopup();//open site popup
+            }
+        } else if (view.getId() == R.id.btnStartHome) {
+            if (ASTUIUtil.checkGpsEnabled(getContext())) {
+                getLocation();
+                checkAndSaveSourceAndDestinationLocation();
+                try {
+                    generateTravelExpensePopup("ReachedSite");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (view.getId() == R.id.btnLeftSite) {
+            getLocation();
+            LeftSiteAlertMessage();
+        } else if (view.getId() == R.id.btnReachedHome) {
+            if (ASTUIUtil.checkGpsEnabled(getContext())) {
+                getLocation();
+                String siteId = transitsharedpreferences.getString("SITE_NUM_ID", "");
+                if (siteId == null || siteId.equals("")) {
+                    ASTUIUtil.showToast("Please Press Reached Site first.");
+                } else {
+                    checkAndSaveSourceAndDestinationLocation();
+                    try {
+                        generateTravelExpensePopup("ReachedHome");
+                    } catch (IOException e) {
+                        // e.printStackTrace();
+                    }
+                    selectedButton();
+                }
+            }
+        } else if (view.getId() == R.id.btnSyncData) {
+            List<TransitDataModel> transitDataArrayList = atmDatabase.getTransitData("1");
+            if (transitDataArrayList != null && transitDataArrayList.size() > 0) {
+                showUnsyncedTransitDataList(transitDataArrayList);//synce save data
+            } else {
+                //  btnSyncData.setVisibility(View.GONE);
+                ASTUIUtil.showToast("No Pending Entries");
+            }
+        }
+    }
+}

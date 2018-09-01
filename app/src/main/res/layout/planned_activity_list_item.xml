@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/rlTransparent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/transparent_background"
+        android:visibility="gone">
+
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:orientation="horizontal"
+        android:paddingBottom="2dp"
+        android:weightSum="20">
+
+        <LinearLayout
+
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_margin="1dp"
+            android:layout_weight="19"
+            android:background="@drawable/shape"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="21">
+
+                <TextView
+                    android:id="@+id/tvSiteName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="10"
+                    android:padding="1dp"
+                    android:singleLine="true"
+                    android:text="BIHAR"
+                    android:textColor="#000000"
+                    android:textSize="12dp" />
+
+                <TextView
+                    android:id="@+id/tvSiteId"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="10"
+                    android:padding="1dp"
+                    android:singleLine="true"
+                    android:text="SNM3992"
+                    android:textColor="#000000"
+                    android:textSize="12dp" />
+
+                <ImageView
+                    android:id="@+id/imgCancelPlan"
+                    android:layout_width="0dp"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="top"
+                    android:layout_weight="1"
+                    android:src="@drawable/delete" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="21">
+
+                <TextView
+                    android:id="@+id/tvPlannedDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="10"
+                    android:padding="1dp"
+                    android:singleLine="true"
+                    android:text="05/11/2015"
+                    android:textColor="#000000"
+                    android:textSize="12dp" />
+
+                <TextView
+                    android:id="@+id/tvPlannedActivity"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_weight="10"
+                    android:padding="1dp"
+                    android:singleLine="true"
+                    android:text="Activity"
+                    android:textColor="#000000"
+                    android:textSize="12dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llPlannedListItem"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_weight="1"
+            android:background="#FFFF00"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+        <!--<ImageView
+            android:layout_width="30dp"
+            android:layout_height="fill_parent"
+            android:src="@drawable/current_activity_date_alert"
+            android:layout_alignParentRight="true" />
+    -->
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imgDisabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:paddingBottom="2dp"
+        android:visibility="gone"
+        android:src="@drawable/disabled_background" />
+
+</RelativeLayout>

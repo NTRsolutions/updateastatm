@@ -1,0 +1,278 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvCurrentDate"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:background="#078f4b"
+        android:gravity="right"
+        android:padding="2dp"
+        android:text=""
+        android:textColor="#ffffff"
+        android:textSize="12sp" />
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvCurrentDate"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10dp"
+                android:orientation="horizontal">
+
+                <AutoCompleteTextView
+                    android:id="@+id/tvSiteId"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/_3dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/edittext_center_bg"
+                    android:hint="Site Id"
+                    android:padding="@dimen/_10dp" />
+
+                <ImageView
+                    android:id="@+id/imgRefresh"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_margin="@dimen/_15dp"
+                    android:src="@drawable/refresh_button" />
+
+            </LinearLayout>
+
+            <AutoCompleteTextView
+                android:id="@+id/tvSiteName"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_5dp"
+                android:layout_marginRight="@dimen/_5dp"
+                android:layout_marginTop="@dimen/_10dp"
+                android:background="@drawable/edittext_center_bg"
+                android:hint="Site Name"
+                android:padding="@dimen/_10dp" />
+
+            <Spinner
+                android:id="@+id/spTask"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="@dimen/_5dp"
+                android:layout_marginRight="@dimen/_5dp"
+                android:layout_marginTop="@dimen/_15dp"
+                android:background="@drawable/custom_spinner"
+                android:padding="@dimen/_5dp">
+
+            </Spinner>
+
+            <Spinner
+                android:id="@+id/spActivities"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="@dimen/_5dp"
+                android:layout_marginRight="@dimen/_5dp"
+                android:layout_marginTop="@dimen/_15dp"
+                android:background="@drawable/custom_spinner"
+                android:padding="@dimen/_5dp">
+
+            </Spinner>
+
+
+            <Spinner
+                android:id="@+id/spZone"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginTop="@dimen/_15dp"
+                android:layout_marginLeft="@dimen/_5dp"
+                android:layout_marginRight="@dimen/_5dp"
+                android:background="@drawable/custom_spinner"
+                android:padding="@dimen/_5dp">
+
+            </Spinner>
+
+            <Spinner
+                android:id="@+id/spNOC"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="@dimen/_5dp"
+                android:layout_marginRight="@dimen/_5dp"
+                android:layout_marginTop="@dimen/_15dp"
+                android:background="@drawable/custom_spinner"
+                android:padding="@dimen/_5dp">
+
+            </Spinner>
+
+            <Spinner
+                android:id="@+id/spStatus"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="@dimen/_5dp"
+                android:layout_marginRight="@dimen/_5dp"
+                android:layout_marginTop="@dimen/_15dp"
+                android:background="@drawable/custom_spinner"
+                android:padding="@dimen/_5dp">
+
+            </Spinner>
+
+            <Spinner
+                android:id="@+id/spReason"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="@dimen/_5dp"
+                android:layout_marginRight="@dimen/_5dp"
+                android:layout_marginTop="@dimen/_15dp"
+                android:background="@drawable/custom_spinner"
+                android:padding="@dimen/_5dp">
+
+            </Spinner>
+
+            <Spinner
+                android:id="@+id/spMaterialStatus"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/_5dp"
+                android:layout_marginRight="@dimen/_5dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginTop="@dimen/_15dp"
+                android:background="@drawable/custom_spinner"
+                android:padding="@dimen/_5dp">
+
+            </Spinner>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_5dp"
+                android:layout_marginRight="@dimen/_5dp"
+                android:layout_marginTop="@dimen/_10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="@dimen/_5dp"
+                    android:text="Other Expenses: "
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etDaAmount"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:hint="Provide Other Expenses"
+                    android:background="@drawable/edittext_center_bg"
+                    android:inputType="number"
+                    android:padding="@dimen/_3dp"
+                    android:textSize="@dimen/_14dp" />
+
+                <ImageView
+                    android:id="@+id/imgDaChart"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/question_icon"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+
+            <EditText
+                android:id="@+id/etRemarks"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10dp"
+                android:layout_marginLeft="@dimen/_5dp"
+                android:layout_marginRight="@dimen/_5dp"
+                android:background="@drawable/edittext_center_bg"
+                android:hint="Remarks with Expense Description"
+                android:inputType="textMultiLine"
+                android:lines="3"
+                android:padding="@dimen/_5dp" />
+
+            <EditText
+                android:id="@+id/etComplaintMessage"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_5dp"
+                android:layout_marginRight="@dimen/_5dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/edittext_center_bg"
+                android:enabled="false"
+                android:hint="Type message"
+                android:inputType="textMultiLine"
+                android:lines="3" />
+
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_5dp"
+                android:layout_marginRight="@dimen/_5dp"
+                android:layout_marginTop="@dimen/_10dp"
+                android:text="DA Amount: 300"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <Spinner
+                android:id="@+id/spDaysTaken"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="@dimen/_5dp"
+                android:layout_marginRight="@dimen/_5dp"
+                android:layout_marginTop="@dimen/_15dp"
+                android:background="@drawable/custom_spinner"
+                android:padding="@dimen/_5dp">
+
+            </Spinner>
+
+
+            <Button
+                android:id="@+id/btnsave"
+                android:layout_width="@dimen/_200dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/_10dp"
+                android:layout_marginTop="@dimen/_15dp"
+                android:background="@drawable/button_login"
+                android:gravity="center"
+                android:text="Save"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btnSyncData"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/_17dp"
+        android:backgroundTint="@color/white"
+        android:src="@drawable/ic_cloud_computing" />
+
+
+</RelativeLayout>
+

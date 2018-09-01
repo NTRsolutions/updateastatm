@@ -1,0 +1,32 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/_16dp"
+    android:paddingLeft="@dimen/_16dp"
+    android:paddingRight="@dimen/_16dp"
+    android:paddingTop="@dimen/_16dp">
+
+    <Button
+        android:id="@+id/btnSyncData"
+        android:layout_width="@dimen/_230dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/button_login"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="Send to NOC"
+        android:textColor="@color/white" />
+
+    <ListView
+        android:id="@+id/lvTransit"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnSyncData"
+        android:layout_marginTop="10dp">
+
+    </ListView>
+
+
+</RelativeLayout>
