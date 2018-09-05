@@ -6,24 +6,24 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_margin="@dimen/_7dp"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:layout_marginRight="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginRight="@dimen/_2dp"
+            android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbEarthVolt"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="Earthing Voltage"
                 android:textSize="12sp" />
 
@@ -40,53 +40,23 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
-            android:layout_marginBottom="@dimen/_8dp"
-            android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:weightSum="2">
-
-            <CheckBox
-                android:id="@+id/cbCharger"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:checked="false"
-                android:text="Charger"
-                android:textSize="12sp" />
-
-            <EditText
-                android:id="@+id/etCharger"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/edittext_center_bg"
-                android:hint="Trusine, CH-111"
-                android:padding="@dimen/_5dp"
-                android:textSize="12sp" />
-
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbInverter"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="Inverter/PCU"
                 android:textSize="12sp" />
 
@@ -105,18 +75,18 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginBottom="@dimen/_8dp"
             android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginRight="@dimen/_2dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbEbConn"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="EB Conn/ I/P Voltage "
                 android:textSize="12sp" />
 
@@ -135,18 +105,19 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
+            android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbConn"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:checked="false"
+                android:gravity="center|left"
                 android:text="Connection &amp; tightness"
                 android:textSize="12sp" />
 
@@ -164,77 +135,77 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
-            android:layout_marginBottom="@dimen/_8dp"
             android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbSolar"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="Solar Cleaning"
                 android:textSize="12sp" />
 
-            <EditText
-                android:id="@+id/etSolar"
+
+            <Spinner
+                android:id="@+id/spSolar"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/edittext_center_bg"
-                android:padding="@dimen/_5dp"
-                android:textSize="12sp" />
+                android:background="@drawable/custom_spinner"
+                android:padding="@dimen/_5dp" />
+
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
+            android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbSolarStruct"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="Solar Struct &amp; panel Tightness"
                 android:textSize="12sp" />
 
-            <EditText
-                android:id="@+id/etSolarStruct"
+            <Spinner
+                android:id="@+id/spSolarStruct"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/edittext_center_bg"
-                android:padding="@dimen/_5dp"
-                android:textSize="12sp" />
+                android:background="@drawable/custom_spinner"
+                android:padding="@dimen/_5dp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
+            android:orientation="horizontal"
             android:weightSum="10">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbBattTopup"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="5"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="Battery Topup"
                 android:textSize="12sp" />
 
@@ -246,6 +217,7 @@
                 android:background="@drawable/edittext_center_bg"
                 android:hint="20/0"
                 android:inputType="numberDecimal"
+                android:maxLength="4"
                 android:padding="@dimen/_5dp"
                 android:textSize="12sp" />
 
@@ -267,18 +239,18 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
+            android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbBattCell"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="Battery Cells"
                 android:textSize="12sp" />
 
@@ -289,6 +261,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/edittext_center_bg"
                 android:hint="2, 6.0, 6.0, 6.0, "
+                android:inputType="numberDecimal"
                 android:padding="@dimen/_5dp"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -298,29 +271,28 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
+            android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbBatteryTerminal"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="Battery Terminal Greasing"
                 android:textSize="12sp" />
 
-            <EditText
-                android:id="@+id/etBatteryTerminal"
+            <Spinner
+                android:id="@+id/spBatteryTerminal"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/edittext_center_bg"
-                android:padding="@dimen/_5dp"
-                android:textSize="12sp" />
+                android:background="@drawable/custom_spinner"
+                android:padding="@dimen/_5dp" />
         </LinearLayout>
 
 
@@ -328,18 +300,18 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
+            android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbCell1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="S.G. Cell 1"
                 android:textSize="12sp" />
 
@@ -351,6 +323,7 @@
                 android:background="@drawable/edittext_center_bg"
                 android:hint="6.00"
                 android:padding="@dimen/_5dp"
+                android:inputType="numberDecimal"
                 android:textSize="12sp" />
 
         </LinearLayout>
@@ -359,18 +332,18 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
+            android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbCell2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="S.G. Cell 2"
                 android:textSize="12sp" />
 
@@ -382,6 +355,7 @@
                 android:background="@drawable/edittext_center_bg"
                 android:hint="6.00"
                 android:padding="@dimen/_5dp"
+                android:inputType="numberDecimal"
                 android:textSize="12sp" />
 
         </LinearLayout>
@@ -390,18 +364,18 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
+            android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbCell3"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="S.G. Cell 3"
                 android:textSize="12sp" />
 
@@ -413,6 +387,7 @@
                 android:background="@drawable/edittext_center_bg"
                 android:hint="6.00"
                 android:padding="@dimen/_5dp"
+                android:inputType="numberDecimal"
                 android:textSize="12sp" />
 
         </LinearLayout>
@@ -421,18 +396,18 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbCell4"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="S.G. Cell 4"
                 android:textSize="12sp" />
 
@@ -443,6 +418,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/edittext_center_bg"
                 android:hint="6.00"
+                android:inputType="numberDecimal"
                 android:padding="@dimen/_5dp"
                 android:textSize="12sp" />
 
@@ -452,18 +428,18 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbCell5"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="S.G. Cell 5"
                 android:textSize="12sp" />
 
@@ -474,6 +450,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/edittext_center_bg"
                 android:hint="6.00"
+                android:inputType="numberDecimal"
                 android:padding="@dimen/_5dp"
                 android:textSize="12sp" />
 
@@ -483,18 +460,18 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbCell6"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="S.G. Cell 6"
                 android:textSize="12sp" />
 
@@ -505,6 +482,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/edittext_center_bg"
                 android:hint="6.00"
+                android:inputType="numberDecimal"
                 android:padding="@dimen/_5dp"
                 android:textSize="12sp" />
 
@@ -514,18 +492,18 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbCell7"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="S.G. Cell 7"
                 android:textSize="12sp" />
 
@@ -536,6 +514,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/edittext_center_bg"
                 android:hint="6.00"
+                android:inputType="numberDecimal"
                 android:padding="@dimen/_5dp"
                 android:textSize="12sp" />
 
@@ -545,19 +524,19 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbCell8"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="5dp"
                 android:layout_weight="1"
-                android:checked="false"
+                android:gravity="center|left"
                 android:text="S.G. Cell 8"
                 android:textSize="12sp" />
 
@@ -568,6 +547,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/edittext_center_bg"
                 android:hint="6.00"
+                android:inputType="numberDecimal"
                 android:padding="@dimen/_5dp"
                 android:textSize="12sp" />
 
@@ -576,10 +556,40 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
-            android:layout_marginBottom="@dimen/_8dp"
             android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginRight="@dimen/_2dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/cbCharger"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center|left"
+                android:text="Charger"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/etCharger"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/edittext_center_bg"
+                android:hint="Trusine, CH-111"
+                android:padding="@dimen/_5dp"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginRight="@dimen/_2dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -588,8 +598,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:text="Photos"
                 android:padding="@dimen/_5dp"
+                android:text="Photos"
                 android:textColor="#000000" />
 
             <LinearLayout
@@ -625,9 +635,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginRight="@dimen/_2dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -674,9 +683,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginRight="@dimen/_2dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -723,18 +731,16 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginRight="@dimen/_2dp"
             android:orientation="horizontal"
             android:weightSum="2">
 
-            <CheckBox
+            <TextView
                 android:id="@+id/cbSpareRequirement"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
                 android:text="Spare Required"
                 android:textSize="12sp" />
 
@@ -754,10 +760,9 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:layout_marginRight="@dimen/_2dp"
-            android:layout_marginLeft="@dimen/_2dp"
             android:layout_marginBottom="@dimen/_8dp"
+            android:layout_marginRight="@dimen/_2dp"
+            android:orientation="horizontal"
             android:weightSum="2">
 
             <TextView
@@ -804,17 +809,17 @@
             android:id="@+id/btnDone"
             android:layout_width="@dimen/_180dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/_15dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:layout_gravity="center"
-            android:gravity="center"
             android:layout_marginTop="20dp"
-            android:textColor="@color/white"
-            android:layout_marginBottom="@dimen/_15dp"
             android:background="@drawable/button_login"
+            android:gravity="center"
             android:padding="@dimen/_10dp"
-            android:textSize="@dimen/_14dp"
-            android:text="Done" />
+            android:text="Submit"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_14dp" />
 
 
     </LinearLayout>

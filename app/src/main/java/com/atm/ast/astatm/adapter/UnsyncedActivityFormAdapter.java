@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.model.ActivityFormDataModel;
+import com.atm.ast.astatm.model.newmodel.ActivitySheetModel;
+import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 
 import java.util.List;
@@ -21,10 +23,10 @@ import java.util.List;
  */
 public class UnsyncedActivityFormAdapter extends BaseAdapter {
     Context context;
-    List<ActivityFormDataModel> activityFormDataArrayList;
+    List<ActivitySheetModel> activityFormDataArrayList;
     ASTUIUtil commonFunctions;
 
-    public UnsyncedActivityFormAdapter(Context context, List<ActivityFormDataModel> activityFormDataArrayList) {
+    public UnsyncedActivityFormAdapter(Context context, List<ActivitySheetModel> activityFormDataArrayList) {
         this.context = context;
         this.activityFormDataArrayList = activityFormDataArrayList;
     }
@@ -51,12 +53,12 @@ public class UnsyncedActivityFormAdapter extends BaseAdapter {
         holder.tvStatus = convertView.findViewById(R.id.tvStatus);
         holder.tvTask = convertView.findViewById(R.id.tvTask);
         holder.llListItem = convertView.findViewById(R.id.llListItem);
-        String activityDateTime = commonFunctions.formatDate(activityFormDataArrayList.get(position).getDate());
+        String activityDateTime = commonFunctions.formatDate(String.valueOf(activityFormDataArrayList.get(position).getSubmitDateTime()));
         holder.tvTask.setText(activityFormDataArrayList.get(position).getTaskName());
         holder.tvActivity.setText(activityFormDataArrayList.get(position).getActivityName());
         holder.tvStatus.setText(activityFormDataArrayList.get(position).getStatusName());
         holder.tvDate.setText(activityDateTime);
-        holder.tvSite.setText(activityFormDataArrayList.get(position).getSiteName());
+        holder.tvSite.setText(activityFormDataArrayList.get(position).getSiteName() + "(" + activityFormDataArrayList.get(position).getSiteId() + ")");
         if (position % 2 == 0) {
             holder.llListItem.setBackgroundColor(Color.parseColor("#ffffff"));
         } else {

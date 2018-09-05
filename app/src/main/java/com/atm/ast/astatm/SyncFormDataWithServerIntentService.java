@@ -71,9 +71,7 @@ public class SyncFormDataWithServerIntentService extends IntentService {
             ASTUIUtil commonFunctions = new ASTUIUtil();
             for (int i = 0; i < 1; i++) {
                 try {
-                    int pendingEntries = atmDatabase.getCircleCount("activty_form_data", "", "");
-                    /*Intent intentComplaintService = new Intent(CircleActivity.this, SyncComplaintDataWithServer.class);
-                    startService(intentComplaintService);*/
+                  //  int pendingEntries = atmDatabase.getCircleCount("activty_form_data", "", "");
                     SyncComplaintData();
                     ArrayList<CallTrackerDataModel> arrCallTrackingData = atmDatabase.getFECallTrackerData();
                     Log.v("Call Tracking Length", String.valueOf(arrCallTrackingData.size()));
@@ -103,8 +101,7 @@ public class SyncFormDataWithServerIntentService extends IntentService {
                     }
                     Thread.sleep(1000);
 
-                    //if (pendingEntries > 0 && connectingToServer == 0) {
-                    if (pendingEntries > 0) {
+                   /* if (pendingEntries > 0) {
                         for (int j = 0; j < pendingEntries; j++) {
                             //connectingToServer = 1;
                             String[] arrFormData = atmDatabase.getFormData();
@@ -129,7 +126,7 @@ public class SyncFormDataWithServerIntentService extends IntentService {
                             }
                         }
                     }
-                    Thread.sleep(1000);
+                    Thread.sleep(1000);*/
 
                 } catch (Exception e) {
                     String ex = e.getLocalizedMessage();
@@ -166,7 +163,7 @@ public class SyncFormDataWithServerIntentService extends IntentService {
 
     //---------------------------Save Form Service Call-------------------------------------
 
-    private void saveFormDataToServer(final String siteNumericId, final String userId, final String NocEnggId, final String activityId, final int zoneId,
+   /* private void saveFormDataToServer(final String siteNumericId, final String userId, final String NocEnggId, final String activityId, final int zoneId,
                                       final int statusId, final String reason, final String taskId, final String materialStatus, final String remarks,
                                       final String nocEnggContact, final String earthVolt, final String battTopup, final String battCells,
                                       final String charger, final String inverter, final String ebConnection, final String conn, final String solar,
@@ -175,8 +172,8 @@ public class SyncFormDataWithServerIntentService extends IntentService {
                                       String isPlanned, String plannedDate, String submitTime, String planId, String longitude, String latitude,
                                       String daAmount, String dayNumber, String isPm) {
         // TODO Auto-generated method stub
-              /* commentList.clear();
-        lvComment.setAdapter(null);*/
+              *//* commentList.clear();
+        lvComment.setAdapter(null);*//*
 
         serviceURL = Contants.BASE_URL + Contants.ADD_NEW_ACTIVITY_NEW_URL;
         //serviceURL = Contants.BASE_URL + Contants.ADD_NEW_ACTIVITY_URL;
@@ -190,19 +187,19 @@ public class SyncFormDataWithServerIntentService extends IntentService {
                 "&SolarStructure=" + "NA" + "&BattTermnialGreas=" + "NA" + "&Photo=" + "NA" + "&ModemConnection=" + "NA" + "&CommStatu=" + "0" + "&SpareReq=" + "NA" +
                 "&plandate=" + plannedDate +
                 "&planid=" + planId + "&da=" + daAmount + "&androidtime=" + submitTime + "&numberOfDays=" + dayNumber + "&lat=" + lon + "&lon=" + lon;
-        /*serviceURL += "&uid=" + userId + "&sid=" + siteNumericId + "&tid=" + taskId + "&aid=" + activityId
+        *//*serviceURL += "&uid=" + userId + "&sid=" + siteNumericId + "&tid=" + taskId + "&aid=" + activityId
                 + "&neid=" + NocEnggId + "&st=" + statusId + "&reason=" + reason + "&ztype=" + zoneId
                 + "&mid=" + materialStatus + "&remarks=" + remarks + "&isplanned=" + isPlanned + "&ispm=0" + "&plandate=" + plannedDate +
-                "&planid=" + planId + "&androidtime="+ submitTime + "&lat=" + latitude + "&lon=" + longitude;*/
+                "&planid=" + planId + "&androidtime="+ submitTime + "&lat=" + latitude + "&lon=" + longitude;*//*
 
         serviceURL = serviceURL.replace(" ", "^^");
 
-        /*Intent activityIntent = new Intent(SyncFormDataWithServerIntentService.this, SyncDataWithServerActivity.class);
+        *//*Intent activityIntent = new Intent(SyncFormDataWithServerIntentService.this, SyncDataWithServerActivity.class);
         activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         activityIntent.putExtra("FORM_NUMBER", formNumber);
         activityIntent.putExtra("CLIENT_NAME", clientName);
 
-        startActivity(activityIntent);*/
+        startActivity(activityIntent);*//*
 
         //serviceURL = serviceURL.replace(" ", "%20");
 
@@ -222,11 +219,11 @@ public class SyncFormDataWithServerIntentService extends IntentService {
             protected Map<String, String> getParams()
                     throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
-               /* params.put("uid", userId);
+               *//* params.put("uid", userId);
                 params.put("sid", siteNumericId);
                 params.put("tid", taskId);
                 params.put("aid", activityId);
-                params.put("lon", lon);*/
+                params.put("lon", lon);*//*
 
                 return params;
             }
@@ -237,9 +234,9 @@ public class SyncFormDataWithServerIntentService extends IntentService {
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         myReq.setRetryPolicy(policy);
       //  queue.add(myReq);
-    }
+    }*/
 
-    private Response.Listener<String> reqSuccessListenerSubmitForm() {
+   /* private Response.Listener<String> reqSuccessListenerSubmitForm() {
         return new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -277,9 +274,9 @@ public class SyncFormDataWithServerIntentService extends IntentService {
                 }
             }
         };
-    }
+    }*/
 
-    private Response.ErrorListener reqErrorListenerSubmitForm() {
+   /* private Response.ErrorListener reqErrorListenerSubmitForm() {
         return new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -294,7 +291,7 @@ public class SyncFormDataWithServerIntentService extends IntentService {
                 //progressbar.dismiss();
             }
         };
-    }
+    }*/
 
     //--------------------------------------------------------------------------------------
 

@@ -1,59 +1,85 @@
 package com.atm.ast.astatm.fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.atm.ast.astatm.R;
+import com.atm.ast.astatm.component.ASTProgressBar;
+import com.atm.ast.astatm.constants.Contants;
+import com.atm.ast.astatm.database.ATMDBHelper;
+import com.atm.ast.astatm.framework.ServiceCaller;
+import com.atm.ast.astatm.model.newmodel.ActivitySheetModel;
+import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.utils.ASTUIUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class PMCheckLIstFragment extends MainFragment {
     Button btnDone;
-    CheckBox cbEarthVolt;
+    TextView cbEarthVolt;
     EditText etEarthVolt;
-    CheckBox cbBattTopup;
+    TextView cbBattTopup;
     EditText etBattTopup;
-    CheckBox cbBattCell;
+    TextView cbBattCell;
     EditText etBattCell;
-    CheckBox cbCharger;
+    TextView cbCharger;
     EditText etCharger;
-    CheckBox cbInverter;
+    TextView cbInverter;
     EditText etInverter;
-    CheckBox cbEbConn;
+    TextView cbEbConn;
     EditText etEbConn;
-    CheckBox cbConn;
+    TextView cbConn;
     EditText etConn;
-    CheckBox cbSolar;
-    EditText etSolar;
-    CheckBox cbCell1;
+    TextView cbSolar;
+    Spinner spSolar;
+    TextView cbCell1;
     EditText etCell1;
-    CheckBox cbCell2;
+    TextView cbCell2;
     EditText etCell2;
-    CheckBox cbCell3;
+    TextView cbCell3;
     EditText etCell3;
-    CheckBox cbCell4;
+    TextView cbCell4;
     EditText etCell4;
-    CheckBox cbCell5;
+    TextView cbCell5;
     EditText etCell5;
-    CheckBox cbCell6;
+    TextView cbCell6;
     EditText etCell6;
-    CheckBox cbCell7;
+    TextView cbCell7;
     EditText etCell7;
-    CheckBox cbCell8;
+    TextView cbCell8;
     EditText etCell8;
     CheckBox cbPhotoYes;
     CheckBox cbPhotoNo;
     CheckBox cbModemConnectionYes;
     CheckBox cbModemConnectionNo;
-    CheckBox cbSpareRequirement;
+    TextView cbSpareRequirement;
     EditText etSpareRequirement;
-    CheckBox cbBatteryTerminal;
-    EditText etBatteryTerminal;
-    CheckBox cbSolarStruct;
-    EditText etSolarStruct;
+    TextView cbBatteryTerminal;
+    Spinner spBatteryTerminal;
+    TextView cbSolarStruct;
+    Spinner spSolarStruct;
     CheckBox cbComm;
     CheckBox cbNonComm;
     CheckBox cbBankOfficial;
@@ -65,7 +91,6 @@ public class PMCheckLIstFragment extends MainFragment {
     String strInverter = "NA";
     String strEbConn = "NA";
     String strConn = "NA";
-    String strSolar = "NA";
     String strSignOff = "NA";
     String strCell1 = "NA";
     String strCell2 = "NA";
@@ -75,7 +100,6 @@ public class PMCheckLIstFragment extends MainFragment {
     String strCell6 = "NA";
     String strCell7 = "NA";
     String strCell8 = "NA";
-    String strConnectionAndTightness = "NA";
     String strSolarCleaning = "NA";
     String strSolarStructureAndPanelTightness = "NA";
     String strBatteryTerminalGreasing = "NA";
@@ -83,6 +107,9 @@ public class PMCheckLIstFragment extends MainFragment {
     String strModemConn = "NA";
     String strCommStatus = "NA";
     String strSpareRequirement = "NA";
+    String planId;
+    ActivitySheetModel sheetModel;
+    ATMDBHelper atmdbHelper;
 
     @Override
     protected int fragmentLayout() {
@@ -107,7 +134,7 @@ public class PMCheckLIstFragment extends MainFragment {
         this.cbConn = this.findViewById(R.id.cbConn);
         this.etConn = this.findViewById(R.id.etConn);
         this.cbSolar = this.findViewById(R.id.cbSolar);
-        this.etSolar = this.findViewById(R.id.etSolar);
+        this.spSolar = this.findViewById(R.id.spSolar);
         this.cbCell1 = this.findViewById(R.id.cbCell1);
         this.etCell1 = this.findViewById(R.id.etCell1);
         this.cbCell2 = this.findViewById(R.id.cbCell2);
@@ -130,33 +157,15 @@ public class PMCheckLIstFragment extends MainFragment {
         this.cbModemConnectionNo = this.findViewById(R.id.cbModemConnectionNo);
         this.cbSpareRequirement = this.findViewById(R.id.cbSpareRequirement);
         this.etSpareRequirement = this.findViewById(R.id.etSpareRequirement);
-        etSpareRequirement.setEnabled(false);
         this.cbBatteryTerminal = this.findViewById(R.id.cbBatteryTerminal);
-        this.etBatteryTerminal = this.findViewById(R.id.etBatteryTerminal);
-        etBatteryTerminal.setEnabled(false);
+        this.spSolarStruct = this.findViewById(R.id.spSolarStruct);
         this.cbSolarStruct = this.findViewById(R.id.cbSolarStruct);
-        this.etSolarStruct = this.findViewById(R.id.etSolarStruct);
-        etSolarStruct.setEnabled(false);
+        this.spBatteryTerminal = this.findViewById(R.id.spBatteryTerminal);
         this.cbComm = this.findViewById(R.id.cbComm);
         this.cbNonComm = this.findViewById(R.id.cbNonComm);
         this.cbBankOfficial = this.findViewById(R.id.cbBankOfficial);
         this.cbGuard = this.findViewById(R.id.cbGuard);
-        etCell8.setEnabled(false);
-        etEbConn.setEnabled(false);
-        etCharger.setEnabled(false);
-        etBattCell.setEnabled(false);
-        etBattTopup.setEnabled(false);
-        etEarthVolt.setEnabled(false);
-        etInverter.setEnabled(false);
-        etSolar.setEnabled(false);
-        etConn.setEnabled(false);
-        etCell1.setEnabled(false);
-        etCell3.setEnabled(false);
-        etCell2.setEnabled(false);
-        etCell4.setEnabled(false);
-        etCell5.setEnabled(false);
-        etCell6.setEnabled(false);
-        etCell7.setEnabled(false);
+
 
     }
 
@@ -191,221 +200,163 @@ public class PMCheckLIstFragment extends MainFragment {
     }
 
     @Override
+    protected void getArgs() {
+        super.getArgs();
+        planId = this.getArguments().getString("PlanId");
+    }
+
+    @Override
     protected void setAccessibility() {
 
     }
 
     @Override
     protected void dataToView() {
+        atmdbHelper = new ATMDBHelper(getContext());
+        final ArrayList<String> yesNoList = new ArrayList<>();
+        yesNoList.add("Yes");
+        yesNoList.add("No");
+        ArrayAdapter<String> yesNoAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, yesNoList);
+        yesNoAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spSolar.setAdapter(yesNoAdapter);
+        spBatteryTerminal.setAdapter(yesNoAdapter);
+        spSolarStruct.setAdapter(yesNoAdapter);
+        spSolar.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                strSolarCleaning = yesNoList.get(position).toString();
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        spBatteryTerminal.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                strBatteryTerminalGreasing = yesNoList.get(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        spSolarStruct.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                strSolarStructureAndPanelTightness = yesNoList.get(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        cbComm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    cbNonComm.setChecked(false);
+                    strCommStatus = "Comm";
+                }
+            }
+        });
+        cbNonComm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    cbComm.setChecked(false);
+                    strCommStatus = "Non Comm";
+                }
+            }
+        });
+
+        cbBankOfficial.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    cbGuard.setChecked(false);
+                    strSignOff = "Bank Official";
+                }
+            }
+        });
+        cbGuard.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    cbBankOfficial.setChecked(false);
+                    strSignOff = "Guard";
+                }
+            }
+        });
+        cbPhotoNo.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    cbPhotoYes.setChecked(false);
+                    strPhotos = "No";
+                }
+            }
+        });
+        cbPhotoYes.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    cbPhotoNo.setChecked(false);
+                    strPhotos = "Yes";
+                }
+            }
+        });
+
+        cbModemConnectionYes.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    cbModemConnectionNo.setChecked(false);
+                    strModemConn = "Yes";
+                }
+            }
+        });
+        cbModemConnectionNo.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    cbModemConnectionYes.setChecked(false);
+                    strModemConn = "No";
+                }
+            }
+        });
+        getActivityFormData();
+
+    }
+
+    private void getActivityFormData() {
+
+        ContentLocalData localData = atmdbHelper.getActivtyFormDataByID(planId);
+        if (localData != null) {
+            if (localData.getActivityFormData() != null) {
+                String activityFormStr = localData.getActivityFormData();
+                sheetModel = new Gson().fromJson(activityFormStr, new TypeToken<ActivitySheetModel>() {
+                }.getType());
+            }
+        }
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.cbBatteryTerminal) {
-            if (cbBatteryTerminal.isChecked()) {
-                etBatteryTerminal.setEnabled(true);
-                //strEarthVolt = etEarthVolt.getText().toString();
-            } else {
-                etBatteryTerminal.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbSolarStruct) {
-            if (cbSolarStruct.isChecked()) {
-                etSolarStruct.setEnabled(true);
-                //strEarthVolt = etEarthVolt.getText().toString();
-            } else {
-                etSolarStruct.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbSpareRequirement) {
-            if (cbSpareRequirement.isChecked()) {
-                etSpareRequirement.setEnabled(true);
-                //strEarthVolt = etEarthVolt.getText().toString();
-            } else {
-                etSpareRequirement.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbComm) {
-            if (cbComm.isChecked()) {
-                cbNonComm.setChecked(false);
-                strCommStatus = "Comm";
-            } else {
-            }
-        } else if (view.getId() == R.id.cbNonComm) {
-            if (cbNonComm.isChecked()) {
-                cbComm.setChecked(false);
-                strCommStatus = "Non Comm";
-            } else {
-
-            }
-        } else if (view.getId() == R.id.cbBankOfficial) {
-            if (cbBankOfficial.isChecked()) {
-                cbGuard.setChecked(false);
-                strSignOff = "Bank Official";
-            } else {
-            }
-        } else if (view.getId() == R.id.cbGuard) {
-            if (cbGuard.isChecked()) {
-                cbBankOfficial.setChecked(false);
-                strSignOff = "Guard";
-            } else {
-
-            }
-        } else if (view.getId() == R.id.cbEarthVolt) {
-            if (cbEarthVolt.isChecked()) {
-                etEarthVolt.setEnabled(true);
-                //strEarthVolt = etEarthVolt.getText().toString();
-            } else {
-                etEarthVolt.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbBattTopup) {
-            if (cbBattTopup.isChecked()) {
-                strBattTopup = "1";
-                etBattTopup.setEnabled(true);
-            } else {
-                strBattTopup = "0";
-                etBattTopup.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbBattCell) {
-            if (cbBattCell.isChecked()) {
-                strBattCells = "1";
-                etBattCell.setEnabled(true);
-            } else {
-                strBattCells = "0";
-                etBattCell.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbCharger) {
-            if (cbCharger.isChecked()) {
-                strCharger = "1";
-                etCharger.setEnabled(true);
-            } else {
-                strCharger = "0";
-                etCharger.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbInverter) {
-            if (cbInverter.isChecked()) {
-                strInverter = "1";
-                etInverter.setEnabled(true);
-            } else {
-                strInverter = "0";
-                etInverter.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbEbConn) {
-            if (cbEbConn.isChecked()) {
-                strEbConn = "1";
-                etEbConn.setEnabled(true);
-            } else {
-                strEbConn = "0";
-                etEbConn.setEnabled(true);
-            }
-        } else if (view.getId() == R.id.cbConn) {
-            if (cbConn.isChecked()) {
-                strConn = "1";
-                strConnectionAndTightness = "1";
-                etConn.setEnabled(true);
-            } else {
-                strConn = "0";
-                strConnectionAndTightness = "0";
-                etConn.setEnabled(true);
-            }
-        } else if (view.getId() == R.id.cbSolar) {
-            if (cbSolar.isChecked()) {
-                strSolar = "1";
-                etSolar.setEnabled(true);
-            } else {
-                strSolar = "0";
-                etSolar.setEnabled(true);
-            }
-        } else if (view.getId() == R.id.cbCell1) {
-            if (cbCell1.isChecked()) {
-                etCell1.setEnabled(true);
-                //strEarthVolt = etEarthVolt.getText().toString();
-            } else {
-                etCell1.setEnabled(false);
-            }
-        }
-
-        /*cbSignOff.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (cbSignOff.isChecked()) {
-                    strSignOff = "1";
-                    etSignOff.setEnabled(true);
-                } else {
-                    strSignOff = "0";
-                    etSignOff.setEnabled(true);
+        switch (view.getId()) {
+            case R.id.btnDone:
+                if (isValidate()) {
+                    addValue();
                 }
-            }
-        });
-*/
-        else if (view.getId() == R.id.cbCell2) {
-            if (cbCell2.isChecked()) {
-                etCell2.setEnabled(true);
-                //strEarthVolt = etEarthVolt.getText().toString();
-            } else {
-                etCell2.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbCell3) {
-            if (cbCell3.isChecked()) {
-                etCell3.setEnabled(true);
-                //strEarthVolt = etEarthVolt.getText().toString();
-            } else {
-                etCell3.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbCell4) {
-            if (cbCell4.isChecked()) {
-                etCell4.setEnabled(true);
-                //strEarthVolt = etEarthVolt.getText().toString();
-            } else {
-                etCell4.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbCell5) {
-            if (cbCell5.isChecked()) {
-                etCell5.setEnabled(true);
-                //strEarthVolt = etEarthVolt.getText().toString();
-            } else {
-                etCell5.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbCell6) {
-            if (cbCell6.isChecked()) {
-                etCell6.setEnabled(true);
-                //strEarthVolt = etEarthVolt.getText().toString();
-            } else {
-                etCell6.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbCell7) {
-            if (cbCell7.isChecked()) {
-                etCell7.setEnabled(true);
-                //strEarthVolt = etEarthVolt.getText().toString();
-            } else {
-                etCell7.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbCell8) {
-            if (cbCell8.isChecked()) {
-                etCell8.setEnabled(true);
-                //strEarthVolt = etEarthVolt.getText().toString();
-            } else {
-                etCell8.setEnabled(false);
-            }
-        } else if (view.getId() == R.id.cbPhotoNo) {
-            if (cbPhotoNo.isChecked()) {
-                cbPhotoYes.setChecked(false);
-                //strSignOff = "Bank Official";
-            } else {
-
-            }
-        } else if (view.getId() == R.id.cbPhotoYes) {
-            if (cbPhotoYes.isChecked()) {
-                cbPhotoNo.setChecked(false);
-                //strSignOff = "Bank Official";
-            } else {
-
-            }
-        } else if (view.getId() == R.id.btnDone) {
-            doneButtonActionPerform();
+                break;
         }
-
     }
 
-    public void doneButtonActionPerform() {
+    // ----validation -----
+    private boolean isValidate() {
         strEarthVolt = etEarthVolt.getText().toString();
         strInverter = etInverter.getText().toString();
         strBattCells = etBattCell.getText().toString();
@@ -413,272 +364,195 @@ public class PMCheckLIstFragment extends MainFragment {
         strCell2 = etCell2.getText().toString();
         strCell3 = etCell3.getText().toString();
         strCell4 = etCell4.getText().toString();
+        strEbConn = etEbConn.getText().toString();
+        strBattTopup = etBattTopup.getText().toString();
+        strConn = etConn.getText().toString();
+
         strCell5 = etCell5.getText().toString();
         strCell6 = etCell6.getText().toString();
         strCell7 = etCell7.getText().toString();
         strCell8 = etCell8.getText().toString();
-        strBatteryTerminalGreasing = etBatteryTerminal.getText().toString();
-        //strPhotos = etPhotos.getText().toString();
-        strSolarStructureAndPanelTightness = etSolarStruct.getText().toString();
-        //strModemConn = etModemConnection.getText().toString();
+        strCell5 = etCell5.getText().toString();
+        strCell6 = etCell6.getText().toString();
+        strCell7 = etCell7.getText().toString();
+        strCell8 = etCell8.getText().toString();
         strSpareRequirement = etSpareRequirement.getText().toString();
-        strEarthVolt = etEarthVolt.getText().toString();
-        strBattTopup = etBattTopup.getText().toString();
-        strBattCells = etBattCell.getText().toString();
         strCharger = etCharger.getText().toString();
-        strInverter = etInverter.getText().toString();
-        strSolarCleaning = etSolar.getText().toString();
-        strEbConn = etEbConn.getText().toString();
-        if ((cbEarthVolt.isChecked() && strEarthVolt.equals("")) || !cbEarthVolt.isChecked()) {
-            ASTUIUtil.showToast("Please Provide Input for Earthing Volt");
-        } else if ((cbInverter.isChecked() && strInverter.equals("")) || !cbInverter.isChecked()) {
+
+        if (strEarthVolt.length() == 0) {
+            ASTUIUtil.showToast("Please Provide Earthing Voltage");
+            return false;
+        } else if (strInverter.length() == 0) {
             ASTUIUtil.showToast("Please Provide Input for Inverter/PCU");
-        } else if (cbBattCell.isChecked() && strBattCells.equals("")) {
-            ASTUIUtil.showToast("Please Provide Input for Battery Cells");
-        } else if ((cbCell1.isChecked() && strCell1.equals("")) || !cbCell1.isChecked()) {
-            ASTUIUtil.showToast("Please Provide Input for S.G. Cell 1");
-        } else if ((cbCell2.isChecked() && strCell2.equals("")) || !cbCell2.isChecked()) {
-            ASTUIUtil.showToast("Please Provide Input for S.G. Cell 2");
-        } else if ((cbCell3.isChecked() && strCell3.equals("")) || !cbCell3.isChecked()) {
-            ASTUIUtil.showToast("Please Provide Input for S.G. Cell 3");
-        } else if ((cbCell4.isChecked() && strCell4.equals("")) || !cbCell4.isChecked()) {
-            ASTUIUtil.showToast("Please Provide Input for S.G. Cell 4");
-        } else if ((cbInverter.isChecked() && strInverter.equals("")) || !cbInverter.isChecked()) {
-            ASTUIUtil.showToast("Please Provide Input for Inverter/PCU");
-        } else if ((cbEbConn.isChecked() && strEbConn.equals("")) || !cbEbConn.isChecked()) {
-            ASTUIUtil.showToast("Please Provide Input for Eb Connection");
-        } else if ((cbConn.isChecked() && strConn.equals("")) || !cbConn.isChecked()) {
+            return false;
+        } else if (strEbConn.length() == 0) {
+            ASTUIUtil.showToast("Please Provide Input for EB conn/I/P Voltage");
+            return false;
+        } else if (strConn.length() == 0) {
             ASTUIUtil.showToast("Please Provide Input for Connection and Tightness");
-        } else if ((cbSolar.isChecked() && strSolarCleaning.equals("")) || !cbSolar.isChecked()) {
-            ASTUIUtil.showToast("Please Provide Input for Solar Cleaning");
-        } /*else if ((cbSolarStruct.isChecked() && strSolarStructureAndPanelTightness.equals("")) || !cbSolarStruct.isChecked()) {
-                    ASTUIUtil.showToast( "Please Provide Input for Solar Structure and Panel Tightness");
-                }*/ else if ((cbBattTopup.isChecked() && strBattTopup.equals("")) || !cbBattTopup.isChecked()) {
+            return false;
+        } else if (strSolarCleaning.length() == 0) {
+            ASTUIUtil.showToast("Please Select Solar Cleaning");
+            return false;
+        } else if (strSolarStructureAndPanelTightness.length() == 0) {
+            ASTUIUtil.showToast("Please Select Solar Struct & Panel Tightness");
+            return false;
+        } else if (strBattTopup.length() == 0) {
             ASTUIUtil.showToast("Please Provide Input for Battery Topup");
-        } else if ((cbBattCell.isChecked() && strBattCells.equals("")) || !cbBattCell.isChecked()) {
+            return false;
+        } else if (strBattCells.length() == 0) {
             ASTUIUtil.showToast("Please Provide Input for Battery Cells");
-        } /*else if (!cbBankOfficial.isChecked() && !cbGuard.isChecked()) {
-                    ASTUIUtil.showToast( "Please Select SignOff");
-                }*/ else if (!cbComm.isChecked() && !cbNonComm.isChecked()) {
+            return false;
+        } else if (strBatteryTerminalGreasing.length() == 0) {
+            ASTUIUtil.showToast("Please Select Battery Terminal Greasing");
+            return false;
+        } else if (strSolarCleaning.length() == 0) {
+            ASTUIUtil.showToast("Please Select Solar Cleaning");
+            return false;
+        } else if (strSolarStructureAndPanelTightness.length() == 0) {
+            ASTUIUtil.showToast("Please Select Solar Struct & panel Tightness");
+            return false;
+        } else if (strBatteryTerminalGreasing.length() == 0) {
+            ASTUIUtil.showToast("Please Select Battery Termiinal Greasing");
+            return false;
+        } else if (strCell1.length() == 0) {
+            ASTUIUtil.showToast("Please Provide Input for S.G. Cell 1");
+            return false;
+        } else if (strCell2.length() == 0) {
+            ASTUIUtil.showToast("Please Provide Input for S.G. Cell 2");
+            return false;
+        } else if (strCell3.length() == 0) {
+            ASTUIUtil.showToast("Please Provide Input for S.G. Cell 3");
+            return false;
+        } else if (strCell4.length() == 0) {
+            ASTUIUtil.showToast("Please Provide Input for S.G. Cell 4");
+            return false;
+        } else if (strCommStatus.length() == 0) {
             ASTUIUtil.showToast("Please Select Comm Status");
-        } else if (!cbModemConnectionYes.isChecked() && !cbModemConnectionNo.isChecked()) {
-            ASTUIUtil.showToast("Please Select Modem Connection");
-        } else if (!cbPhotoYes.isChecked() && !cbPhotoNo.isChecked()) {
-            ASTUIUtil.showToast("Please Select Photo Availability");
-        } else {
-                    /*if (strPhotos.equals("") && !cbPhotos.isChecked()) {
-                        strPhotos = "NA";
-                    } else {
-                        //strPhotos = "";
-                    }*/
-            if (cbPhotoYes.isChecked()) {
-                strPhotos = "Yes";
-            } else if (cbPhotoNo.isChecked()) {
-                strPhotos = "No";
-            }
-
-            if (cbModemConnectionYes.isChecked()) {
-                strModemConn = "Yes";
-            } else if (cbModemConnectionNo.isChecked()) {
-                strModemConn = "No";
-            }
-
-            if (strBatteryTerminalGreasing.equals("") && !cbBatteryTerminal.isChecked()) {
-                strBatteryTerminalGreasing = "NA";
-            } else {
-                //strBatteryTerminalGreasing = "";
-            }
-
-
-            if (strSolarStructureAndPanelTightness.equals("") && !cbSolarStruct.isChecked()) {
-                strSolarStructureAndPanelTightness = "NA";
-            } else {
-                //strSolarStructureAndPanelTightness = "";
-            }
-                    /*if (strModemConn.equals("") && !cbModemConnection.isChecked()) {
-                        strModemConn = "NA";
-                    } else {
-                        //strModemConn = "";
-                    }*/
-
-
-            if (strSpareRequirement.equals("") && !cbSpareRequirement.isChecked()) {
-                strSpareRequirement = "NA";
-            } else {
-                //strSpareRequirement = "";
-            }
-            if (strEarthVolt.equals("") && !cbEarthVolt.isChecked()) {
-                strEarthVolt = "NA";
-            } else {
-                //strEarthVolt = "";
-            }
-
-            if (strBattTopup.equals("") && !cbBattTopup.isChecked()) {
-                strBattTopup = "NA";
-            } else {
-                //strBattTopup = "";
-            }
-
-            if (strBattCells.equals("") && !cbBattCell.isChecked()) {
-                strBattCells = "NA";
-            } else {
-                //strBattCells = "";
-            }
-
-            if (strCharger.equals("") && !cbCharger.isChecked()) {
-                strCharger = "NA";
-            } else {
-                //strCharger = "";
-            }
-
-            if (strInverter.equals("") && !cbInverter.isChecked()) {
-                strInverter = "NA";
-            } else {
-                //strInverter = "";
-            }
-
-            if (strEbConn.equals("") && !cbEbConn.isChecked()) {
-                strEbConn = "NA";
-            } else {
-                //strEbConn = "";
-            }
-
-                /*strConn = etConn.getText().toString();
-                if (strConn.equals("") && !cbConn.isChecked()) {
-                    strConn = "NA";
-                } else {
-                    strConn = "^^";
-                }*/
-
-            strSolar = etSolar.getText().toString();
-            if (strSolar.equals("") && !cbSolar.isChecked()) {
-                strSolar = "NA";
-            } else {
-                //strSolar = "";
-            }
-
-//                strSignOff = etSignOff.getText().toString();
-//                if (strSignOff.equals("") && !cbSignOff.isChecked()) {
-//                    strSignOff = "NA";
-//                } else {
-//                    strSignOff = "^^";
-//                }
-
-            strCell1 = etCell1.getText().toString();
-            if (strCell1.equals("") && !cbCell1.isChecked()) {
-                strCell1 = "NA";
-            } else {
-                //strCell1 = "";
-            }
-
-
-            strCell2 = etCell2.getText().toString();
-            if (strCell2.equals("") && !cbCell2.isChecked()) {
-                strCell2 = "NA";
-            } else {
-                //strCell2 = "";
-            }
-            strCell3 = etCell3.getText().toString();
-            if (strCell3.equals("") && !cbCell3.isChecked()) {
-                strCell3 = "NA";
-            } else {
-                //strCell3 = "";
-            }
-            strCell4 = etCell4.getText().toString();
-            if (strCell4.equals("") && !cbCell4.isChecked()) {
-                strCell4 = "NA";
-            } else {
-                //strCell4 = "";
-            }
-            strCell5 = etCell5.getText().toString();
-            if (strCell5.equals("") && !cbCell5.isChecked()) {
-                strCell5 = "NA";
-            } else {
-                //strCell5 = "";
-            }
-
-
-            strCell6 = etCell6.getText().toString();
-            if (strCell6.equals("") && !cbCell6.isChecked()) {
-                strCell6 = "NA";
-            } else {
-                //strCell6 = "";
-            }
-            strCell7 = etCell7.getText().toString();
-            if (strCell7.equals("") && !cbCell7.isChecked()) {
-                strCell7 = "NA";
-            } else {
-                //strCell7 = "";
-            }
-            strCell8 = etCell8.getText().toString();
-            if (strCell8.equals("") && !cbCell8.isChecked()) {
-                strCell8 = "NA";
-            } else {
-                //strCell8 = "";
-            }
-            strSpareRequirement = etSpareRequirement.getText().toString();
-            if (strSpareRequirement.equals("") && !cbSpareRequirement.isChecked()) {
-                strSpareRequirement = "NA";
-            } else {
-                // strSpareRequirement = "";
-            }
-
-            Intent intent = new Intent("ViewPageChange");
-            intent.putExtra("willReloadBackScreen", true);
-            intent.putExtra("strEarthVolt", strEarthVolt);
-            intent.putExtra("strInverter", strInverter);
-            intent.putExtra("strBattCells", strBattCells);
-            intent.putExtra("strCell1", strCell1);
-            intent.putExtra("strCell2", strCell2);
-            intent.putExtra("strCell3", strCell3);
-            intent.putExtra("strCell4", strCell4);
-            intent.putExtra("strCell5", strCell5);
-            intent.putExtra("strCell6", strCell6);
-            intent.putExtra("strCell7", strCell7);
-            intent.putExtra("strCell8", strCell8);
-            intent.putExtra("strBatteryTerminalGreasing", strBatteryTerminalGreasing);
-            intent.putExtra("strSolarStructureAndPanelTightness", strSolarStructureAndPanelTightness);
-            intent.putExtra("strSpareRequirement", strSpareRequirement);
-            intent.putExtra("strCharger", strCharger);
-            intent.putExtra("strSolarCleaning", strSolarCleaning);
-            intent.putExtra("strEbConn", strEbConn);
-            intent.putExtra("strPhotos", strPhotos);
-            intent.putExtra("strModemConn", strModemConn);
-            intent.putExtra("strBattTopup", strBattTopup);
-            intent.putExtra("strSolar", strSolar);
-            intent.putExtra("isChecked", false);
-            reloadBackScreen(intent);
+            return false;
+        } else if (strSignOff.length() == 0) {
+            ASTUIUtil.showToast("Please Select Sign Off");
+            return false;
         }
+        return true;
     }
 
-    boolean willReloadOnBack = true;
+    //add value into model
+    public void addValue() {
+        sheetModel.setEarthVolt(strEarthVolt);
+        sheetModel.setInverter(strInverter);
+        sheetModel.setBattCells(strBattCells);
+        sheetModel.setCell1(strCell1);
+        sheetModel.setCell2(strCell2);
+        sheetModel.setCell3(strCell3);
+        sheetModel.setCell4(strCell4);
+        sheetModel.setCell5(strCell5);
+        sheetModel.setCell6(strCell6);
+        sheetModel.setCell7(strCell7);
+        sheetModel.setCell8(strCell8);
+        sheetModel.setBatteryTerminalGreasing(strBatteryTerminalGreasing);
+        sheetModel.setSolarStructureAndPanelTightness(strSolarStructureAndPanelTightness);
+        sheetModel.setSpareRequirement(strSpareRequirement);
+        sheetModel.setCharger(strCharger);
+        sheetModel.setSolar(strSolarCleaning);
+        sheetModel.setEbConn(strEbConn);
+        sheetModel.setPhotos(strPhotos);
+        sheetModel.setModemConn(strModemConn);
+        sheetModel.setBattTopup(strBattTopup);
+
+        if (ASTUIUtil.isOnline(getContext())) {
+            activityFormDataServiceCall();
+        } else {
+            ASTUIUtil.showToast(Contants.OFFLINE_MESSAGE);
+            saveActivityFormDataIntoDb();
+        }
+    }
 
     @Override
     public boolean onBackPressed() {
         return super.onBackPressed();
 
     }
-   /*   for save this into server
-   arrSaveData[11] = strEarthVolt;
-    arrSaveData[12] = strBattTopup;
-    arrSaveData[13] = strBattCells;
-    arrSaveData[14] = strCharger;
-    arrSaveData[15] = strInverter;
-    arrSaveData[16] = strEbConn;
-    arrSaveData[17] = strConn;
-    arrSaveData[18] = strSolar;
-    arrSaveData[19] = strSignOff;
-    arrSaveData[20] = strCell1;
-    arrSaveData[21] = strCell2;
-    arrSaveData[22] = strCell3;
-    arrSaveData[23] = strCell4;
-    arrSaveData[24] = strCell5;
-    arrSaveData[25] = strCell6;
-    arrSaveData[26] = strCell7;
-    arrSaveData[27] = strCell8;
-    arrSaveData[42] = strPhotos;
-    arrSaveData[43] = strModemConn;
-    arrSaveData[44] = strSpareRequirement;
-    arrSaveData[45] = strBatteryTerminalGreasing;
-    arrSaveData[46] = strSolarStructureAndPanelTightness;*/
+
+    //---------------------Calling Web Service to save activity form data into server--------------------------
+    public void activityFormDataServiceCall() {
+
+        String serviceURL = "";
+        serviceURL = Contants.BASE_URL + Contants.ADD_NEW_ACTIVITY_NEW_URL;
+        serviceURL += "&uid=" + sheetModel.getUserId() + "&sid=" + sheetModel.getSiteId() + "&tid=" + sheetModel.getTaskId() + "&aid=" + sheetModel.getActivityId()
+                + "&neid=" + sheetModel.getNocEnggId() + "&st=" + sheetModel.getStatusId() + "&reason=" + sheetModel.getReasonId() + "&ztype=" + sheetModel.getZoneId()
+                + "&mid=" + sheetModel.getMaterialStatus() + "&remarks=" + sheetModel.getRemarks() + "&isplanned=" + sheetModel.getIsPlanned() + "&ispm=" + sheetModel.getIsPm() + "&earthingvoltage=" + sheetModel.getEarthVolt() +
+                "&batterytopup=" + sheetModel.getBattTopup() + "&batterycells=" + sheetModel.getBattCells() + "&charger=" + sheetModel.getCharger() + "&inverter=" + sheetModel.getInverter() +
+                "&ebconnection=" + sheetModel.getEbConn() + "&connection=" + sheetModel.getConn() + "&solar=" + sheetModel.getSolar() + "&signoff=" + sheetModel.getSignOff() +
+                "&sgc1=" + sheetModel.getCell1() + "&sgc2=" + sheetModel.getCell2() + "&sgc3=" + sheetModel.getCell3() + "&sgc4=" + sheetModel.getCell4() + "&sgc5=" + sheetModel.getCell5() +
+                "&sgc6=" + sheetModel.getCell6() + "&sgc7=" + sheetModel.getCell7() + "&sgc8=" + sheetModel.getCell8() +
+                "&SolarStructure=" + sheetModel.getSolarStructureAndPanelTightness() + "&BattTermnialGreas=" + sheetModel.getBatteryTerminalGreasing() + "&Photo=" + sheetModel.getPhotos() + "&ModemConnection=" + sheetModel.getModemConn() + "&CommStatu=" + "0" + "&SpareReq=" + sheetModel.getSpareRequirement() +
+                "&plandate=" + sheetModel.getPlannedDate() +
+                "&planid=" + sheetModel.getPlanId() + "&da=" + sheetModel.getOtherExpenses() + "&androidtime=" + sheetModel.getSubmitDateTime() + "&numberOfDays=" + sheetModel.getDaysTaken() + "&lat=" + sheetModel.getLatitude() + "&lon=" + sheetModel.getLongitude();
+        serviceURL = serviceURL.replace(" ", "^^");
+
+        Log.d(Contants.LOG_TAG, "activityFormDataServiceCall serviceURL***************" + serviceURL);
+        ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
+        _progrssBar.show();
+        ServiceCaller serviceCaller = new ServiceCaller(getContext());
+       /* serviceCaller.CallCommanServiceMethod(serviceURL, "activityFormDataServiceCall", new IAsyncWorkCompletedCallback() {
+            @Override
+            public void onDone(String result, boolean isComplete) {
+                if (isComplete) {
+                    parseActivityFormData(result, sheetModel.getPlanId());
+                } else {
+                    ASTUIUtil.showToast("Server Side error");
+                }
+                _progrssBar.dismiss();
+            }
+        });*/
+    }
+
+    //parse activity form data response
+    private void parseActivityFormData(String response, String savePlanId) {
+        if (response != null) {
+            try {
+                JSONObject jsonRootObject = new JSONObject(response);
+                String jsonStatus = jsonRootObject.optString("status").toString();
+
+                if (jsonStatus.equals("2")) {
+                    JSONArray jsonArray = jsonRootObject.optJSONArray("data");
+                   /* for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    }*/
+                    atmdbHelper.deleteActivtyFormDataByPlanId(savePlanId);
+                    ASTUIUtil.showToast("Activity Form Data Saved on Server");
+                    openPlannedActivityListTabScreen();
+                } else if (jsonStatus.equals("0")) {
+
+                }
+                //connectingToServer = 0;
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                // connectingToServer = 0;
+            }
+        }
+    }
+
+    //save activity data into db
+    private void saveActivityFormDataIntoDb() {
+        String activityData = new Gson().toJson(sheetModel);
+        ContentLocalData localData = new ContentLocalData();
+        localData.setPlanId(planId);
+        localData.setActivityFormData(activityData);
+        atmdbHelper.upsertActivtyFormData(localData);
+        ASTUIUtil.showToast("Activity Data is Saved Locally");
+        openPlannedActivityListTabScreen();
+    }
+
+    //open openPlannedActivityListTabfragment screen
+    private void openPlannedActivityListTabScreen() {
+        PlannedActivityListTabFragment plannedActivityListTabFragment = new PlannedActivityListTabFragment();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("ActivityRefreshFlag", true);
+        getHostActivity().updateFragment(plannedActivityListTabFragment, bundle);
+    }
+
+
 }

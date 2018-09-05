@@ -148,8 +148,8 @@ public class SiteNotFoundPopup {
       Calling Web Service to get Site Data--------------------------
       */
     private void getSiteSearchData() {
-        ASTProgressBar _progrssBar = new ASTProgressBar(globalContext);
-        _progrssBar.show();
+        progressbar = ProgressDialog.show(globalContext, "",
+                "Please wait while getting data..", true);
         ServiceCaller serviceCaller = new ServiceCaller(globalContext);
         String serviceURL = "";
         serviceURL = Contants.BASE_URL + Contants.ALL_SITE_ID_URL;
@@ -161,8 +161,10 @@ public class SiteNotFoundPopup {
                     parseandsavegetSiteSearchData(result);
                 } else {
                     ASTUIUtil.showToast("Site Search Data Not Avilable");
+                    if(progressbar.isShowing()){
+                        progressbar.dismiss();
+                    }
                 }
-                _progrssBar.dismiss();
             }
         });
     }

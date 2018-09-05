@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.atm.ast.astatm.ASTGson;
 import com.atm.ast.astatm.model.newmodel.Activity;
+import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.District;
 import com.atm.ast.astatm.model.newmodel.FieldEngineer;
@@ -57,7 +58,11 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         String CREATE_FieldEngineer_TABLE = "CREATE TABLE FieldEngineer(FieldEngId INTEGER,FieldEngName TEXT, ContactNo TEXT)";
         db.execSQL(CREATE_FieldEngineer_TABLE);
 
+        String CREATE_ActivtyFormData_TABLE = "CREATE TABLE ActivtyFormData(planId TEXT,activtyFormData TEXT)";
+        db.execSQL(CREATE_ActivtyFormData_TABLE);
+
     }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
         db.execSQL("DROP TABLE IF EXISTS todaySitePlan");
@@ -72,6 +77,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS PlanActivityHeaderDetails");
         db.execSQL("DROP TABLE IF EXISTS NOCEngineer");
         db.execSQL("DROP TABLE IF EXISTS FieldEngineer");
+        db.execSQL("DROP TABLE IF EXISTS ActivtyFormData");
         onCreate(db);
     }
 
@@ -871,6 +877,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return i > 0;
     }
+
     public void populatePlanActivityHeaderValueData(ContentValues values, Header ob) {
         values.put("Planned", ob.getPlanned());
         values.put("Executed", ob.getExecuted());
@@ -902,6 +909,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return list;
     }
+
     //------------------NOCEngineer Details----------------
     public boolean upsertNOCEngineerData(NOCEngineer ob) {
         boolean done = false;
@@ -916,6 +924,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         }
         return done;
     }
+
     //get and check NOCEngineer Data by id
     public NOCEngineer getNOCEngineerDataByID(long id) {
         String query = "Select * FROM NOCEngineer WHERE NocEngId = '" + id + "' ";
@@ -933,12 +942,14 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return ob;
     }
+
     //populate NOCEngineer Data
     private void populateNOCEngineerData(Cursor cursor, NOCEngineer ob) {
         ob.setNocEngId(cursor.getInt(0));
         ob.setNocEngName(cursor.getString(1));
         ob.setContactNo(cursor.getString(2));
     }
+
     public boolean insertNOCEngineerData(NOCEngineer ob) {
         ContentValues values = new ContentValues();
         populateNOCEngineerValueData(values, ob);
@@ -947,6 +958,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return i > 0;
     }
+
     public boolean updateNOCEngineerData(NOCEngineer ob) {
         ContentValues values = new ContentValues();
         populateNOCEngineerValueData(values, ob);
@@ -956,11 +968,13 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return i > 0;
     }
+
     public void populateNOCEngineerValueData(ContentValues values, NOCEngineer ob) {
         values.put("NocEngId", ob.getNocEngId());
         values.put("NocEngName", ob.getNocEngName());
         values.put("ContactNo", ob.getContactNo());
     }
+
     //get all NOCEngineer Data
     public ArrayList<NOCEngineer> getAllNOCEngineerData() {
         String query = "Select *  FROM NOCEngineer ";
@@ -979,6 +993,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return list;
     }
+
     //------------------FieldEngineer Details----------------
     public boolean upsertFieldEngineerData(FieldEngineer ob) {
         boolean done = false;
@@ -993,6 +1008,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         }
         return done;
     }
+
     //get and check FieldEngineer Data by id
     public FieldEngineer getFieldEngineerDataByID(long id) {
         String query = "Select * FROM FieldEngineer WHERE FieldEngId = '" + id + "' ";
@@ -1010,12 +1026,14 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return ob;
     }
+
     //populate FieldEngineer Data
     private void populateFieldEngineerData(Cursor cursor, FieldEngineer ob) {
         ob.setFieldEngId(cursor.getInt(0));
         ob.setFieldEngName(cursor.getString(1));
         ob.setContactNo(cursor.getString(2));
     }
+
     public boolean inserFieldEngineerData(FieldEngineer ob) {
         ContentValues values = new ContentValues();
         populateFieldEngineerValueData(values, ob);
@@ -1024,6 +1042,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return i > 0;
     }
+
     public boolean updateFieldEngineerData(FieldEngineer ob) {
         ContentValues values = new ContentValues();
         populateFieldEngineerValueData(values, ob);
@@ -1033,11 +1052,13 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return i > 0;
     }
+
     public void populateFieldEngineerValueData(ContentValues values, FieldEngineer ob) {
         values.put("FieldEngId", ob.getFieldEngId());
         values.put("FieldEngName", ob.getFieldEngName());
         values.put("ContactNo", ob.getContactNo());
     }
+
     //get all FieldEngineer Data
     public ArrayList<FieldEngineer> getAllFieldEngineerData() {
         String query = "Select *  FROM FieldEngineer ";
@@ -1055,5 +1076,95 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         }
         db.close();
         return list;
+    }
+
+
+    //------------------ActivtyFormData Details----------------
+    public boolean upsertActivtyFormData(ContentLocalData ob) {
+        boolean done = false;
+        ContentLocalData data = null;
+        if (ob.getPlanId() != null && !ob.getPlanId().equals("") && !ob.getPlanId().equals("0")) {
+            data = getActivtyFormDataByID(ob.getPlanId());
+            if (data == null) {
+                done = inserActivtyFormData(ob);
+            } else {
+                done = updateActivtyFormData(ob);
+            }
+        }
+        return done;
+    }
+
+    //get and check ActivtyFormData Data by id
+    public ContentLocalData getActivtyFormDataByID(String id) {
+        String query = "Select * FROM ActivtyFormData WHERE planId = '" + id + "' ";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ContentLocalData ob = new ContentLocalData();
+        if (cursor.moveToFirst()) {
+            cursor.moveToFirst();
+            populateActivtyFormData(cursor, ob);
+            cursor.close();
+        } else {
+            ob = null;
+        }
+        db.close();
+        return ob;
+    }
+
+    //populate ActivtyFormData Data
+    private void populateActivtyFormData(Cursor cursor, ContentLocalData ob) {
+        ob.setPlanId(cursor.getString(0));
+        ob.setActivityFormData(cursor.getString(1));
+    }
+
+    public boolean inserActivtyFormData(ContentLocalData ob) {
+        ContentValues values = new ContentValues();
+        populateActivtyFormValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = db.insert("ActivtyFormData", null, values);
+        db.close();
+        return i > 0;
+    }
+
+    public boolean updateActivtyFormData(ContentLocalData ob) {
+        ContentValues values = new ContentValues();
+        populateActivtyFormValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = 0;
+        i = db.update("ActivtyFormData", values, " planId = '" + ob.getPlanId() + "'", null);
+        db.close();
+        return i > 0;
+    }
+
+    public void populateActivtyFormValueData(ContentValues values, ContentLocalData ob) {
+        values.put("planId", ob.getPlanId());
+        values.put("activtyFormData", ob.getActivityFormData());
+    }
+
+    //get all ActivtyFormData Data
+    public ArrayList<ContentLocalData> getAllActivtyFormData() {
+        String query = "Select *  FROM ActivtyFormData ";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<ContentLocalData> list = new ArrayList<ContentLocalData>();
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+                ContentLocalData ob = new ContentLocalData();
+                populateActivtyFormData(cursor, ob);
+                list.add(ob);
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        return list;
+    }
+
+    public void deleteActivtyFormDataByPlanId(String planId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String condition = " planId = '" + planId + "'";
+        db.delete("ActivtyFormData", condition, null);
+        db.close();
     }
 }

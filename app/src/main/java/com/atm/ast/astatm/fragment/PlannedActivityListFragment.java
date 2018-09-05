@@ -66,7 +66,7 @@ public class PlannedActivityListFragment extends MainFragment {
     //String[] arrCircles;
     String first = "";
     //public String[] arrFeName;
-    AtmDatabase atmDatabase;
+    //  AtmDatabase atmDatabase;
     //public static Boolean[] arrSelectedFilterOne;
     //public static Boolean[] arrSelectedFilterTwo;
     RadioButton rbNoFilter, rbActivity, rbCircle;
@@ -166,7 +166,7 @@ public class PlannedActivityListFragment extends MainFragment {
     protected void dataToView() {
         atmdbHelper = new ATMDBHelper(getContext());
         popup = new PopupWindow(getContext());
-        atmDatabase = new AtmDatabase(getContext());
+        // atmDatabase = new AtmDatabase(getContext());
         //  circleViewResDataList = atmDatabase.getAllCircleData("NAME");
         commonFunctions = new ASTUIUtil();
         //reasonList = new ArrayList<>();

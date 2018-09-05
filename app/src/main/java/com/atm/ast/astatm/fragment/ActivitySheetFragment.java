@@ -7,6 +7,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,6 +20,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atm.ast.astatm.ASTGson;
 import com.atm.ast.astatm.R;
@@ -39,6 +41,7 @@ import com.atm.ast.astatm.model.SiteDisplayDataModel;
 import com.atm.ast.astatm.model.TaskListDataModel;
 import com.atm.ast.astatm.model.TransitDataModel;
 import com.atm.ast.astatm.model.newmodel.Activity;
+import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.FieldEngineer;
 import com.atm.ast.astatm.model.newmodel.NOCEngineer;
@@ -49,6 +52,12 @@ import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.atm.ast.astatm.utils.LogAnalyticsHelper;
 import com.atm.ast.astatm.utils.SiteNotFoundPopup;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -61,7 +70,7 @@ import java.util.Locale;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class ActivitySheetFragment  extends MainFragment {
+public class ActivitySheetFragment extends MainFragment {
     Spinner spActivities, spZone, spNOC, spStatus, spReason, spTask, spMaterialStatus, spDaysTaken;
     FloatingActionButton btnSyncData;
     EditText etRemarks, etComplaintMessage, etOtherExpenses;
@@ -70,28 +79,20 @@ public class ActivitySheetFragment  extends MainFragment {
     PopupWindow siteNotFoundPopupWindow;
     private GoogleApiClient client;
     Dialog daRateChartDialog = null;
-    int dataRefreshed = 0;
-    int dataRefreshedForSms = 0;
+    // int dataRefreshed = 0;
+    //  int dataRefreshedForSms = 0;
     AutoCompleteTextView tvSiteName, tvSiteId;
     Button btnsave;
     Boolean isPlan = false;
     ASTUIUtil commonFunction;
     CustomDialog customDialog;
-    AtmDatabase atmDatabase;
     ATMDBHelper atmdbHelper;
-    // ArrayList<SiteDisplayDataModel> siteDetailArrayList;
     List<Data> siteDetailArrayList;
-    //ArrayList<NocEnggListDataModel> nocEnggList;
     ArrayList<NOCEngineer> nocEnggList;
     ArrayList<FieldEngineer> FieldEngineerList;
     ArrayList<Data> taskList;
     ArrayList<Reason> reasonList;
-    //ArrayList<ActivityListSheetDataModel> activityDetailArrayList;
     ArrayList<Activity> activityDetailArrayList;
-    ActivityListSheetDataModel activityListSheetDataModel;
-    NocEnggListDataModel nocEnggListDataModel;
-    TaskListDataModel taskListDataModel;
-    ReasonListDataModel reasonListDataModel;
     SharedPreferences pref;
     String userId, userRole, userAccess, r1;
     String userName = "";
@@ -103,16 +104,11 @@ public class ActivitySheetFragment  extends MainFragment {
     String lat = "23.23";
     String lon = "23.23";
     String[] arrSiteName, arrSiteId;
-    // Dialog dialog = null;
-    // Dialog equipListDialog = null;
     Dialog unsyncedDialog = null;
-
-    String serviceURL;
     long plannedDate;
     String planId;
     String taskId;
     LogAnalyticsHelper analyticsHelper = null;
-    boolean isPMChecklistDone = true;
     boolean engineerFlage = false;
     boolean pmChecklistFlag = false;
     private String strIsPm;
@@ -221,7 +217,6 @@ public class ActivitySheetFragment  extends MainFragment {
         }
 
         siteNotFoundPopupWindow = new PopupWindow(getContext());
-        atmDatabase = new AtmDatabase(getContext());
         atmdbHelper = new ATMDBHelper(getContext());
         logScreen();
         //--------------Start Background Service--------------------------------
@@ -241,7 +236,11 @@ public class ActivitySheetFragment  extends MainFragment {
         if (appversionName != null) {
             tvCurrentDate.setText(formattedDate + " : " + appversionName);
         }
-        etComplaintMessage.setText(complaintMessage);
+        if (complaintMessage != null && !complaintMessage.equals("")) {
+            etComplaintMessage.setText(complaintMessage);
+        } else {
+            etComplaintMessage.setVisibility(View.GONE);
+        }
         tvSiteName.setEnabled(false);
         tvSiteId.setEnabled(false);
         imgDaChart.setOnClickListener(new View.OnClickListener() {
@@ -261,19 +260,12 @@ public class ActivitySheetFragment  extends MainFragment {
                                                          spZone.setEnabled(false);
                                                          spZone.setSelection(0);
                                                          spActivities.setEnabled(true);
-                                                         //need to verify
-                                                         //   activityDetailArrayList = atmDatabase.getAllActivityData("activity_task_id", taskList.get(position - 1).getTaskId());
-                                                         //setActivityListAdapter();
                                                      } else if (spTask.getSelectedItem().toString().equals("CM")) {
                                                          spZone.setEnabled(true);
                                                          spActivities.setEnabled(true);
-                                                         // activityDetailArrayList = atmDatabase.getAllActivityData("activity_task_id", taskList.get(position - 1).getTaskId());
-                                                         // setActivityListAdapter();
                                                      } else {
                                                          spZone.setEnabled(true);
                                                          spActivities.setEnabled(true);
-                                                         // activityDetailArrayList = atmDatabase.getAllActivityData("activity_task_id", taskList.get(position - 1).getTaskId());
-                                                         //setActivityListAdapter();
                                                      }
 
                                                      if (!planId.equals("0")) {
@@ -297,13 +289,8 @@ public class ActivitySheetFragment  extends MainFragment {
                                                    @Override
                                                    public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
                                                                               int position, long id) {
-                                                       if (spActivities.getSelectedItem().toString().equals("PM")
-                                                               || spActivities.getSelectedItem().toString().equals("CM")
-                                                               || spTask.getSelectedItem().toString().equals("Project")) {
-                                                       }
                                                        if (spActivities.getSelectedItemPosition() > 0) {
                                                            long activityId = getActivityId();
-                                                           //reasonList = atmDatabase.getReasonData(activityFilterId);
                                                            setReasonListAdapter(activityId);
                                                            spReason.setEnabled(true);
                                                            spDaysTaken.setEnabled(true);
@@ -334,13 +321,6 @@ public class ActivitySheetFragment  extends MainFragment {
                                                @Override
                                                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                                                    if (spStatus.getSelectedItemPosition() == 2) {
-                                                     /*  String activityFilterId = getActivityId();
-                                                       if (activityFilterId.equals("")) {
-                                                           ASTUIUtil.showToast("Please Select an Activity");
-                                                       } else {
-                                                           reasonList = atmDatabase.getReasonData(activityFilterId);
-                                                           setReasonListAdapter();
-                                                       }*/
                                                    }
                                                }
 
@@ -354,10 +334,6 @@ public class ActivitySheetFragment  extends MainFragment {
         getAllActivity();
         getNocEnggListData();
         setSiteNameAdapter();
-        setActivityListAdapter();
-        setNocEnggAdapter();
-        setTaskListAdapter();
-        atmDatabase = new AtmDatabase(getContext());
     }
 
     //set all spinner value
@@ -380,13 +356,11 @@ public class ActivitySheetFragment  extends MainFragment {
         statusList.add("Completed");
         statusList.add("Pending");
         statusList.add("Customer Issue");
-        final ArrayList<String> ActivityList = new ArrayList<>();
-        ActivityList.add("--Select Activity--");
         ArrayList<String> MaterialStatusList = new ArrayList<>();
         MaterialStatusList.add("--Select Material Status--");
         MaterialStatusList.add("Material at Site");
         MaterialStatusList.add("Material Moved");
-        ArrayList<String> reasonList = new ArrayList<>();
+       /* ArrayList<String> reasonList = new ArrayList<>();
         reasonList.add("--Select Reason--");
         reasonList.add("NC, Non Comm");
         reasonList.add("ERT, Earthing Issue");
@@ -423,35 +397,23 @@ public class ActivitySheetFragment  extends MainFragment {
         reasonList.add("PCF, Solar PCU faulty");
         reasonList.add("OVF, OVCD  Faulty");
         reasonList.add("OVU, OVCD Upgrade");
-        Collections.sort(reasonList);
+        Collections.sort(reasonList);*/
 
-        //-------------Site Id Auto Complete-----------------------------
-        SiteDisplayDataModel siteDisplayDataModel = new SiteDisplayDataModel();
-        final ArrayList<SiteDisplayDataModel> list = new ArrayList<SiteDisplayDataModel>();
-        //-------------------------------Activity Spinner-----------------------------------
-        ArrayAdapter<String> dataAdapterActivity = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, ActivityList);
-        dataAdapterActivity.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spActivities.setAdapter(dataAdapterActivity);
         //-------------------------------ZOne Spinner-----------------------------------
         // Creating adapter for activity spinner
         ArrayAdapter<String> dataAdapterZone = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, zoneList);
-        // Drop down layout style - list view with radio button
         dataAdapterZone.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // attaching data adapter to spinner
         spZone.setAdapter(dataAdapterZone);
         // ---------------------------------Days Spinner------------------------------------
         ArrayAdapter<String> dataAdapterDays = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, arrDaysTaken);
-        // Drop down layout style - list view with radio button
         dataAdapterZone.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // attaching data adapter to spinner
         spDaysTaken.setAdapter(dataAdapterDays);
 
         //-------------------------------Status Spinner-----------------------------------
         ArrayAdapter<String> dataAdapterStatus = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, statusList);
-        // Drop down layout style - list view with radio button
         dataAdapterStatus.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // attaching data adapter to spinner
         spStatus.setAdapter(dataAdapterStatus);
+
         ArrayAdapter<String> dataAdapterMaterialStatus = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, MaterialStatusList);
         dataAdapterMaterialStatus.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spMaterialStatus.setAdapter(dataAdapterMaterialStatus);
@@ -551,21 +513,46 @@ public class ActivitySheetFragment  extends MainFragment {
     }
 
     public void parseAndSaveActivityDropdownListData(String result) {
-        if (result != null) {
-            ServiceContentData serviceData = ASTGson.store().getObject(ServiceContentData.class, result);
-            if (serviceData != null) {
-                if (serviceData.getStatus() == 2) {
-                    if (serviceData.getData() != null) {
-                        for (Data data : serviceData.getData()) {
-                            atmdbHelper.upsertActivityDropdownData(data);
+
+        ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
+
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                _progrssBar.show();
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                Boolean flag = false;
+                if (result != null) {
+                    ServiceContentData serviceData = ASTGson.store().getObject(ServiceContentData.class, result);
+                    if (serviceData != null) {
+                        if (serviceData.getStatus() == 2) {
+                            if (serviceData.getData() != null) {
+                                for (Data data : serviceData.getData()) {
+                                    atmdbHelper.upsertActivityDropdownData(data);
+                                }
+                                flag = true;
+                            }
                         }
-                        setTaskListAdapter();
                     }
-                } else {
-                    ASTUIUtil.showToast("Task List Not Avilable");
+                }
+
+                return flag;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean flag) {
+                super.onPostExecute(flag);
+                setTaskListAdapter();
+                if (_progrssBar.isShowing()) {
+                    _progrssBar.dismiss();
                 }
             }
-        }
+        }.execute();
     }
 
     /*
@@ -573,6 +560,8 @@ public class ActivitySheetFragment  extends MainFragment {
      *  Calling Web Service to get NOC Engineer List
      */
     private void getNocEnggListData() {
+        ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
+        _progrssBar.show();
         ServiceCaller serviceCaller = new ServiceCaller(getContext());
         String serviceURL = "";
         serviceURL = Contants.BASE_URL + Contants.ALL_NOC_ENGG_LIST_URL;
@@ -582,6 +571,7 @@ public class ActivitySheetFragment  extends MainFragment {
                 if (isComplete) {
                     parseandsaveNocEnggListData(result);
                 }
+                _progrssBar.dismiss();
             }
         });
     }
@@ -590,24 +580,51 @@ public class ActivitySheetFragment  extends MainFragment {
      * Parse and Save getNocEnggListData
      */
     public void parseandsaveNocEnggListData(String result) {
-        if (result != null) {
-            ServiceContentData serviceData = ASTGson.store().getObject(ServiceContentData.class, result);
-            if (serviceData != null) {
-                if (serviceData.getStatus() == 2) {
-                    if (serviceData.getNOCEngineer() != null) {
-                        for (NOCEngineer data : serviceData.getNOCEngineer()) {
-                            atmdbHelper.upsertNOCEngineerData(data);
+
+        ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
+
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                _progrssBar.show();
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                Boolean flag = false;
+                if (result != null) {
+                    ServiceContentData serviceData = ASTGson.store().getObject(ServiceContentData.class, result);
+                    if (serviceData != null) {
+                        if (serviceData.getStatus() == 2) {
+                            if (serviceData.getNOCEngineer() != null) {
+                                for (NOCEngineer data : serviceData.getNOCEngineer()) {
+                                    atmdbHelper.upsertNOCEngineerData(data);
+                                }
+                            }
+                            if (serviceData.getFieldEngineer() != null) {
+                                for (FieldEngineer data : serviceData.getFieldEngineer()) {
+                                    atmdbHelper.upsertFieldEngineerData(data);
+                                }
+                            }
+                            flag = true;
                         }
                     }
-                    if (serviceData.getFieldEngineer() != null) {
-                        for (FieldEngineer data : serviceData.getFieldEngineer()) {
-                            atmdbHelper.upsertFieldEngineerData(data);
-                        }
-                    }
-                    setNocEnggAdapter();
+                }
+
+                return flag;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean flag) {
+                super.onPostExecute(flag);
+                setNocEnggAdapter();
+                if (_progrssBar.isShowing()) {
+                    _progrssBar.dismiss();
                 }
             }
-        }
+        }.execute();
     }
 
     //get all site name and site id
@@ -659,16 +676,43 @@ public class ActivitySheetFragment  extends MainFragment {
 
     //get all activity list
     private void getAllActivity() {
-        ArrayList<Data> dataList = atmdbHelper.getAllActivityDropdownData();
-        activityDetailArrayList = new ArrayList<Activity>();
-        if (dataList != null && dataList.size() > 0) {
-            for (Data data : dataList) {
-                taskList.add(data);//add task lsit data
-                for (Activity activity : data.getActivity()) {
-                    activityDetailArrayList.add(activity);
+        ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
+
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                _progrssBar.show();
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                Boolean flag = false;
+                ArrayList<Data> dataList = atmdbHelper.getAllActivityDropdownData();
+                activityDetailArrayList = new ArrayList<Activity>();
+                if (dataList != null && dataList.size() > 0) {
+                    for (Data data : dataList) {
+                        taskList.add(data);//add task lsit data
+                        for (Activity activity : data.getActivity()) {
+                            activityDetailArrayList.add(activity);
+                        }
+                    }
+                    flag = true;
+                }
+                return flag;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean flag) {
+                super.onPostExecute(flag);
+                setActivityListAdapter();
+                setTaskListAdapter();
+                if (_progrssBar.isShowing()) {
+                    _progrssBar.dismiss();
                 }
             }
-        }
+        }.execute();
     }
 
     //set activity spinner
@@ -689,8 +733,8 @@ public class ActivitySheetFragment  extends MainFragment {
                 }
             }
         }
-        spActivities.setSelection(selectionIndex);
         spActivities.setAdapter(dataAdapter);
+        spActivities.setSelection(selectionIndex);
     }
 
     //set noc engg name list in array
@@ -763,14 +807,6 @@ public class ActivitySheetFragment  extends MainFragment {
                     selectionIndex = i + 1;
                 }
             }
-          /*  if (dataRefreshed == 1) {
-                if (AddNewActivityFlag) {
-                    spTask.setEnabled(true);
-                } else {
-                    spTask.setEnabled(false);
-                }
-                dataRefreshed = 0;
-            }*/
         }
         spTask.setEnabled(false);
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, arrTaskList);
@@ -792,15 +828,13 @@ public class ActivitySheetFragment  extends MainFragment {
     }
 
     public void SaveDataToServer(String NocEnggId, String NocEnggContact, String remarks, int zoneId, int materialStatus, int statusId, int reason) throws ParseException {
-        //  isPlanned = 1;   change to pm checklist activity type 1
+        String isPlanned = "1";  // change to pm checklist activity type 1
 
         String circleName = "NA", clientName = "NA";
-        String siteId = "NA";
-        siteId = tvSiteId.getText().toString();
         for (int i = 0; i < siteDetailArrayList.size(); i++) {
             if (siteDetailArrayList.get(i).getSiteId() == Long.parseLong(siteId)) {//siteDetailArrayList.get(i).getCustomerSiteId().equals(CustomerSiteId) may be change this
                 siteName = siteDetailArrayList.get(i).getSiteName();
-                siteId = siteDetailArrayList.get(i).getSiteId() + "";
+                // siteId = siteDetailArrayList.get(i).getSiteId() + "";
                 clientName = siteDetailArrayList.get(i).getClient();
                 circleName = siteDetailArrayList.get(i).getCircle();
             }
@@ -813,23 +847,22 @@ public class ActivitySheetFragment  extends MainFragment {
             spZone.setSelection(0);
             zoneId = 0;
         }
-        activityId = activityDetailArrayList.get(spActivities.getSelectedItemPosition() - 1).getActivityId() + "";
-        String taskId = taskList.get(spTask.getSelectedItemPosition() - 1).getTaskId() + "";
-
         // 745, 746 Material Status
         if (materialStatus == 1) {
-            materialStatus = 745;
+            materialStatus = 745;// Material at site id
         } else if (materialStatus == 2) {
-            materialStatus = 746;
+            materialStatus = 746;// Material moved id
         }
         //set status id value
         if (statusId == 1) {
-            statusId = 737;
+            statusId = 737;// completed
         } else if (statusId == 2) {
-            statusId = 738;
+            statusId = 738;// pending
         } else if (statusId == 3) {
-            statusId = 739;
+            statusId = 739;// coustomer issue
         }
+
+
 //get reason id from reason list
         long reasonId = 0;
         if (reason > 0) {
@@ -853,7 +886,7 @@ public class ActivitySheetFragment  extends MainFragment {
         sheetModel.setNocEnggContact(NocEnggContact);
         sheetModel.setCircleName(circleName);
         sheetModel.setClientName(clientName);
-        // sheetModel.setIsPlanned(String.valueOf(isPlanned));
+        sheetModel.setIsPlanned(String.valueOf(isPlanned));
         sheetModel.setPlannedDate(String.valueOf(plannedDate));
         sheetModel.setPlanId(planId);
         if (location == null) {
@@ -872,7 +905,7 @@ public class ActivitySheetFragment  extends MainFragment {
         sheetModel.setActivityName(spActivities.getSelectedItem().toString());
         sheetModel.setStatusName(spStatus.getSelectedItem().toString());
         sheetModel.setSiteName(tvSiteName.getText().toString());
-        sheetModel.setSiteId(tvSiteId.getText().toString());
+        //sheetModel.setSiteId(tvSiteId.getText().toString());
         sheetModel.setOtherExpenses(otherExpenses);
         sheetModel.setDaysTaken(daysTaken);
         if (pmChecklistFlag) {
@@ -880,20 +913,45 @@ public class ActivitySheetFragment  extends MainFragment {
         } else {
             strIsPm = "0";
         }
-
+        sheetModel.setIsPm(strIsPm);
+        long submitTime = System.currentTimeMillis();
+        sheetModel.setSubmitDateTime(submitTime);
         // atmDatabase.addFormData(arrSaveData, strIsPm);
-        //  atmDatabase.updatePendingActivity(planId);
+        // atmDatabase.updatePendingActivity(planId);
 
         sendMessage(clientName, circleName, NocEnggContact);
-
-        ASTUIUtil.showToast("Data is Saved Locally");
-        PlannedActivityListTabFragment plannedActivityListTabFragment = new PlannedActivityListTabFragment();
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("ActivityRefreshFlag", true);
-        getHostActivity().updateFragment(plannedActivityListTabFragment, bundle);
+        if (pmChecklistFlag) {
+            saveActivityFormDataIntoDb(sheetModel);
+            openPMCheckListFragment();
+        } else {
+            if (ASTUIUtil.isOnline(getContext())) {
+                activityFormDataServiceCall(sheetModel);
+            } else {
+                ASTUIUtil.showToast(Contants.OFFLINE_MESSAGE);
+                saveActivityFormDataIntoDb(sheetModel);
+                openPlannedActivityListTabScreen();
+            }
+        }
 
     }
 
+    //save activity data into db
+    private void saveActivityFormDataIntoDb(ActivitySheetModel sheetModel) {
+        String activityData = new Gson().toJson(sheetModel);
+        ContentLocalData localData = new ContentLocalData();
+        localData.setPlanId(planId);
+        localData.setActivityFormData(activityData);
+        atmdbHelper.upsertActivtyFormData(localData);
+        ASTUIUtil.showToast("Activity Data is Saved Locally");
+    }
+
+    public void openPMCheckListFragment() {
+        PMCheckLIstFragment pmCheckLIstFragment = new PMCheckLIstFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("headerTxt", "PM CheckList");
+        bundle.putString("PlanId", planId);
+        getHostActivity().updateFragment(pmCheckLIstFragment, bundle);
+    }
 
     //send message
     private void sendMessage(String clientName, String circleName, String NocEnggContact) {
@@ -916,43 +974,40 @@ public class ActivitySheetFragment  extends MainFragment {
         }
     }
 
-    //update plann date
-    private void updatePlannedDate() {
-        String myFormat = "dd/MM/yyyyy";
-        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-    }
-
     public void genrateUnsyncedList() {
         unsyncedDialog.setContentView(R.layout.activity_transit_entries);
         unsyncedDialog.setTitle("Unsynced Entries");
         unsyncedDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         unsyncedDialog.setCanceledOnTouchOutside(false);
-        ActivityFormDataModel activityFormDataModel;
-        ArrayList<ActivityFormDataModel> arrListFormData = new ArrayList<>();
         ListView lvTransit;
         Button btnSyncData;
-        int pendingEntries = atmDatabase.getCircleCount("activty_form_data", "", "");
-        //if (pendingEntries > 0 && connectingToServer == 0) {
-        if (pendingEntries > 0) {
-            arrListFormData = atmDatabase.getAllFormData();
-        }
-        atmDatabase = new AtmDatabase(getContext());
-        List<TransitDataModel> transitDataArrayList = atmDatabase.getTransitData("1");
+        ArrayList<ActivitySheetModel> activityFormList = new ArrayList<>();
+        ArrayList<ContentLocalData> contentLocalData = atmdbHelper.getAllActivtyFormData();
         lvTransit = (ListView) unsyncedDialog.findViewById(R.id.lvTransit);
         btnSyncData = unsyncedDialog.findViewById(R.id.btnSyncData);
-        if (arrListFormData.size() > 0) {
-            lvTransit.setAdapter(new UnsyncedActivityFormAdapter(getContext(), arrListFormData));
-        } else {
-            btnSyncData.setVisibility(View.GONE);
-            ASTUIUtil.showToast("No Pending Entries");
+        if (contentLocalData != null && contentLocalData.size() > 0) {
+            for (int i = 0; i < contentLocalData.size(); i++) {
+                String activityFormStr = contentLocalData.get(i).getActivityFormData();
+                if (activityFormStr != null) {
+                    ActivitySheetModel activityData = new Gson().fromJson(activityFormStr, new TypeToken<ActivitySheetModel>() {
+                    }.getType());
+                    activityFormList.add(activityData);
+                }
+            }
+            lvTransit.setAdapter(new UnsyncedActivityFormAdapter(getContext(), activityFormList));
         }
         btnSyncData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentService = new Intent(getContext(), SyncFormDataWithServerIntentService.class);
-                getContext().startService(intentService);
                 unsyncedDialog.dismiss();
-                ASTUIUtil.showToast("Syncing with server.");
+                if (ASTUIUtil.isOnline(getContext())) {
+                    for (ActivitySheetModel sheetModel : activityFormList) {
+                        activityFormDataServiceCall(sheetModel);
+                    }
+                    ASTUIUtil.showToast("Activity Form Data Syncing with server.");
+                } else {
+                    ASTUIUtil.showToast(Contants.OFFLINE_MESSAGE);
+                }
             }
         });
         unsyncedDialog.show();
@@ -979,14 +1034,22 @@ public class ActivitySheetFragment  extends MainFragment {
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.imgRefresh) {
-            dataRefreshed = 1;
-            dataRefreshedForSms = 1;
-            getSiteSearchData();
-            getActivityDropdownList();//get all task
-            getNocEnggListData();
-            getEquipListData();
+            if (ASTUIUtil.isOnline(getContext())) {
+                getSiteSearchData();
+                getActivityDropdownList();//get all task
+                getNocEnggListData();
+                getEquipListData();
+            } else {
+                ASTUIUtil.showToast(Contants.OFFLINE_MESSAGE);
+            }
         } else if (view.getId() == R.id.btnSyncData) {
-            genrateUnsyncedList();
+            ArrayList<ContentLocalData> contentLocalData = atmdbHelper.getAllActivtyFormData();
+            if (contentLocalData != null && contentLocalData.size() > 0) {
+                genrateUnsyncedList();
+            } else {
+                btnSyncData.setVisibility(View.GONE);
+                ASTUIUtil.showToast("No Activity form data Pending");
+            }
         } else if (view.getId() == R.id.btnsave) {
             checkAllDataValidation();
         }
@@ -1011,9 +1074,8 @@ public class ActivitySheetFragment  extends MainFragment {
         });
     }
 
+    //check all validation
     private void checkAllDataValidation() {
-        int checkSiteId = 0;
-        int checkSiteName = 0;
         String siteName = tvSiteName.getText().toString();
         String custSiteId = tvSiteId.getText().toString();
         int zoneId = spZone.getSelectedItemPosition();
@@ -1021,21 +1083,13 @@ public class ActivitySheetFragment  extends MainFragment {
         int reason = spReason.getSelectedItemPosition();
         String remarks = etRemarks.getText().toString();
         int materialStatus = spMaterialStatus.getSelectedItemPosition();
-        for (int i = 0; i < siteDetailArrayList.size(); i++) {
-            if (siteDetailArrayList.get(i).getCustomerSiteId().equals(custSiteId)) {//  if (siteDetailArrayList.get(i).getSiteId() == Long.parseLong(custSiteId)) {
-                checkSiteId = 1;
-            }
-            if (siteDetailArrayList.get(i).getSiteName().equals(siteName)) {
-                checkSiteName = 1;
-            }
-        }
         //geting eng details
         String NocEnggId = null;
         String NocEnggContact = null;
         if (spNOC.getSelectedItemPosition() == 1) {
             NocEnggId = "0";
         } else {
-            if (nocEnggList != null && nocEnggList.size() > 0) {
+            if (nocEnggList != null && nocEnggList.size() > 0 && spNOC.getSelectedItemPosition() > 1) {
                 NocEnggId = nocEnggList.get(spNOC.getSelectedItemPosition() - 2).getNocEngId() + "";
                 NocEnggContact = nocEnggList.get(spNOC.getSelectedItemPosition() - 2).getContactNo();
             }
@@ -1053,26 +1107,7 @@ public class ActivitySheetFragment  extends MainFragment {
             ASTUIUtil.showToast("Please Select Activity");
         } else if (spNOC.getSelectedItemPosition() == 0) {
             ASTUIUtil.showToast("Please Select NOC Engineer");
-        } else if (checkSiteId == 0) {
-            SiteNotFoundPopup siteNotFoundPopup = new SiteNotFoundPopup();
-            if (dataRefreshedForSms == 0) {
-                ASTUIUtil.showToast("Site ID not found, please press Refresh button");
-                dataRefreshedForSms = 1;
-                siteNotFoundPopup.getSitePopup(siteNotFoundPopupWindow, getContext(), "Please Press Refresh Button", "Refresh", userId, "Refresh", userName);
-            } else {
-                ASTUIUtil.showToast("Site ID not found. Contact NOC");
-                siteNotFoundPopup.getSitePopup(siteNotFoundPopupWindow, getContext(), "Enter Site Id for sending message to NOC.", "Send", userId, "SMS", userName);
-            }
-        } else if (checkSiteName == 0) {
-            SiteNotFoundPopup siteNotFoundPopup = new SiteNotFoundPopup();
-            if (dataRefreshedForSms == 0) {
-                ASTUIUtil.showToast("Site Name not found, please press Refresh button");
-                dataRefreshedForSms = 1;
-                siteNotFoundPopup.getSitePopup(siteNotFoundPopupWindow, getContext(), "Please Press Refresh Button", "Refresh", userId, "Refresh", userName);
-            } else {
-                ASTUIUtil.showToast("Site Name not found. Contact NOC");
-                siteNotFoundPopup.getSitePopup(siteNotFoundPopupWindow, getContext(), "Enter Site Id for sending message to NOC.", "Send", userId, "SMS", userName);
-            }
+            ASTUIUtil.showToast("Site ID not found, please press Refresh button");
         } else if (NocEnggId == null || NocEnggId == "" || NocEnggId.equalsIgnoreCase("--Select Engineer--")) {
             ASTUIUtil.showToast("Please Select Correct Engg Name");
         } else if (materialStatus == 0) {
@@ -1091,12 +1126,72 @@ public class ActivitySheetFragment  extends MainFragment {
         }
     }
 
-    public void openPMCheckListFragment() {
-        PMCheckLIstFragment pmCheckLIstFragment = new PMCheckLIstFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("headerTxt", "PM CheckList");
-        bundle.putBoolean("showMenuButton", false);
-        getHostActivity().updateFragment(pmCheckLIstFragment, bundle);
+    //---------------------Calling Web Service to save activity form data into server--------------------------
+    public void activityFormDataServiceCall(ActivitySheetModel sheetModel) {
+
+        String serviceURL = "";
+        serviceURL = Contants.BASE_URL + Contants.ADD_NEW_ACTIVITY_NEW_URL;
+        serviceURL += "&uid=" + sheetModel.getUserId() + "&sid=" + sheetModel.getSiteId() + "&tid=" + sheetModel.getTaskId() + "&aid=" + sheetModel.getActivityId()
+                + "&neid=" + sheetModel.getNocEnggId() + "&st=" + sheetModel.getStatusId() + "&reason=" + sheetModel.getReasonId() + "&ztype=" + sheetModel.getZoneId()
+                + "&mid=" + sheetModel.getMaterialStatus() + "&remarks=" + sheetModel.getRemarks() + "&isplanned=" + sheetModel.getIsPlanned() + "&ispm=" + sheetModel.getIsPm() + "&earthingvoltage=" + sheetModel.getEarthVolt() +
+                "&batterytopup=" + sheetModel.getBattTopup() + "&batterycells=" + sheetModel.getBattCells() + "&charger=" + sheetModel.getCharger() + "&inverter=" + sheetModel.getInverter() +
+                "&ebconnection=" + sheetModel.getEbConn() + "&connection=" + sheetModel.getConn() + "&solar=" + sheetModel.getSolar() + "&signoff=" + sheetModel.getSignOff() +
+                "&sgc1=" + sheetModel.getCell1() + "&sgc2=" + sheetModel.getCell2() + "&sgc3=" + sheetModel.getCell3() + "&sgc4=" + sheetModel.getCell4() + "&sgc5=" + sheetModel.getCell5() +
+                "&sgc6=" + sheetModel.getCell6() + "&sgc7=" + sheetModel.getCell7() + "&sgc8=" + sheetModel.getCell8() +
+                "&SolarStructure=" + sheetModel.getSolarStructureAndPanelTightness() + "&BattTermnialGreas=" + sheetModel.getBatteryTerminalGreasing() + "&Photo=" + sheetModel.getPhotos() + "&ModemConnection=" + sheetModel.getModemConn() + "&CommStatu=" + "0" + "&SpareReq=" + sheetModel.getSpareRequirement() +
+                "&plandate=" + sheetModel.getPlannedDate() +
+                "&planid=" + sheetModel.getPlanId() + "&da=" + sheetModel.getOtherExpenses() + "&androidtime=" + sheetModel.getSubmitDateTime() + "&numberOfDays=" + sheetModel.getDaysTaken() + "&lat=" + sheetModel.getLatitude() + "&lon=" + sheetModel.getLongitude();
+        serviceURL = serviceURL.replace(" ", "^^");
+
+        Log.d(Contants.LOG_TAG, "activityFormDataServiceCall serviceURL***************" + serviceURL);
+        ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
+        _progrssBar.show();
+        ServiceCaller serviceCaller = new ServiceCaller(getContext());
+       /* serviceCaller.CallCommanServiceMethod(serviceURL, "activityFormDataServiceCall", new IAsyncWorkCompletedCallback() {
+            @Override
+            public void onDone(String result, boolean isComplete) {
+                if (isComplete) {
+                    parseActivityFormData(result, sheetModel.getPlanId());
+                } else {
+                    ASTUIUtil.showToast("Server Side error");
+                }
+                _progrssBar.dismiss();
+            }
+        });*/
     }
 
+    //parse activity form data response
+    private void parseActivityFormData(String response, String savePlanId) {
+        if (response != null) {
+            try {
+                JSONObject jsonRootObject = new JSONObject(response);
+                String jsonStatus = jsonRootObject.optString("status").toString();
+
+                if (jsonStatus.equals("2")) {
+                    JSONArray jsonArray = jsonRootObject.optJSONArray("data");
+                   /* for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    }*/
+                    atmdbHelper.deleteActivtyFormDataByPlanId(savePlanId);
+                    ASTUIUtil.showToast("Activity Form Data Saved on Server");
+                    openPlannedActivityListTabScreen();
+                } else if (jsonStatus.equals("0")) {
+
+                }
+                //connectingToServer = 0;
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                // connectingToServer = 0;
+            }
+        }
+    }
+
+    //open openPlannedActivityListTabfragment screen
+    private void openPlannedActivityListTabScreen() {
+        PlannedActivityListTabFragment plannedActivityListTabFragment = new PlannedActivityListTabFragment();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("ActivityRefreshFlag", true);
+        getHostActivity().updateFragment(plannedActivityListTabFragment, bundle);
+    }
 }

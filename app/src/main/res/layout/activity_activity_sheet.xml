@@ -218,6 +218,7 @@
                 android:layout_marginTop="10dp"
                 android:background="@drawable/edittext_center_bg"
                 android:enabled="false"
+                android:paddingLeft="@dimen/_5dp"
                 android:hint="Type message"
                 android:inputType="textMultiLine"
                 android:lines="3" />
