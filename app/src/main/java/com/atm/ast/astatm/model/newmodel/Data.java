@@ -12,6 +12,9 @@ public class Data extends FNObject {
     private long CircleId;
     private String Circle;
 
+    public Data() {
+    }
+
     public String getSiteName() {
         return SiteName;
     }

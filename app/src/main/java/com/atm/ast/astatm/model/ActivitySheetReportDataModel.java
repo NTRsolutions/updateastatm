@@ -23,6 +23,42 @@ public class ActivitySheetReportDataModel {
     String feId;
     String leave;
     String circle;
+    String Reason;
+    String CircleId;
+    String FEId;
+    String FEName;
+
+    public String getReason() {
+        return Reason;
+    }
+
+    public void setReason(String reason) {
+        Reason = reason;
+    }
+
+    public String getCircleId() {
+        return CircleId;
+    }
+
+    public void setCircleId(String circleId) {
+        CircleId = circleId;
+    }
+
+    public String getFEId() {
+        return FEId;
+    }
+
+    public void setFEId(String FEId) {
+        this.FEId = FEId;
+    }
+
+    public String getFEName() {
+        return FEName;
+    }
+
+    public void setFEName(String FEName) {
+        this.FEName = FEName;
+    }
 
     public String getCircle() {
         return circle;

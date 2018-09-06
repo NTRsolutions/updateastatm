@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.atm.ast.astatm.ASTGson;
+import com.atm.ast.astatm.model.ActivitySheetReportDataModel;
 import com.atm.ast.astatm.model.newmodel.Activity;
 import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.model.newmodel.Data;
@@ -57,10 +58,12 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_NOCEngineer_TABLE);
         String CREATE_FieldEngineer_TABLE = "CREATE TABLE FieldEngineer(FieldEngId INTEGER,FieldEngName TEXT, ContactNo TEXT)";
         db.execSQL(CREATE_FieldEngineer_TABLE);
-
         String CREATE_ActivtyFormData_TABLE = "CREATE TABLE ActivtyFormData(planId TEXT,activtyFormData TEXT)";
         db.execSQL(CREATE_ActivtyFormData_TABLE);
-
+        String CREATE_ActivitySheetReportHeaderDetails_TABLE = "CREATE TABLE ActivitySheetReportHeaderDetails(Planned INTEGER,Executed INTEGER, OnTheWay TEXT,ReachedSite TEXT,LeftSite TEXT,Unknown TEXT,Circle TEXT,AttendanceCount INTEGER,WorkingCount INTEGER,LeaveCount INTEGER)";
+        db.execSQL(CREATE_ActivitySheetReportHeaderDetails_TABLE);
+        String CREATE_ActivitySheetReportDetails_TABLE = "CREATE TABLE ActivitySheetReportDetails(siteName TEXT,Customer TEXT, ActivityDate TEXT,ActivityTime TEXT,ZoneType TEXT,TotalAmount TEXT,Status TEXT,Days TEXT,Color TEXT,NOCApprovel TEXT,Activity TEXT,TADA TEXT,Bonus TEXT,Penalty TEXT,Reason TEXT,CircleId TEXT,Circle TEXT,FEId TEXT,FEName TEXT)";
+        db.execSQL(CREATE_ActivitySheetReportDetails_TABLE);
     }
 
     @Override
@@ -78,6 +81,8 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS NOCEngineer");
         db.execSQL("DROP TABLE IF EXISTS FieldEngineer");
         db.execSQL("DROP TABLE IF EXISTS ActivtyFormData");
+        db.execSQL("DROP TABLE IF EXISTS ActivitySheetReportHeaderDetails");
+        db.execSQL("DROP TABLE IF EXISTS ActivitySheetReportDetails");
         onCreate(db);
     }
 
@@ -1166,5 +1171,137 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         String condition = " planId = '" + planId + "'";
         db.delete("ActivtyFormData", condition, null);
         db.close();
+    }
+
+
+    //-----------------------ActivitySheetReportHeader Details----------------------
+    //populate ActivitySheetReportHeaderDetails Data
+    private void populateActivitySheetReportHeaderDetails(Cursor cursor, Header ob) {
+        ob.setPlanned(cursor.getInt(0));
+        ob.setExecuted(cursor.getInt(1));
+        ob.setOnTheWay(cursor.getString(2));
+        ob.setReachedSite(cursor.getString(3));
+        ob.setLeftSite(cursor.getString(4));
+        ob.setUnknown(cursor.getString(5));
+        ob.setCircle(cursor.getString(6));
+        ob.setAttendanceCount(cursor.getInt(7));
+        ob.setWorkingCount(cursor.getInt(8));
+        ob.setLeaveCount(cursor.getInt(9));
+    }
+
+    public boolean insertActivitySheetReportHeaderDetails(Header ob) {
+        ContentValues values = new ContentValues();
+        populateActivitySheetReportHeaderDetailsValue(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = db.insert("ActivitySheetReportHeaderDetails", null, values);
+        db.close();
+        return i > 0;
+    }
+
+    public void populateActivitySheetReportHeaderDetailsValue(ContentValues values, Header ob) {
+        values.put("Planned", ob.getPlanned());
+        values.put("Executed", ob.getExecuted());
+        values.put("OnTheWay", ob.getOnTheWay());
+        values.put("ReachedSite", ob.getReachedSite());
+        values.put("LeftSite", ob.getLeftSite());
+        values.put("Unknown", ob.getUnknown());
+        values.put("Circle", ob.getCircle());
+        values.put("AttendanceCount", ob.getAttendanceCount());
+        values.put("WorkingCount", ob.getWorkingCount());
+        values.put("LeaveCount", ob.getLeaveCount());
+    }
+
+    //get all ActivitySheetReportHeaderDetails Data
+    public ArrayList<Header> getAllActivitySheetReportHeaderDetails() {
+        String query = "Select *  FROM ActivitySheetReportHeaderDetails ";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<Header> list = new ArrayList<Header>();
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+                Header ob = new Header();
+                populatePlanActivityHeaderData(cursor, ob);
+                list.add(ob);
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        return list;
+    }
+
+    //-----------------------ActivitySheetReportDetails----------------------
+    //populate ActivitySheetReportDetails
+    private void populateActivitySheetReportDetails(Cursor cursor, ActivitySheetReportDataModel ob) {
+        ob.setSiteName(cursor.getString(0));
+        ob.setCustomer(cursor.getString(1));
+        ob.setActivityDate(cursor.getString(2));
+        ob.setActivityTime(cursor.getString(3));
+        ob.setZoneType(cursor.getString(4));
+        ob.setTotalAmount(cursor.getString(5));
+        ob.setCircle(cursor.getString(6));
+        ob.setStatus(cursor.getString(7));
+        ob.setDays(cursor.getString(8));
+        ob.setColor(cursor.getString(9));
+        ob.setNocApprovel(cursor.getString(10));
+        ob.setActivity(cursor.getString(11));
+        ob.setTaDaAmt(cursor.getString(12));
+        ob.setBonus(cursor.getString(13));
+        ob.setPenalty(cursor.getString(14));
+        ob.setReason(cursor.getString(15));
+        ob.setCircleId(cursor.getString(16));
+        ob.setColor(cursor.getString(17));
+        ob.setFEId(cursor.getString(18));
+        ob.setFEName(cursor.getString(19));
+    }
+
+    public boolean insertActivitySheetReportDetails(ActivitySheetReportDataModel ob) {
+        ContentValues values = new ContentValues();
+        populateActivitySheetReportDetailsValue(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = db.insert("ActivitySheetReportDetails", null, values);
+        db.close();
+        return i > 0;
+    }
+
+    public void populateActivitySheetReportDetailsValue(ContentValues values, ActivitySheetReportDataModel ob) {
+        values.put("siteName", ob.getSiteName());
+        values.put("Customer", ob.getCustomer());
+        values.put("ActivityDate", ob.getActivityDate());
+        values.put("ActivityTime", ob.getActivityTime());
+        values.put("ZoneType", ob.getZoneType());
+        values.put("TotalAmount", ob.getTotalAmount());
+        values.put("Status", ob.getStatus());
+        values.put("Days", ob.getDays());
+        values.put("Color", ob.getColor());
+        values.put("NOCApprovel", ob.getNocApprovel());
+        values.put("Activity", ob.getActivity());
+        values.put("TADA", ob.getTaDaAmt());
+        values.put("Bonus", ob.getBonus());
+        values.put("Penalty", ob.getPenalty());
+        values.put("Reason", ob.getReason());
+        values.put("CircleId", ob.getCircleId());
+        values.put("Circle", ob.getCircle());
+        values.put("FEId", ob.getFEId());
+        values.put("FEName", ob.getFEName());
+    }
+
+    //get all ActivitySheetReportDetails
+    public ArrayList<ActivitySheetReportDataModel> getAllActivitySheetReportDetails() {
+        String query = "Select *  FROM ActivitySheetReportDetails ";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<ActivitySheetReportDataModel> list = new ArrayList<ActivitySheetReportDataModel>();
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+                ActivitySheetReportDataModel ob = new ActivitySheetReportDataModel();
+                populateActivitySheetReportDetails(cursor, ob);
+                list.add(ob);
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        return list;
     }
 }

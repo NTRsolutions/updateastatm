@@ -23,6 +23,7 @@ import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
+import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
 import com.atm.ast.astatm.model.newmodel.ActivitySheetModel;
 import com.atm.ast.astatm.model.newmodel.ContentLocalData;
@@ -495,7 +496,7 @@ public class PMCheckLIstFragment extends MainFragment {
         ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
         _progrssBar.show();
         ServiceCaller serviceCaller = new ServiceCaller(getContext());
-       /* serviceCaller.CallCommanServiceMethod(serviceURL, "activityFormDataServiceCall", new IAsyncWorkCompletedCallback() {
+        serviceCaller.CallCommanServiceMethod(serviceURL, "activityFormDataServiceCall", new IAsyncWorkCompletedCallback() {
             @Override
             public void onDone(String result, boolean isComplete) {
                 if (isComplete) {
@@ -505,7 +506,7 @@ public class PMCheckLIstFragment extends MainFragment {
                 }
                 _progrssBar.dismiss();
             }
-        });*/
+        });
     }
 
     //parse activity form data response
@@ -550,7 +551,7 @@ public class PMCheckLIstFragment extends MainFragment {
     private void openPlannedActivityListTabScreen() {
         PlannedActivityListTabFragment plannedActivityListTabFragment = new PlannedActivityListTabFragment();
         Bundle bundle = new Bundle();
-        bundle.putBoolean("ActivityRefreshFlag", true);
+        bundle.putString("headerTxt", "Activity Monitor");
         getHostActivity().updateFragment(plannedActivityListTabFragment, bundle);
     }
 

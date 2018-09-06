@@ -16,7 +16,6 @@ public class PlannedActivityListTabFragment extends MainFragment {
     ViewPager viewPager;
     TabLayout tabLayout;
     String con = "";
-    boolean activityRefreshFlag = false;
 
     @Override
     protected int fragmentLayout() {
@@ -26,7 +25,6 @@ public class PlannedActivityListTabFragment extends MainFragment {
     @Override
     protected void getArgs() {
         con = this.getArguments().getString("condition");
-        activityRefreshFlag = this.getArguments().getBoolean("ActivityRefreshFlag", false);
     }
 
     @Override

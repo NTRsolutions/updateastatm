@@ -15,9 +15,11 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.atm.ast.astatm.ASTGson;
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
+import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
@@ -25,6 +27,9 @@ import com.atm.ast.astatm.model.ActivityListSheetDataModel;
 import com.atm.ast.astatm.model.ActivitySheetReportDataModel;
 import com.atm.ast.astatm.model.CircleDisplayDataModel;
 import com.atm.ast.astatm.model.ExecutedActivityListModel;
+import com.atm.ast.astatm.model.newmodel.Data;
+import com.atm.ast.astatm.model.newmodel.Header;
+import com.atm.ast.astatm.model.newmodel.ServiceContentData;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.atm.ast.astatm.utils.FilterPopupActivity;
 
@@ -45,27 +50,15 @@ public class ActivitySheetReportFragment extends MainFragment {
     View viewVertical5;
     AutoCompleteTextView etSearch;
     ImageView imgRefresh;
-    AtmDatabase atmDatabase;
-    String[] arrActivities;
-    String[] arrCircles;
-    public static int[] checkListActivity;
-    public static int[] checkListCircle;
-    PopupWindow popup = null;
-    public static List<CircleDisplayDataModel> circleViewResDataList = new ArrayList<CircleDisplayDataModel>();
-    public String[] arrFeName;
-    String uid = "";
     String lat = "25.30";
     String lon = "25.30";
     //Shared Prefrences
     SharedPreferences pref;
-    String userId, userRole, userAccess, r1;
-    ActivitySheetReportDataModel activitySheetReportDataModel;
-    ArrayList<ActivitySheetReportDataModel> activitySheetReportArrayList;
-    ArrayList<ExecutedActivityListModel> arrExecutedActivityData;
-    ArrayList<ActivityListSheetDataModel> arrActivityList;
-    ArrayList<ActivitySheetReportDataModel> arrActivityListFilter;
+    String userId = "";
     String[][] arrColorCode = new String[15][2];
     TextView tvVersionNumber;
+    ATMDBHelper atmdbHelper;
+    ArrayList<ActivitySheetReportDataModel> activitySheetReportArrayList;
 
     @Override
     protected int fragmentLayout() {
@@ -105,14 +98,11 @@ public class ActivitySheetReportFragment extends MainFragment {
      */
     public void getSharedPrefData() {
         pref = getContext().getSharedPreferences("MyPref", MODE_PRIVATE);
-        uid = pref.getString("userId", "");
+        userId = pref.getString("userId", "");
     }
 
     @Override
     protected void dataToView() {
-        popup = new PopupWindow(getContext());
-        atmDatabase = new AtmDatabase(getContext());
-        arrExecutedActivityData = new ArrayList<>();
         arrColorCode[0][0] = "G";
         arrColorCode[0][1] = "#00FF00";
         arrColorCode[1][0] = "Y";
@@ -149,18 +139,18 @@ public class ActivitySheetReportFragment extends MainFragment {
             tvVersionNumber.setText(versionName);
         }
         inflater = LayoutInflater.from(getContext());
-        arrExecutedActivityData = atmDatabase.getExecutedActivityData();
-        circleViewResDataList = atmDatabase.getAllCircleData("NAME");
-        String lastUpdatedDate = new SimpleDateFormat("MMM d, yyyy").format(atmDatabase.getExecutedActivityLastUpdatedDate());
-        String currentDate = new SimpleDateFormat("MMM d, yyyy").format(System.currentTimeMillis());
-        arrActivityList = atmDatabase.getAllActivityData("", "");
-        if (arrExecutedActivityData.size() <= 0 || !lastUpdatedDate.equals(currentDate)) {
+        atmdbHelper = new ATMDBHelper(getContext());
+        activitySheetReportArrayList = new ArrayList<>();
+        if (ASTUIUtil.isOnline(getContext())) {
             getActivitySheetReportData();
-            arrActivities = new String[arrActivityList.size()];
-            arrCircles = new String[circleViewResDataList.size()];
         } else {
-            activitySheetReportArrayList = new ArrayList<>();
-            tvPlannedExecuted.setText("Planned/Executed: " + arrExecutedActivityData.get(0).getExecuted());
+            ASTUIUtil.showToast(Contants.OFFLINE_MESSAGE);
+            activitySheetReportArrayList = atmdbHelper.getAllActivitySheetReportDetails();
+            inflateTableRow(activitySheetReportArrayList);
+            setFeNameAdapter(arrListFeName);
+        }
+
+           /* tvPlannedExecuted.setText("Planned/Executed: " + arrExecutedActivityData.get(0).getExecuted());
             tvOnTheWay.setText("On The Way: " + arrExecutedActivityData.get(0).getOnTheWay());
             tvReachedSite.setText("Reached Site: " + arrExecutedActivityData.get(0).getReachedSite());
             tvLeftSite.setText("Left Site: " + arrExecutedActivityData.get(0).getLeftSite());
@@ -196,62 +186,19 @@ public class ActivitySheetReportFragment extends MainFragment {
                 arrListFeName.add(activitySheetReportArrayList.get(i).getFeName());
             }
             inflateTableRow(activitySheetReportArrayList);
-            setFeNameAdapter(arrListFeName);
-        }
+            setFeNameAdapter(arrListFeName);*/
 
 
-        popup.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-               /* arrActivityListFilter = activitySheetReportArrayList;
-                ArrayList<ActivitySheetReportDataModel> arrActivityListFilterTemp = new ArrayList();
-                ArrayList<ActivitySheetReportDataModel> arrActivityListFilterTemp1 = new ArrayList();
-                for (int j = 0; j < arrActivities.length; j++) {
-                    if (PlannedActivityListFragment.arrSelectedFilterOne[j] == true) {
-                        for (int i = 0; i < arrActivityListFilter.size(); i++) {
-                            if (arrActivities[j].equals(arrActivityListFilter.get(i).getActivity())) {
-                                arrActivityListFilterTemp.add(arrActivityListFilter.get(i));
-                            }
-                        }
-                    }
-                }
-                for (int i = 0; i < arrCircles.length; i++) {
-                    if (PlannedActivityListFragment.arrSelectedFilterTwo[i] == true) {
-                        if (arrActivityListFilterTemp.size() > 1) {
-                            for (int j = 0; j < arrActivityListFilterTemp.size(); j++) {
-                                if (arrActivityListFilterTemp.get(j).getCircle().equals(arrCircles[i])) {
-                                    arrActivityListFilterTemp1.add(arrActivityListFilterTemp.get(j));
-                                }
-                            }
-                        } else {
-                            for (int j = 0; j < arrActivityListFilter.size(); j++) {
-                                if (arrCircles[i].equals(arrActivityListFilter.get(j).getCircle())) {
-                                    arrActivityListFilterTemp.add(arrActivityListFilter.get(j));
-                                }
-                            }
-                        }
-                    }
-                }
-                if (arrActivityListFilterTemp1.size() > 0) {
-                    arrActivityListFilterTemp = arrActivityListFilterTemp1;
-                }
-                if (arrActivityListFilterTemp.size() > 0) {
-                    inflateTableRow(arrActivityListFilterTemp);
-                } else {
-                    ASTUIUtil.showToast("Data Not Found");
-                }*/
-            }
-        });
     }
 
 
     /**
      * inflate Table Row Item
-     * @param activitySheetReportArrayList
      */
 
-    public void inflateTableRow(final ArrayList<ActivitySheetReportDataModel> activitySheetReportArrayList) {
-        if (activitySheetReportArrayList.size() > 0) {
+    public void inflateTableRow(ArrayList<ActivitySheetReportDataModel> activitySheetReportArrayList) {
+
+        if (activitySheetReportArrayList != null && activitySheetReportArrayList.size() > 0) {
             llActivitySheetReport.removeAllViews();
             for (int i = 0; i < activitySheetReportArrayList.size(); i++) {
                 View view = inflater.inflate(R.layout.activity_sheet_report_table_item, llActivitySheetReport, false);
@@ -315,7 +262,7 @@ public class ActivitySheetReportFragment extends MainFragment {
         _progrssBar.show();
         ServiceCaller serviceCaller = new ServiceCaller(getContext());
         String serviceURL = Contants.BASE_URL + Contants.GET_ACTIVITY_REPORT_URL;
-        serviceURL += "&uid=" + uid + "&lat=" + lat + "&lon=" + lon;
+        serviceURL += "&uid=" + userId + "&lat=" + lat + "&lon=" + lon;
         serviceCaller.CallCommanServiceMethod(serviceURL, "getActivitySheetReportData", new IAsyncWorkCompletedCallback() {
             @Override
             public void onDone(String result, boolean isComplete) {
@@ -339,7 +286,9 @@ public class ActivitySheetReportFragment extends MainFragment {
                 JSONObject jsonRootObject = new JSONObject(result);
                 String jsonStatus = jsonRootObject.optString("status").toString();
                 if (jsonStatus.equals("2")) {
-                    ArrayList<ExecutedActivityListModel> arrExecutedActivityData = new ArrayList<>();
+                    atmdbHelper.deleteAllRows("ActivitySheetReportHeaderDetails");
+                    atmdbHelper.deleteAllRows("ActivitySheetReportDetails");
+
                     String planned = "";
                     String executed = "";
                     String onTheWay = "";
@@ -363,35 +312,25 @@ public class ActivitySheetReportFragment extends MainFragment {
                         attendanceCount = jsonObject.optString("AttendanceCount").toString();
                         workingCount = jsonObject.optString("WorkingCount").toString();
                         leaveCount = jsonObject.optString("LeaveCount").toString();
-                        tvPlannedExecuted.setText("Planned/Executed: " + planned + "/" + executed);
-                        tvOnTheWay.setText("On The Way: " + onTheWay);
-                        tvReachedSite.setText("Reached Site: " + reachedSite);
-                        tvLeftSite.setText("Left Site: " + leftSite);
-                        tvUnknown.setText("Unknown: " + unknown);
-                        //tvCircleName.setText("Circle Name: " + );
-                        tvAttendance.setText("Attendance/Leave: " + attendanceCount + "/" + leaveCount);
-                        tvCircleName.setVisibility(View.GONE);
-                        viewVertical5.setVisibility(View.GONE);
-                        if (onTheWay.equals("")) {
-                            tvOnTheWay.setText("N/A");
-                        }
-                        if (reachedSite.equals("")) {
-                            tvReachedSite.setText("N/A");
-                        }
-                        if (leftSite.equals("")) {
-                            tvLeftSite.setText("N/A");
-                        }
-                        if (unknown.equals("")) {
-                            tvUnknown.setText("N/A");
-                        }
+
+                        Header header = new Header();
+                        header.setPlanned(Long.parseLong(planned));
+                        header.setExecuted(Long.parseLong(executed));
+                        header.setOnTheWay(onTheWay);
+                        header.setReachedSite(reachedSite);
+                        header.setLeftSite(leftSite);
+                        header.setUnknown(unknown);
+                        header.setCircle(circle);
+                        header.setAttendanceCount(Long.parseLong(attendanceCount));
+                        header.setWorkingCount(Long.parseLong(workingCount));
+                        header.setLeaveCount(Long.parseLong(leaveCount));
+                        atmdbHelper.insertActivitySheetReportHeaderDetails(header);
                     }
+                    setHeaderValue();
                     JSONArray jsonArray = jsonRootObject.optJSONArray("data");
                     activitySheetReportArrayList = new ArrayList<>(jsonArray.length());
                     ArrayList<String> arrListFeName = new ArrayList<>();
-                    int rowNumber = 0;
-                    int arrayLength = jsonArray.length();
                     for (int i = 0; i < jsonArray.length(); i++) {
-                        rowNumber = i;
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                         String siteName = jsonObject.optString("siteName").toString();
                         String customer = jsonObject.optString("Customer").toString();
@@ -413,7 +352,7 @@ public class ActivitySheetReportFragment extends MainFragment {
                         if (!arrListFeName.contains(feName)) {
                             arrListFeName.add(feName);
                         }
-                        activitySheetReportDataModel = new ActivitySheetReportDataModel();
+                        ActivitySheetReportDataModel activitySheetReportDataModel = new ActivitySheetReportDataModel();
                         activitySheetReportDataModel.setSiteName(siteName);
                         activitySheetReportDataModel.setCustomer(customer);
                         activitySheetReportDataModel.setActivityDate(activityDate);
@@ -430,40 +369,11 @@ public class ActivitySheetReportFragment extends MainFragment {
                         activitySheetReportDataModel.setPenalty(penalty);
                         activitySheetReportDataModel.setFeName(feName);
                         activitySheetReportDataModel.setFeId(feId);
-                        activitySheetReportArrayList.add(activitySheetReportDataModel);
-                        ExecutedActivityListModel executedActivityListModel = new ExecutedActivityListModel();
-                        executedActivityListModel.setExecuted(executed);
-                        executedActivityListModel.setOnTheWay(onTheWay);
-                        executedActivityListModel.setReachedSite(reachedSite);
-                        executedActivityListModel.setLeftSite(leftSite);
-                        executedActivityListModel.setUnknown(unknown);
-                        executedActivityListModel.setAttendance(attendanceCount);
-                        executedActivityListModel.setSiteName(siteName);
-                        executedActivityListModel.setCustomer(customer);
-                        executedActivityListModel.setActivityDate(activityDate);
-                        executedActivityListModel.setActivityTime(activityTime);
-                        executedActivityListModel.setZoneType(zoneType);
-                        executedActivityListModel.setTotalAmount(totalAmount);
-                        executedActivityListModel.setStatus(status);
-                        executedActivityListModel.setDays(days);
-                        executedActivityListModel.setColor(color);
-                        executedActivityListModel.setActivity(activity);
-                        executedActivityListModel.setNocApprovel(nocApprovel);
-                        executedActivityListModel.setTaDaAmt(taDaAmt);
-                        executedActivityListModel.setBonus(bonus);
-                        executedActivityListModel.setPenalty(penalty);
-                        executedActivityListModel.setFeId(feId);
-                        executedActivityListModel.setFeName(feName);
-                        executedActivityListModel.setLeave(leaveCount);
-                        executedActivityListModel.setCircle(executedCircleName);
-                        arrExecutedActivityData.add(executedActivityListModel);
+                        activitySheetReportDataModel.setCircle(executedCircleName);
+                        atmdbHelper.insertActivitySheetReportDetails(activitySheetReportDataModel);
                     }
-                    atmDatabase.deleteAllRows("executed_activity");
-                    atmDatabase.addExecutedActivityData(arrExecutedActivityData);
+                    activitySheetReportArrayList = atmdbHelper.getAllActivitySheetReportDetails();
                     inflateTableRow(activitySheetReportArrayList);
-                    arrActivities = new String[activitySheetReportArrayList.size()];
-                    int f = activitySheetReportArrayList.size();
-                    arrCircles = new String[circleViewResDataList.size()];
                     setFeNameAdapter(arrListFeName);
                 }
             } catch (JSONException e) {
@@ -474,8 +384,39 @@ public class ActivitySheetReportFragment extends MainFragment {
 
     }
 
+    //set header value
+    private void setHeaderValue() {
+        ArrayList<Header> headersList = atmdbHelper.getAllActivitySheetReportHeaderDetails();
+        if (headersList != null && headersList.size() > 0) {
+            for (Header header : headersList) {
+                tvPlannedExecuted.setText("Planned/Executed: " + header.getPlanned() + "/" + header.getExecuted());
+                tvOnTheWay.setText("On The Way: " + header.getOnTheWay());
+                tvReachedSite.setText("Reached Site: " + header.getReachedSite());
+                tvLeftSite.setText("Left Site: " + header.getLeftSite());
+                tvUnknown.setText("Unknown: " + header.getUnknown());
+                tvAttendance.setText("Attendance/Leave: " + header.getAttendanceCount() + "/" + header.getLeaveCount());
+                tvCircleName.setVisibility(View.GONE);
+                viewVertical5.setVisibility(View.GONE);
+                if (header.getOnTheWay().equals("")) {
+                    tvOnTheWay.setText("N/A");
+                }
+                if (header.getReachedSite().equals("")) {
+                    tvReachedSite.setText("N/A");
+                }
+                if (header.getLeftSite().equals("")) {
+                    tvLeftSite.setText("N/A");
+                }
+                if (header.getUnknown().equals("")) {
+                    tvUnknown.setText("N/A");
+                }
+            }
+        }
+
+    }
+
     /**
      * set Name Adapter
+     *
      * @param arrListFeName
      */
 
@@ -486,9 +427,11 @@ public class ActivitySheetReportFragment extends MainFragment {
             @Override
             public void afterTextChanged(Editable s) {
             }
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
+
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String searchText = etSearch.getText().toString();
@@ -508,7 +451,6 @@ public class ActivitySheetReportFragment extends MainFragment {
                     }
                 }
                 inflateTableRow(activitySheetReportTempArrayList);
-
             }
         });
     }
@@ -518,41 +460,8 @@ public class ActivitySheetReportFragment extends MainFragment {
     public void onClick(View view) {
         if (view.getId() == R.id.imgRefresh) {
             getActivitySheetReportData();
-        } else if (view.getId() == R.id.tvFilter) {
-            getFIlterData();
         }
 
     }
 
-    /**
-     * get Filter Data
-     */
-
-    public void getFIlterData() {
-        String[] arrParentData = new String[2];
-        arrActivities = new String[arrActivityList.size()];
-        arrCircles = new String[circleViewResDataList.size()];
-        String[] arrFilteredIdData = {"Battery", "NoComm", "INV"};
-        arrParentData[0] = "Activity";
-        arrParentData[1] = "Circle";
-        checkListCircle = new int[0];
-        checkListActivity = new int[0];
-        for (int i = 0; i < circleViewResDataList.size(); i++) {
-            arrCircles[i] = circleViewResDataList.get(i).getCircleName();
-        }
-        for (int i = 0; i < arrActivityList.size(); i++) {
-            arrActivities[i] = arrActivityList.get(i).getActivityName();
-        }
-        /*PlannedActivityListFragment.arrSelectedFilterOne = new Boolean[arrActivities.length];
-        PlannedActivityListFragment.arrSelectedFilterTwo = new Boolean[arrCircles.length];
-        for (int i = 0; i < arrActivities.length; i++) {
-            PlannedActivityListFragment.arrSelectedFilterOne[i] = false;
-        }
-        for (int i = 0; i < arrCircles.length; i++) {
-            PlannedActivityListFragment.arrSelectedFilterTwo[i] = false;
-        }
-        FilterPopupActivity filterPopup = new FilterPopupActivity();
-        filterPopup.getFilterPopup(popup, getContext(), arrParentData, arrActivities, arrCircles, arrFilteredIdData, "planned_activity");*/
-
-    }
 }

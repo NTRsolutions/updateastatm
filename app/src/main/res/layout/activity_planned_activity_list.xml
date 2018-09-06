@@ -101,7 +101,8 @@
                         android:layout_gravity="center"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:visibility="gone">
 
                         <ImageView
                             android:id="@+id/filter"
@@ -455,11 +456,11 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
-        android:backgroundTint="@color/white"
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/_10dp"
-        android:visibility="gone"
-        android:src="@drawable/add_new_activity_btn" />
+        android:backgroundTint="@color/white"
+        android:src="@drawable/add_new_activity_btn"
+        android:visibility="gone" />
 
 
 </RelativeLayout>

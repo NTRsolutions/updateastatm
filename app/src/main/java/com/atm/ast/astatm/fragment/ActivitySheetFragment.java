@@ -1147,7 +1147,7 @@ public class ActivitySheetFragment extends MainFragment {
         ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
         _progrssBar.show();
         ServiceCaller serviceCaller = new ServiceCaller(getContext());
-       /* serviceCaller.CallCommanServiceMethod(serviceURL, "activityFormDataServiceCall", new IAsyncWorkCompletedCallback() {
+        serviceCaller.CallCommanServiceMethod(serviceURL, "activityFormDataServiceCall", new IAsyncWorkCompletedCallback() {
             @Override
             public void onDone(String result, boolean isComplete) {
                 if (isComplete) {
@@ -1157,7 +1157,7 @@ public class ActivitySheetFragment extends MainFragment {
                 }
                 _progrssBar.dismiss();
             }
-        });*/
+        });
     }
 
     //parse activity form data response
@@ -1191,7 +1191,7 @@ public class ActivitySheetFragment extends MainFragment {
     private void openPlannedActivityListTabScreen() {
         PlannedActivityListTabFragment plannedActivityListTabFragment = new PlannedActivityListTabFragment();
         Bundle bundle = new Bundle();
-        bundle.putBoolean("ActivityRefreshFlag", true);
+        bundle.putString("headerTxt", "Activity Monitor");
         getHostActivity().updateFragment(plannedActivityListTabFragment, bundle);
     }
 }
