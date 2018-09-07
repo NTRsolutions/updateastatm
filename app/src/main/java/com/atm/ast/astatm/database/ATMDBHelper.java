@@ -1229,8 +1229,6 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return list;
     }
-
-    //-----------------------ActivitySheetReportDetails----------------------
     //populate ActivitySheetReportDetails
     private void populateActivitySheetReportDetails(Cursor cursor, ActivitySheetReportDataModel ob) {
         ob.setSiteName(cursor.getString(0));
@@ -1239,20 +1237,19 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         ob.setActivityTime(cursor.getString(3));
         ob.setZoneType(cursor.getString(4));
         ob.setTotalAmount(cursor.getString(5));
-        ob.setCircle(cursor.getString(6));
-        ob.setStatus(cursor.getString(7));
-        ob.setDays(cursor.getString(8));
-        ob.setColor(cursor.getString(9));
-        ob.setNocApprovel(cursor.getString(10));
-        ob.setActivity(cursor.getString(11));
-        ob.setTaDaAmt(cursor.getString(12));
-        ob.setBonus(cursor.getString(13));
-        ob.setPenalty(cursor.getString(14));
-        ob.setReason(cursor.getString(15));
-        ob.setCircleId(cursor.getString(16));
-        ob.setColor(cursor.getString(17));
-        ob.setFEId(cursor.getString(18));
-        ob.setFEName(cursor.getString(19));
+        ob.setStatus(cursor.getString(6));
+        ob.setDays(cursor.getString(7));
+        ob.setColor(cursor.getString(8));
+        ob.setNocApprovel(cursor.getString(9));
+        ob.setActivity(cursor.getString(10));
+        ob.setTaDaAmt(cursor.getString(11));
+        ob.setBonus(cursor.getString(12));
+        ob.setPenalty(cursor.getString(13));
+        ob.setReason(cursor.getString(14));
+        ob.setCircleId(cursor.getString(15));
+        ob.setCircle(cursor.getString(16));
+        ob.setFeId(cursor.getString(17));
+        ob.setFeName(cursor.getString(18));
     }
 
     public boolean insertActivitySheetReportDetails(ActivitySheetReportDataModel ob) {
@@ -1282,8 +1279,8 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         values.put("Reason", ob.getReason());
         values.put("CircleId", ob.getCircleId());
         values.put("Circle", ob.getCircle());
-        values.put("FEId", ob.getFEId());
-        values.put("FEName", ob.getFEName());
+        values.put("FEId", ob.getFeId());
+        values.put("FEName", ob.getFeName());
     }
 
     //get all ActivitySheetReportDetails

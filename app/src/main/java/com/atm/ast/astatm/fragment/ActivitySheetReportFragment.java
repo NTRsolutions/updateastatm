@@ -147,7 +147,15 @@ public class ActivitySheetReportFragment extends MainFragment {
             ASTUIUtil.showToast(Contants.OFFLINE_MESSAGE);
             activitySheetReportArrayList = atmdbHelper.getAllActivitySheetReportDetails();
             inflateTableRow(activitySheetReportArrayList);
-            setFeNameAdapter(arrListFeName);
+            if (activitySheetReportArrayList != null && activitySheetReportArrayList.size() > 0) {
+                ArrayList<String> arrListFeName = new ArrayList<>();
+                for (ActivitySheetReportDataModel dataModel : activitySheetReportArrayList) {
+                    if (!arrListFeName.contains(dataModel.getFeName())) {
+                        arrListFeName.add(dataModel.getFeName());
+                    }
+                }
+                setFeNameAdapter(arrListFeName);
+            }
         }
 
            /* tvPlannedExecuted.setText("Planned/Executed: " + arrExecutedActivityData.get(0).getExecuted());
@@ -173,7 +181,7 @@ public class ActivitySheetReportFragment extends MainFragment {
                 activitySheetReportDataModel.setActivity(arrExecutedActivityData.get(i).getActivity());
                 activitySheetReportDataModel.setNocApprovel(arrExecutedActivityData.get(i).getNocApprovel());
                 activitySheetReportDataModel.setTaDaAmt(arrExecutedActivityData.get(i).getTaDaAmt());
-                activitySheetReportDataModel.setBonus(arrExecutedActivityData.get(i).getBonus());
+                activitySheetReportDataModel.setBonus(arrExecut edActivityData.get(i).getBonus());
                 activitySheetReportDataModel.setPenalty(arrExecutedActivityData.get(i).getPenalty());
                 activitySheetReportDataModel.setFeName(arrExecutedActivityData.get(i).getFeName());
                 activitySheetReportDataModel.setFeId(arrExecutedActivityData.get(i).getFeId());
