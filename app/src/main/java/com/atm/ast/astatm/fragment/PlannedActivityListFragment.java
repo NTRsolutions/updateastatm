@@ -282,7 +282,7 @@ public class PlannedActivityListFragment extends MainFragment {
     //Set Adapter for Planned Activity List Grid Data
     private void setAdaptor() {
         planActivityList = atmdbHelper.getAllPlanActivityData();
-        if (planActivityList.size() == 0) {
+        if (planActivityList != null && planActivityList.size() == 0) {
             lvActivityList.setEmptyView(lvActivityList);
         } else {
             lvActivityList.setEmptyView(lvActivityList);

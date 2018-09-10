@@ -16,6 +16,7 @@ import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.adapter.FeTrackerAdapter;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
+import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
@@ -24,6 +25,8 @@ import com.atm.ast.astatm.model.CircleDisplayDataModel;
 import com.atm.ast.astatm.model.FeTrackerChildItemModel;
 import com.atm.ast.astatm.model.FeTrackerEmployeeModel;
 import com.atm.ast.astatm.model.PlannedActivityListModel;
+import com.atm.ast.astatm.model.newmodel.Data;
+import com.atm.ast.astatm.model.newmodel.Header;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.atm.ast.astatm.utils.FilterPopupActivity;
 
@@ -41,19 +44,13 @@ public class FeTrackerFragment extends MainFragment {
     AutoCompleteTextView etSearch;
     ArrayList<FeTrackerEmployeeModel> arrFeTracker;
     ArrayList<FeTrackerChildItemModel> arrayListFeTrackerChild;
-    ArrayList<ActivityListSheetDataModel> arrActivityList;
-    public static List<CircleDisplayDataModel> circleViewResDataList = new ArrayList<CircleDisplayDataModel>();
-    public static int[] checkListActivity;
-    public static int[] checkListCircle;
-    PopupWindow popup = null;
     SharedPreferences pref;
     String userId, userRole, userAccess, r1;
     String userName = "";
-    AtmDatabase atmDatabase;
     TextView tvPlannedExecuted, tvOnTheWay, tvReachedSite, tvLeftSite, tvUnknown, tvCircleName, tvAttendance;
     TextView tvFilter;
-    String[] arrActivities;
-    String[] arrCircles;
+    private ATMDBHelper atmdbHelper;
+    ArrayList<Data> planActivityList;
 
     @Override
     protected int fragmentLayout() {
@@ -88,67 +85,50 @@ public class FeTrackerFragment extends MainFragment {
 
     @Override
     protected void dataToView() {
-        popup = new PopupWindow(getContext());
         pref = getContext().getSharedPreferences("MyPref", MODE_PRIVATE);
         userId = pref.getString("userId", "");
         userName = pref.getString("userName", "");
-        atmDatabase = new AtmDatabase(getContext());
-        ArrayList<PlannedActivityListModel> arrPendingActivityData;
-        arrPendingActivityData = atmDatabase.getPendingActivityData();
-        if (arrPendingActivityData.size() > 0) {
-            tvPlannedExecuted.setText("Planned/Executed: " + arrPendingActivityData.get(0).getExecuted());
-            tvOnTheWay.setText("On The Way: " + arrPendingActivityData.get(0).getOnTheWay());
-            tvReachedSite.setText("Reached Site: " + arrPendingActivityData.get(0).getReachedSite());
-            tvLeftSite.setText("Left Site: " + arrPendingActivityData.get(0).getLeftSite());
-            tvUnknown.setText("Unknown: " + arrPendingActivityData.get(0).getUnknown());
-            tvAttendance.setText("Attendance/Leave: " + arrPendingActivityData.get(0).getAttendance() + "/" + arrPendingActivityData.get(0).getLeave());
-            tvCircleName.setVisibility(View.GONE);
+        atmdbHelper = new ATMDBHelper(getContext());
+        planActivityList = atmdbHelper.getAllPlanActivityData();
+        setHeaderDetail();
+        if (ASTUIUtil.isOnline(getContext())) {
+            getFeTracker();
         }
-        getFeTracker();
-        popup.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-              /*  ArrayList<FeTrackerEmployeeModel> arrFeTrackerTemp = new ArrayList<FeTrackerEmployeeModel>();
-                ArrayList<FeTrackerEmployeeModel> arrFeTrackerTemp1 = new ArrayList();
-                for (int j = 0; j < arrActivities.length; j++) {
-                    if (PlannedActivityListFragment.arrSelectedFilterOne[j] == true) {
-                        for (int i = 0; i < arrFeTracker.size(); i++) {
-                            if (arrActivities[j].equals(arrFeTracker.get(i).getActivity())) {
-                                arrFeTrackerTemp.add(arrFeTracker.get(i));
-                            }
-                        }
-                    }
+
+    }
+
+    //set header value
+    private void setHeaderDetail() {
+        ArrayList<Header> headerList = atmdbHelper.getAllPlanActivityHeaderData();
+        if (headerList != null && headerList.size() > 0) {
+            for (Header header : headerList) {
+                String onTheWay = header.getOnTheWay();
+                String reachedSite = header.getReachedSite();
+                String leftSite = header.getLeftSite();
+                String unknown = header.getUnknown();
+
+                tvPlannedExecuted.setText("Planned/Executed: " + header.getPlanned() + "/" + header.getExecuted());
+                tvOnTheWay.setText("On The Way: " + onTheWay);
+                tvReachedSite.setText("Reached Site: " + reachedSite);
+                tvLeftSite.setText("Left Site: " + leftSite);
+                tvUnknown.setText("Unknown: " + unknown);
+                //tvCircleName.setText("Circle Name: " + );
+                tvAttendance.setText("Attendance/Leave: " + header.getAttendanceCount() + "/" + header.getLeaveCount());
+                tvCircleName.setVisibility(View.GONE);
+                if (onTheWay.equals("")) {
+                    tvOnTheWay.setText("N/A");
                 }
-                for (int i = 0; i < arrCircles.length; i++) {
-                    if (PlannedActivityListFragment.arrSelectedFilterTwo[i] == true) {
-                        if (arrFeTrackerTemp.size() > 1) {
-                            for (int j = 0; j < arrFeTrackerTemp.size(); j++) {
-                                String re = arrActivities[i];
-                                String reee = arrFeTrackerTemp.get(j).getCircle();
-                                if (arrFeTrackerTemp.get(j).getCircle().equals(arrCircles[i])) {
-                                    arrFeTrackerTemp1.add(arrFeTrackerTemp.get(j));
-                                }
-                            }
-                        } else {
-                            for (int j = 0; j < arrFeTracker.size(); j++) {
-                                if (arrCircles[i].equals(arrFeTracker.get(j).getCircle())) {
-                                    arrFeTrackerTemp.add(arrFeTracker.get(j));
-                                }
-                            }
-                        }
-                    }
+                if (reachedSite.equals("")) {
+                    tvReachedSite.setText("N/A");
                 }
-                if (arrFeTrackerTemp1.size() > 0) {
-                    arrFeTrackerTemp = arrFeTrackerTemp1;
+                if (leftSite.equals("")) {
+                    tvLeftSite.setText("N/A");
                 }
-                if (arrFeTrackerTemp.size() > 0) {
-                    String[][] data = new String[arrFeTrackerTemp.size()][arrFeTrackerTemp.size()];
-                    elvFeList.setAdapter(new FeTrackerAdapter(getContext(), data, arrFeTrackerTemp, arrayListFeTrackerChild));
-                } else {
-                    ASTUIUtil.showToast("Data Not Found");
-                }*/
+                if (unknown.equals("")) {
+                    tvUnknown.setText("N/A");
+                }
             }
-        });
+        }
     }
 
     /*
@@ -163,7 +143,7 @@ public class FeTrackerFragment extends MainFragment {
         ServiceCaller serviceCaller = new ServiceCaller(getContext());
         String serviceURL = Contants.BASE_URL + Contants.FE_TRACKER_URL;
         serviceURL += "&uid=" + userId + "&lat=" + lat + "&lon=" + lon;
-        serviceCaller.CallCommanServiceMethod(serviceURL, "parseandsavegetFeTrackerData", new IAsyncWorkCompletedCallback() {
+        serviceCaller.CallCommanServiceMethod(serviceURL, "getFeTracker", new IAsyncWorkCompletedCallback() {
             @Override
             public void onDone(String result, boolean isComplete) {
                 if (isComplete) {
@@ -244,7 +224,7 @@ public class FeTrackerFragment extends MainFragment {
                                 feTrackerChildItemModel.setLon(siteLong);
                                 feTrackerChildItemModel.setDistanceFromSite(siteBaseDistanceFromSite);
                                 arrayListFeTrackerChild.add(feTrackerChildItemModel);
-                                Log.v("FeTrackerChildData", arrayListFeTrackerChild.get(j).getSiteName() + " - " +
+                                Log.d("FeTrackerChildData", arrayListFeTrackerChild.get(j).getSiteName() + " - " +
                                         arrayListFeTrackerChild.get(j).getTransitTime());
                             }
                         }
@@ -265,9 +245,9 @@ public class FeTrackerFragment extends MainFragment {
                         feTrackerEmployeeModel.setActivity(feActivity);
                         arrFeTracker.add(feTrackerEmployeeModel);
                     }
-                    atmDatabase.deleteAllRows("table_fe_tracker");
-                    atmDatabase.deleteAllRows("table_fe_tracker_transit");
-                    atmDatabase.addFeTrackerData(arrFeTracker);
+                    atmdbHelper.deleteAllRows("table_fe_tracker");
+                    atmdbHelper.deleteAllRows("table_fe_tracker_transit");
+                    atmdbHelper.addFeTrackerData(arrFeTracker);
                     setFeNameAdapter(arrListFeName, data);
                     elvFeList.setAdapter(new FeTrackerAdapter(getContext(), data, arrFeTracker, arrayListFeTrackerChild));
                 }
@@ -326,42 +306,9 @@ public class FeTrackerFragment extends MainFragment {
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.tvFilter) {
-            getFilterData();
+
         }
     }
 
-    /**
-     * get Filter List Data and show  FilterPopup
-     */
-    public void getFilterData() {
-        arrActivityList = atmDatabase.getAllActivityData("", "");
-        circleViewResDataList = atmDatabase.getAllCircleData("NAME");
-        String[] arrParentData = new String[2];
-        arrActivities = new String[arrActivityList.size()];
-        arrCircles = new String[circleViewResDataList.size()];
-        String[] arrFilteredIdData = {"Battery", "NoComm", "INV"};
-        arrParentData[0] = "Activity";
-        arrParentData[1] = "Circle";
-        final List<String> listActivities = new ArrayList<>();
-        final List<String> listCircles = new ArrayList<>();
-        checkListCircle = new int[0];
-        checkListActivity = new int[0];
-        for (int i = 0; i < circleViewResDataList.size(); i++) {
-            arrCircles[i] = circleViewResDataList.get(i).getCircleName();
-        }
-        for (int i = 0; i < arrActivityList.size(); i++) {
-            arrActivities[i] = arrActivityList.get(i).getActivityName();
-        }
-       /* PlannedActivityListFragment.arrSelectedFilterOne = new Boolean[arrActivities.length];
-        PlannedActivityListFragment.arrSelectedFilterTwo = new Boolean[arrCircles.length];
-        for (int i = 0; i < arrActivities.length; i++) {
-            PlannedActivityListFragment.arrSelectedFilterOne[i] = false;
-        }
-        for (int i = 0; i < arrCircles.length; i++) {
-            PlannedActivityListFragment.arrSelectedFilterTwo[i] = false;
-        }
-        FilterPopupActivity filterPopup = new FilterPopupActivity();
-        filterPopup.getFilterPopup(popup, getContext(), arrParentData, arrActivities, arrCircles, arrFilteredIdData, "planned_activity");
-*/
-    }
+
 }

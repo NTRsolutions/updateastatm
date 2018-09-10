@@ -26,6 +26,7 @@ import com.atm.ast.astatm.SyncSiteAddressDataWithServer;
 import com.atm.ast.astatm.adapter.FillSiteAddressAdapter;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
+import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
@@ -34,6 +35,9 @@ import com.atm.ast.astatm.model.FillSiteActivityModel;
 import com.atm.ast.astatm.model.SiteDisplayDataModel;
 import com.atm.ast.astatm.model.StateModel;
 import com.atm.ast.astatm.model.TehsilModel;
+import com.atm.ast.astatm.model.newmodel.Data;
+import com.atm.ast.astatm.model.newmodel.District;
+import com.atm.ast.astatm.model.newmodel.Tehsil;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 
 import org.json.JSONArray;
@@ -56,14 +60,17 @@ public class FillSiteAddressFragment extends MainFragment {
     Dialog unsyncedDialog = null;
     String filledCircleName, filledDistrictId, filledTehsilId;
     String[] arrSiteName, arrSiteId;
-    String siteId, siteNumId;
-    ArrayList<SiteDisplayDataModel> siteDetailArrayList;
-    AtmDatabase atmDatabase = new AtmDatabase(getContext());
-    ArrayList<DistrictModel> arrDistrict;
-    ArrayList<TehsilModel> arrTehsil;
+    long siteId;
+    String customerSiteId;
+    List<Data> siteDetailArrayList;
+    ArrayList<District> arrDistrict;
+    ArrayList<Tehsil> arrTehsil;
     ASTUIUtil commonFunctions;
     String startTime, endTime;
     FloatingActionButton btnSyncData;
+    ATMDBHelper atmdbHelper;
+    District[] districtsList;
+    Tehsil[] tehsilList;
 
     @Override
     protected int fragmentLayout() {
@@ -107,6 +114,7 @@ public class FillSiteAddressFragment extends MainFragment {
 
     @Override
     protected void dataToView() {
+        atmdbHelper = new ATMDBHelper(getContext());
         commonFunctions = new ASTUIUtil();
         unsyncedDialog = new Dialog(getContext());
         etStartTime.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -162,12 +170,12 @@ public class FillSiteAddressFragment extends MainFragment {
                 }
             }
         });
-        final ArrayList<StateModel> arrState = atmDatabase.getStateData();
+        final ArrayList<Data> arrState = atmdbHelper.getAllStateDetailListData();
         if (arrState.size() > 0) {
             ArrayList<String> arrStateName = new ArrayList<>();
             arrStateName.add("-- Select State --");
             for (int i = 0; i < arrState.size(); i++) {
-                arrStateName.add(arrState.get(i).getStateName());
+                arrStateName.add(arrState.get(i).getCircle());
             }
             ArrayAdapter<String> StateArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, arrStateName); //selected item will look like a spinner set from XML
             StateArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -177,14 +185,21 @@ public class FillSiteAddressFragment extends MainFragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position > 0) {
-                    arrDistrict = atmDatabase.getDistrictData(arrState.get(position - 1).getStateId());
+                    arrDistrict = new ArrayList<>();
+                    districtsList = arrState.get(position - 1).getDistrict();
+                    if (districtsList != null) {
+                        for (District district : districtsList) {
+                            arrDistrict.add(district);
+                        }
+                    }
+
                     int selectedDistrictId = 0;
                     if (arrDistrict.size() > 0) {
                         ArrayList<String> arrDistrictName = new ArrayList<>();
                         arrDistrictName.add("-- Select District --");
                         for (int i = 0; i < arrDistrict.size(); i++) {
-                            arrDistrictName.add(arrDistrict.get(i).getDistrictName());
-                            if (arrDistrict.get(i).getDistrictId().equalsIgnoreCase(filledDistrictId)) {
+                            arrDistrictName.add(arrDistrict.get(i).getDistrict());
+                            if (arrDistrict.get(i).getDistrictId() == Long.parseLong(filledDistrictId)) {
                                 selectedDistrictId = i + 1;
                             }
                         }
@@ -214,12 +229,13 @@ public class FillSiteAddressFragment extends MainFragment {
 
                 if (position > 0 || position != 0) {
                     int selectedTehsilId = 0;
-                    arrTehsil = atmDatabase.getTehsilData(arrDistrict.get(position - 1).getDistrictId());
+                    arrTehsil = new ArrayList<>();
+                    tehsilList = arrDistrict.get(position - 1).getTehsil();
                     if (arrTehsil.size() > 0) {
                         ArrayList<String> arrTehsilName = new ArrayList<>();
                         arrTehsilName.add("-- Select Tehsil --");
                         for (int i = 0; i < arrTehsil.size(); i++) {
-                            arrTehsilName.add(arrTehsil.get(i).getTehsilName());
+                            arrTehsilName.add(arrTehsil.get(i).getTehsil());
                             if (arrTehsil.get(i).getTehsilId().equalsIgnoreCase(filledTehsilId)) {
                                 selectedTehsilId = i + 1;
                             }
@@ -250,17 +266,14 @@ public class FillSiteAddressFragment extends MainFragment {
         ArrayAdapter<String> dataAdapterOnsiteOffsite = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, offsiteOnsiteList);
         dataAdapterOnsiteOffsite.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spOffsiteOnsite.setAdapter(dataAdapterOnsiteOffsite);
-        siteDetailArrayList = atmDatabase.getFilteredData("site_search_name", "", "Survey");
+        siteDetailArrayList = atmdbHelper.getAllSiteListData();
         arrSiteName = new String[siteDetailArrayList.size()];
         arrSiteId = new String[siteDetailArrayList.size()];
         for (int i = 0; i < siteDetailArrayList.size(); i++) {
             arrSiteName[i] = siteDetailArrayList.get(i).getSiteName();
-            arrSiteId[i] = siteDetailArrayList.get(i).getSiteId();
+            arrSiteId[i] = String.valueOf(siteDetailArrayList.get(i).getSiteId());
         }
         setSiteNameAdapter();
-        //  getStateData();
-
-
     }
 
 
@@ -278,7 +291,7 @@ public class FillSiteAddressFragment extends MainFragment {
                 }
                 if (!etSiteId.getText().toString().equals("")) {
                     getSiteNumId();
-                    getSiteAddressData(siteNumId);
+                    getSiteAddressData(siteId);
                 }
             }
         });
@@ -289,15 +302,15 @@ public class FillSiteAddressFragment extends MainFragment {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String siteId = etSiteId.getText().toString();
+                String customersiteId = etSiteId.getText().toString();
                 for (int i = 0; i <= arrSiteId.length - 1; i++) {
-                    if (siteId.equalsIgnoreCase(arrSiteId[i])) {
+                    if (customersiteId.equalsIgnoreCase(arrSiteId[i])) {
                         etSiteName.setText(arrSiteName[i]);
                     }
                 }
                 if (!etSiteId.getText().toString().equals("")) {
                     getSiteNumId();
-                    getSiteAddressData(siteNumId);
+                    getSiteAddressData(siteId);
                 }
             }
         });
@@ -307,7 +320,7 @@ public class FillSiteAddressFragment extends MainFragment {
      *
      * Calling Web Service to get Selected Site Data
      */
-    private void getSiteAddressData(String strSiteNumId) {
+    private void getSiteAddressData(long strSiteNumId) {
         ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
         _progrssBar.show();
         ServiceCaller serviceCaller = new ServiceCaller(getContext());
@@ -402,13 +415,13 @@ public class FillSiteAddressFragment extends MainFragment {
                         for (int j = 0; j < spState.getAdapter().getCount(); j++) {
                             if (spState.getAdapter().getItem(j).equals(circle)) {
                                 spState.setSelection(j);
-                                final ArrayList<StateModel> arrState = atmDatabase.getStateData();
-                                final ArrayList<DistrictModel> arrDistrict = atmDatabase.getDistrictData(arrState.get(j - 1).getStateId());
-                                if (arrDistrict.size() > 0) {
+                                final ArrayList<Data> arrState = atmdbHelper.getAllStateDetailListData();
+                                District[] districtsList = arrState.get(j - 1).getDistrict();
+                                if (districtsList.length > 0) {
                                     ArrayList<String> arrDistrictName = new ArrayList<>();
                                     arrDistrictName.add("-- Select District --");
-                                    for (int k = 0; k < arrDistrict.size(); k++) {
-                                        arrDistrictName.add(arrDistrict.get(k).getDistrictName());
+                                    for (District district:districtsList) {
+                                        arrDistrictName.add(district.getDistrict());
                                     }
                                     ArrayAdapter<String> DistrictArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, arrDistrictName); //selected item will look like a spinner set from XML
                                     DistrictArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -491,24 +504,23 @@ public class FillSiteAddressFragment extends MainFragment {
     }
 
     public void getSiteNumId() {
-        siteId = etSiteId.getText().toString();
+        customerSiteId = etSiteId.getText().toString();
         for (int i = 0; i < arrSiteId.length; i++) {
-            if (arrSiteId[i].equals(siteId)) {
-                siteNumId = siteDetailArrayList.get(i).getSiteNumId();
+            if (arrSiteId[i].equals(String.valueOf(siteId))) {
+                siteId = siteDetailArrayList.get(i).getSiteId();
                 break;
             }
         }
     }
 
     public void genrateUnsyncedList() {
-        unsyncedDialog.setContentView(R.layout.offline_sync_site_address_screen);
+       /* unsyncedDialog.setContentView(R.layout.offline_sync_site_address_screen);
         unsyncedDialog.setTitle("Unsynced Entries");
         unsyncedDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         unsyncedDialog.setCanceledOnTouchOutside(false);
         ListView lvSiteAddress;
         Button btnSyncData;
-        atmDatabase = new AtmDatabase(getContext());
-        List<FillSiteActivityModel> siteAddressDataArrayList = atmDatabase.getSiteAddress();
+        List<FillSiteActivityModel> siteAddressDataArrayList = atmdbHelper.getSiteAddress();
         lvSiteAddress = (ListView) unsyncedDialog.findViewById(R.id.lvSiteAddress);
         btnSyncData = (Button) unsyncedDialog.findViewById(R.id.btnSyncData);
 
@@ -517,7 +529,7 @@ public class FillSiteAddressFragment extends MainFragment {
                     siteAddressDataArrayList));
         } else {
             btnSyncData.setVisibility(View.GONE);
-            ASTUIUtil.showToast( "No Pending Entries");
+            ASTUIUtil.showToast("No Pending Entries");
         }
 
         btnSyncData.setOnClickListener(new View.OnClickListener() {
@@ -526,12 +538,12 @@ public class FillSiteAddressFragment extends MainFragment {
                 Intent intentService = new Intent(getContext(), SyncSiteAddressDataWithServer.class);
                 getContext().startService(intentService);
                 unsyncedDialog.dismiss();
-                ASTUIUtil.showToast( "Syncing with server.");
+                ASTUIUtil.showToast("Syncing with server.");
             }
         });
         if (siteAddressDataArrayList.size() > 0) {
             unsyncedDialog.show();
-        }
+        }*/
     }
 
 
@@ -613,12 +625,7 @@ public class FillSiteAddressFragment extends MainFragment {
                             }
                         }
                     }
-                    atmDatabase.deleteAllRows("state");
-                    atmDatabase.deleteAllRows("district");
-                    atmDatabase.deleteAllRows("tehsil");
-                    atmDatabase.addStateData(arrState, arrDistrict, arrTehsil);
-                    final ArrayList<StateModel> arrStateNew = atmDatabase.getStateData();
-                    arrState = arrStateNew;
+                    final ArrayList<Data> arrStateNew = atmdbHelper.getAllStateDetailListData();
                     if (arrState.size() > 0) {
                         ArrayList<String> arrStateName = new ArrayList<>();
                         arrStateName.add("-- Select State --");

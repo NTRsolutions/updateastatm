@@ -14,6 +14,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,11 +29,20 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.adapter.TodayPlanListAdapter;
 import com.atm.ast.astatm.adapter.UnsyncedTransitAdapter;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
+import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
@@ -40,12 +50,13 @@ import com.atm.ast.astatm.model.SiteDisplayDataModel;
 import com.atm.ast.astatm.model.TransitDataModel;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.ServiceContentData;
-import com.atm.ast.astatm.runtimepermission.PermissionUtils;
-import com.atm.ast.astatm.services.SyncTransitDataWithServer;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.atm.ast.astatm.utils.GPSTracker;
 import com.atm.ast.astatm.utils.SiteNotFoundPopup;
 import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -53,34 +64,30 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import static android.content.Context.LOCATION_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 
 public class TransitFragment extends MainFragment {
     FloatingActionButton btnSyncData;
     TextView btnStartHome, btnReachedSite, btnLeftSite, btnReachedHome;
+    CardView CardbtnReachedHome, CardbtnLeftSite, CardbtnReachedSite, CardbtnStartHome;
+    ImageView startHomeTick, rechedSiteTick, leftSiteTick, reachedHomeTick;
     Button btnAddSiteData;
     TextView tvSelectedSite, tvTestButton, tvRemainingDistance;
     TextView tvCurrentDate;
     String networkProvider;
     String serviceURL;
     public double lat = 0.0000, lon = 0.0000;
-    AtmDatabase atmDatabase;
-    ProgressDialog siteprogressbar;
     ArrayList<Data> todayPlannedSiteArrayList;
     SharedPreferences pref;
-    String userId, userRole, userAccess, r1;
+    String userId;
     String userName = "";
     Location location;
     String selectedButtonType = "";
     String selectedSite;
     public String TRANSIT_PREFERENCES = "TransitPrefs";
     SharedPreferences transitsharedpreferences;
-    ArrayList<String> permissions = new ArrayList<>();
-    PermissionUtils permissionUtils;
-    private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 1;
-    private int REQUEST_CODE_GPS_PERMISSIONS = 2;
+    ATMDBHelper atmdbHelper;
+    ProgressDialog trprogressbar;
 
     @Override
     protected int fragmentLayout() {
@@ -125,10 +132,8 @@ public class TransitFragment extends MainFragment {
             String formattedDate = ASTUIUtil.getCurrentDate();
             tvCurrentDate.setText(formattedDate + " : " + appversionName);
         }
-        atmDatabase = new AtmDatabase(getContext());
+        atmdbHelper = new ATMDBHelper(getContext());
         todayPlannedSiteArrayList = new ArrayList<>();
-        Intent intentService = new Intent(getContext(), SyncTransitDataWithServer.class);
-        //startService(intentService);
         deletePreviousDateSiteFromDB();
     }
 
@@ -146,7 +151,7 @@ public class TransitFragment extends MainFragment {
                 Date preDate = formatter.parse(preDateStr);
                 if (currentDate.after(preDate)) {
                     // ASTUIUtil.showToast( "Pre Date " + preDateStr + "----current Date " + currentDateStr);
-                    atmDatabase.deleteAllRows("todaySitePlan");//delete previous date all site
+                    atmdbHelper.deleteAllRows("todaySitePlan");//delete previous date all site
                     ASTUIUtil.saveCurrentDateToPre(currentDateStr, getContext());
                 }
             } catch (ParseException e) {
@@ -172,11 +177,9 @@ public class TransitFragment extends MainFragment {
             tvSelectedSite.setText(selectedSite + "(" + transitsharedpreferences.getString("SITE_ID", "") + ")");
             tvRemainingDistance.setText("Distance From Site - 10 KM");
         }
-       /* SharedPreferences.Editor editor = transitsharedpreferences.edit();
-        editor.putString("SELECTED_BUTTON", "");
-        editor.commit();*/
+
         selectedButtonType = selectedButton;
-        //getTodayPlannedActivityData();
+        getTodayPlannedActivityData();
 
         selectedButton();
     }
@@ -188,11 +191,12 @@ public class TransitFragment extends MainFragment {
         siteIdPopupDialog.setTitle("Select Site");
         siteIdPopupDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         siteIdPopupDialog.setCanceledOnTouchOutside(false);
+
         ListView lvPlannedActivities = (ListView) siteIdPopupDialog.findViewById(R.id.lvPlannedActivities);
         TextView tvTitlePlannedActivity = (TextView) siteIdPopupDialog.findViewById(R.id.tvTitlePlannedActivity);
         ImageView imgRefresh = (ImageView) siteIdPopupDialog.findViewById(R.id.imgRefresh);
         TextView noSiteFound = (TextView) siteIdPopupDialog.findViewById(R.id.noSiteFound);
-        todayPlannedSiteArrayList = atmDatabase.getAllTodaySiteListData();
+        todayPlannedSiteArrayList = atmdbHelper.getAllTodaySiteListData();
         siteIdPopupDialog.show();
         if (todayPlannedSiteArrayList != null && todayPlannedSiteArrayList.size() > 0) {
             noSiteFound.setVisibility(View.GONE);
@@ -203,9 +207,10 @@ public class TransitFragment extends MainFragment {
             noSiteFound.setVisibility(View.VISIBLE);
             lvPlannedActivities.setVisibility(View.GONE);
             siteIdPopupDialog.dismiss();
+
             SiteNotFoundPopup siteNotFoundPopup = new SiteNotFoundPopup();
             PopupWindow siteNotFoundPopupWindow = new PopupWindow(getContext());
-            ASTUIUtil.showToast("Site ID not found. please Contact NOC");
+            Toast.makeText(getContext(), "Site ID not found. please press Refresh button Or Contact NOC", Toast.LENGTH_SHORT).show();
             siteNotFoundPopup.getSitePopup(siteNotFoundPopupWindow, getContext(), "Enter Site Id for sending message to NOC.", "Send", userId, "SMS", userName);
 
         }
@@ -254,31 +259,42 @@ public class TransitFragment extends MainFragment {
 
     //save transit data into DB
     private void saveTransitDataIntoDB(String transitAddress, String siteId, String totalTravelCost, String totalDistance, String strActualKms, String strActualTravelCost, String strRemarks, String strHotelExp, String strActualHotelExp) {
-        SharedPreferences.Editor editor = transitsharedpreferences.edit();
-        ArrayList<TransitDataModel> arrTransitData = new ArrayList<>();
+        String transitAddressStr = transitAddress + " - " + networkProvider;
+        if (ASTUIUtil.isOnline(getContext())) {
+            saveTransitData(userId, siteId, selectedButtonType, lat, lon, totalDistance, totalTravelCost, transitAddressStr, strActualKms, strActualTravelCost, strRemarks, strHotelExp, strActualHotelExp);
+        } else {
+            transitSaveIntoDB(userId, siteId, selectedButtonType, lat, lon, totalDistance, totalTravelCost, transitAddressStr, strActualKms, strActualTravelCost, strRemarks, strHotelExp, strActualHotelExp);
+        }
+    }
+
+    //save data into db if offline
+    private void transitSaveIntoDB(String userIdStr, String siteIdStr, String selectedButtonTypeStr, double newlat, double newlon, String totalDistanceStr, String totalTravelCostStr, String transitAddressStr, String strActualKmsStr, String strActualTravelCostStr, String strRemarksStr, String strHotelExpStr, String strActualHotelExp) {
         TransitDataModel transitDataModel = new TransitDataModel();
-        transitDataModel.setSiteId(siteId);
-        transitDataModel.setUserId(userId);
+        transitDataModel.setSiteId(siteIdStr);
+        transitDataModel.setUserId(userIdStr);
         transitDataModel.setDateTime(String.valueOf(System.currentTimeMillis()));
-        transitDataModel.setType(selectedButtonType);
-        transitDataModel.setLatitude(String.valueOf(lat));
-        transitDataModel.setLongitude(String.valueOf(lon));
-        transitDataModel.setCalculatedAmount(totalTravelCost);
-        transitDataModel.setCalcilatedDistance(totalDistance);
-        transitDataModel.setAddress(transitAddress + " - " + networkProvider);
-        transitDataModel.setActualKms(strActualKms);
-        transitDataModel.setActualAmt(strActualTravelCost);
-        transitDataModel.setRemarks(strRemarks);
-        transitDataModel.setHotelExpense(strHotelExp);
+        transitDataModel.setType(selectedButtonTypeStr);
+        transitDataModel.setLatitude(String.valueOf(newlat));
+        transitDataModel.setLongitude(String.valueOf(newlon));
+        transitDataModel.setCalculatedAmount(totalTravelCostStr);
+        transitDataModel.setCalcilatedDistance(totalDistanceStr);
+        transitDataModel.setAddress(transitAddressStr);
+        transitDataModel.setActualKms(strActualKmsStr);
+        transitDataModel.setActualAmt(strActualTravelCostStr);
+        transitDataModel.setRemarks(strRemarksStr);
+        transitDataModel.setHotelExpense(strHotelExpStr);
         transitDataModel.setActualHotelExpense(strActualHotelExp);
 
-        arrTransitData.add(transitDataModel);
-        atmDatabase.addTransitData(arrTransitData);//save in data base
+        //arrTransitData.add(transitDataModel);
+        atmdbHelper.upsertTransitData(transitDataModel);//save in data base
+        updateTodaySiteTable(siteIdStr);
+    }
 
+    private void updateTodaySiteTable(String siteId) {
         if (selectedButtonType.equals("4")) {
-            atmDatabase.updateTodaySiteTransitComplete(1, siteId);//update today planed site status so that it will show only uncomplete site
+            atmdbHelper.updateTodaySiteTransitComplete(1, siteId);//update today planed site status so that it will show only uncomplete site
         }
-        ASTUIUtil.showToast("Your Transit is saved");
+        Toast.makeText(getContext(), "Your Transit is saved", Toast.LENGTH_LONG).show();
     }
 
     //open Travel Expense Popup and set expense related data
@@ -288,6 +304,7 @@ public class TransitFragment extends MainFragment {
         travelClaimDialog.setTitle("Travel Allowance");
         travelClaimDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         travelClaimDialog.setCanceledOnTouchOutside(false);
+
         Button btnSubmit, btnChangeSite;
         final TextView tvTotalDistance, tvFromCity, tvTotalTravelCost, tvBaseToSiteDistance;
         final EditText etActualTravelCost, etActualDistance, etRemarks, etActualKms, etHotelExp, etActualHotelExp;
@@ -296,6 +313,7 @@ public class TransitFragment extends MainFragment {
         final CheckBox chkHotelExpense;
         final LinearLayout llHotelExpChkBox, llBaseToSiteDistance;
         ImageView btnHotelExpRateChart;
+
         btnSubmit = (Button) travelClaimDialog.findViewById(R.id.btnSubmit);
         btnChangeSite = (Button) travelClaimDialog.findViewById(R.id.btnChangeSite);
         tvTotalDistance = (TextView) travelClaimDialog.findViewById(R.id.tvTotalDistance);
@@ -337,13 +355,13 @@ public class TransitFragment extends MainFragment {
             btnChangeSite.setVisibility(View.GONE);//show only in reached site
             llHotelExpChkBox.setVisibility(View.VISIBLE);
             //tvBaseToSiteDistance.setVisibility(View.VISIBLE);
-            String siteId = transitsharedpreferences.getString("SITE_NUM_ID", "");
+            String siteId = transitsharedpreferences.getString("SITE_ID", "");
 
             if (siteId != null && !siteId.equals("")) {
                 SharedPreferences.Editor editor = transitsharedpreferences.edit();
-                SiteDisplayDataModel siteData = atmDatabase.getSiteSearchDataBySiteId(siteId);
+                Data siteData = atmdbHelper.getPopulateSiteListDataBySiteID(Long.parseLong(siteId));
                 if (siteData != null) {
-                    editor.putString("SITE_BASE_DISTANCE", siteData.getBaseDistance());
+                    editor.putString("SITE_BASE_DISTANCE", siteData.getBaseDistance() + "");
                 } else {
                     editor.putString("SITE_BASE_DISTANCE", "0");
                 }
@@ -401,9 +419,9 @@ public class TransitFragment extends MainFragment {
                                              String strRemarks = "NA";
                                              strRemarks = etRemarks.getText().toString();
                                              if (strActualKms.equals("")) {
-                                                 ASTUIUtil.showToast("Please Provide Actual KMs");
+                                                 Toast.makeText(getContext(), "Please Provide Actual KMs", Toast.LENGTH_SHORT).show();
                                              } else if (strActualTravelCost.equals("")) {
-                                                 ASTUIUtil.showToast("Please Provide Actual Travel Cost");
+                                                 Toast.makeText(getContext(), "Please Provide Actual Travel Cost", Toast.LENGTH_SHORT).show();
                                              } else {
                                                  if (etRemarks.equals("")) {
                                                      strRemarks = "NA";
@@ -418,7 +436,7 @@ public class TransitFragment extends MainFragment {
                                                      strActualHotelExp = "0";
                                                  }
                                                  getLocation();
-                                                 String siteId = transitsharedpreferences.getString("SITE_NUM_ID", "");
+                                                 String siteId = transitsharedpreferences.getString("SITE_ID", "");
                                                  if (buttonClick.equals("ReachedSite")) {
                                                      selectedButtonType = "2";
                                                  }
@@ -434,10 +452,10 @@ public class TransitFragment extends MainFragment {
                                                      editor.putString("DESTINATION_LONG", "");
                                                      editor.putString("SELECTED_BUTTON", "");//for restart transit
                                                      editor.commit();
-
-                                                     //      Intent intentReload = new Intent(getContext(), NewTransitActivity.class);
-                                                     //startActivity(intentReload);
-                                                     reloadBackScreen();
+                                                     TransitFragment transitFragment = new TransitFragment();
+                                                     Bundle bundle = new Bundle();
+                                                     bundle.putString("headerTxt", "Transit");
+                                                     ApplicationHelper.application().getActivity().updateFragment(transitFragment, bundle);
                                                  }
                                                  String totalDistance = tvTotalDistance.getText().toString();
                                                  saveTransitDataIntoDB(finalFullAddress, siteId, tvTotalTravelCost.getText().toString(), totalDistance.substring(0, totalDistance.length() - 4), strActualKms, strActualTravelCost, strRemarks, strHotelExp, strActualHotelExp);
@@ -489,9 +507,9 @@ public class TransitFragment extends MainFragment {
         } else if (distance > 150) {
             perKmCost = 1.25;
         }
-
+        double newDistance = Math.round(distance * 100.0) / 100.0;
         /*tvTotalTravelCost.setText(String.valueOf((int) distance * 2));*/
-        tvTotalTravelCost.setText(String.valueOf(perKmCost * distance));
+        tvTotalTravelCost.setText(String.valueOf(perKmCost * newDistance));
         tvFromCity.setText(sourceAddress + " - " + destinationAddress);
 
     }
@@ -579,7 +597,7 @@ public class TransitFragment extends MainFragment {
                     case DialogInterface.BUTTON_POSITIVE:
                         checkAndSaveSourceAndDestinationLocation();
                         String transitAddress = getAddressThroughLatLong(lat, lon, "short");
-                        String siteNumId = transitsharedpreferences.getString("SITE_NUM_ID", "");
+                        String siteNumId = transitsharedpreferences.getString("SITE_ID", "");
                         if (siteNumId.equals("") || siteNumId.equals(null)) {
                             ASTUIUtil.showToast("Please Select a Site");
                         } else {
@@ -625,30 +643,67 @@ public class TransitFragment extends MainFragment {
         unsyncedDialog.setCanceledOnTouchOutside(false);
         ListView lvTransit = (ListView) unsyncedDialog.findViewById(R.id.lvTransit);
         Button btnSyncData = (Button) unsyncedDialog.findViewById(R.id.btnSyncData);
+        Button cancel = (Button) unsyncedDialog.findViewById(R.id.cancel);
         lvTransit.setAdapter(new UnsyncedTransitAdapter(getContext(),
                 transitDataArrayList));
         btnSyncData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentService = new Intent(getContext(), SyncTransitDataWithServer.class);
-                //startService(intentService);
+                syncSaveDataIntoServer(transitDataArrayList);
                 unsyncedDialog.dismiss();
-                ASTUIUtil.showToast("Syncing with server.");
+                Toast.makeText(getContext(), "Syncing with server.", Toast.LENGTH_SHORT).show();
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                unsyncedDialog.dismiss();
             }
         });
         unsyncedDialog.show();
     }
 
+    //sync save transit data into server
+    private void syncSaveDataIntoServer(List<TransitDataModel> transitDataArrayList) {
+        for (TransitDataModel dataModel : transitDataArrayList) {
+            String userId = dataModel.getUserId();
+            String siteId = dataModel.getSiteId();
+            String transitType = dataModel.getType();
+            String date = dataModel.getDateTime();
+            String lat = dataModel.getLatitude();
+            String lon = dataModel.getLongitude();
+            String calculatedDistance = dataModel.getCalcilatedDistance();
+            String calculatedAmount = dataModel.getCalculatedAmount();
+            String transitAddressStr = dataModel.getAddress();
+            String strActualKms = dataModel.getActualKms();
+            String strActualTravelCost = dataModel.getActualAmt();
+            String remarks = dataModel.getRemarks();
+            String hotelExpenses = dataModel.getHotelExpense();
+            hotelExpenses = hotelExpenses.replace("Rs.", "0");
+            String actualHotelExpenses = dataModel.getActualHotelExpense();
+
+            saveTransitData(userId, siteId, transitType, Double.parseDouble(lat), Double.parseDouble(lon), calculatedDistance, calculatedAmount, transitAddressStr, strActualKms, strActualTravelCost, remarks, hotelExpenses, actualHotelExpenses);
+        }
+    }
+
     //show button which is selected
     private void selectedButton() {
         SharedPreferences.Editor editor = transitsharedpreferences.edit();
-
         switch (selectedButtonType) {
             case "1":
                 btnStartHome.setBackgroundColor(Color.parseColor("#FFA500"));
                 btnReachedSite.setBackgroundColor(Color.parseColor("#666699"));
                 btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
                 btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
+
+                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#FFA500"));
+                startHomeTick.setVisibility(View.VISIBLE);
+                rechedSiteTick.setVisibility(View.GONE);
+                leftSiteTick.setVisibility(View.GONE);
+                reachedHomeTick.setVisibility(View.GONE);
 
                 editor.putString("SELECTED_BUTTON", "1");
                 editor.commit();
@@ -664,6 +719,16 @@ public class TransitFragment extends MainFragment {
                 btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
                 btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
 
+                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#078f4b"));
+                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#FFA500"));
+
+                startHomeTick.setVisibility(View.VISIBLE);
+                rechedSiteTick.setVisibility(View.VISIBLE);
+                leftSiteTick.setVisibility(View.GONE);
+                reachedHomeTick.setVisibility(View.GONE);
+
                 editor.putString("SELECTED_BUTTON", "2");
                 editor.commit();
                 btnReachedHome.setEnabled(false);
@@ -677,6 +742,16 @@ public class TransitFragment extends MainFragment {
                 btnReachedSite.setBackgroundColor(Color.parseColor("#078f4b"));
                 btnLeftSite.setBackgroundColor(Color.parseColor("#1E90FF"));
                 btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
+
+                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#1E90FF"));
+                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#078f4b"));
+                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#FFA500"));
+
+                startHomeTick.setVisibility(View.VISIBLE);
+                rechedSiteTick.setVisibility(View.VISIBLE);
+                leftSiteTick.setVisibility(View.VISIBLE);
+                reachedHomeTick.setVisibility(View.GONE);
 
                 editor.putString("SELECTED_BUTTON", "3");
                 editor.commit();
@@ -692,10 +767,20 @@ public class TransitFragment extends MainFragment {
                 btnReachedSite.setBackgroundColor(Color.parseColor("#078f4b"));
                 btnLeftSite.setBackgroundColor(Color.parseColor("#1E90FF"));
                 btnReachedHome.setBackgroundColor(Color.parseColor("#FF4500"));
+
+                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#FF4500"));
+                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#1E90FF"));
+                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#078f4b"));
+                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#FFA500"));
                 btnReachedHome.setEnabled(false);
                 btnReachedSite.setEnabled(false);
                 btnLeftSite.setEnabled(false);
                 btnStartHome.setEnabled(true);
+
+                startHomeTick.setVisibility(View.VISIBLE);
+                rechedSiteTick.setVisibility(View.VISIBLE);
+                leftSiteTick.setVisibility(View.VISIBLE);
+                reachedHomeTick.setVisibility(View.VISIBLE);
 
                 //editor.putString("SELECTED_BUTTON", "4");
                 //editor.commit();
@@ -705,10 +790,20 @@ public class TransitFragment extends MainFragment {
                 btnReachedSite.setBackgroundColor(Color.parseColor("#666699"));
                 btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
                 btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
+
+                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#666699"));
                 btnReachedSite.setEnabled(false);
                 btnLeftSite.setEnabled(false);
                 btnReachedHome.setEnabled(false);
                 btnStartHome.setEnabled(true);
+
+                startHomeTick.setVisibility(View.GONE);
+                rechedSiteTick.setVisibility(View.GONE);
+                leftSiteTick.setVisibility(View.GONE);
+                reachedHomeTick.setVisibility(View.GONE);
                 break;
         }
     }
@@ -750,7 +845,7 @@ public class TransitFragment extends MainFragment {
                 if (contentData.getStatus() == 2) {
                     if (contentData.getData() != null) {
                         for (Data data : contentData.getData()) {
-                            atmDatabase.upsertTodaySitePlanData(data);
+                            atmdbHelper.upsertTodaySitePlanData(data);
                         }
                     }
 
@@ -762,77 +857,16 @@ public class TransitFragment extends MainFragment {
 
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // redirects to utils
-        permissionUtils.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-
-    private void buildAlertMessageNoGps() {
-        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), REQUEST_CODE_GPS_PERMISSIONS);
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        dialog.cancel();
-                        checkGpsEnable();
-                    }
-                });
-        final android.app.AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-    //    check gps enable in device or not
-    private void checkGpsEnable() {
-        try {
-            boolean isGPSEnabled = false;
-            boolean isNetworkEnabled = false;
-            final LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
-            // getting GPS status
-            isGPSEnabled = locationManager
-                    .isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-            // getting network status
-            isNetworkEnabled = locationManager
-                    .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-            if (!isGPSEnabled && !isNetworkEnabled) {
-                buildAlertMessageNoGps();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
     public void onClick(View view) {
         if (view.getId() == R.id.btnAddSiteData) {
-            //  FillSiteAddressFragment fillSiteAddressFragment = new FillSiteAddressFragment();
-            //  Bundle bundle = new Bundle();
-            //  bundle.putString("headerTxt", "Fill Site Data");
-            // bundle.putBoolean("showMenuButton", false);
-            //  getHostActivity().updateFragment(fillSiteAddressFragment, bundle);
+            FillSiteAddressFragment fillSiteAddressFragment = new FillSiteAddressFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("headerTxt", "Fill Site Data");
+            getHostActivity().updateFragment(fillSiteAddressFragment, bundle);
         } else if (view.getId() == R.id.btnStartHome) {
             if (ASTUIUtil.checkGpsEnabled(getContext())) {
                 selectedButtonType = "1";
                 getSiteIdPopup();//open site popup
-            }
-        } else if (view.getId() == R.id.btnStartHome) {
-            if (ASTUIUtil.checkGpsEnabled(getContext())) {
-                getLocation();
-                checkAndSaveSourceAndDestinationLocation();
-                try {
-                    generateTravelExpensePopup("ReachedSite");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
         } else if (view.getId() == R.id.btnLeftSite) {
             getLocation();
@@ -840,7 +874,7 @@ public class TransitFragment extends MainFragment {
         } else if (view.getId() == R.id.btnReachedHome) {
             if (ASTUIUtil.checkGpsEnabled(getContext())) {
                 getLocation();
-                String siteId = transitsharedpreferences.getString("SITE_NUM_ID", "");
+                String siteId = transitsharedpreferences.getString("SITE_ID", "");
                 if (siteId == null || siteId.equals("")) {
                     ASTUIUtil.showToast("Please Press Reached Site first.");
                 } else {
@@ -854,13 +888,94 @@ public class TransitFragment extends MainFragment {
                 }
             }
         } else if (view.getId() == R.id.btnSyncData) {
-            List<TransitDataModel> transitDataArrayList = atmDatabase.getTransitData("1");
+            List<TransitDataModel> transitDataArrayList = atmdbHelper.getTransitData("1");
             if (transitDataArrayList != null && transitDataArrayList.size() > 0) {
                 showUnsyncedTransitDataList(transitDataArrayList);//synce save data
             } else {
-                //  btnSyncData.setVisibility(View.GONE);
                 ASTUIUtil.showToast("No Pending Entries");
             }
         }
     }
+
+    //call service-------------------------
+
+    private void saveTransitData(String userIdStr, String siteIdStr, String selectedButtonTypeStr, double newlat, double newlon, String totalDistanceStr, String totalTravelCostStr, String transitAddressStr, String strActualKmsStr, String strActualTravelCostStr, String strRemarksStr, String strHotelExpStr, String strActualHotelExp) {
+        trprogressbar = ProgressDialog.show(getContext(), "",
+                "Please wait..", true);
+
+        String userId = userIdStr;
+        String siteNumId = siteIdStr;
+        String transitType = selectedButtonTypeStr;
+        String date = String.valueOf(System.currentTimeMillis());
+        String lat = String.valueOf(newlat);
+        String lon = String.valueOf(newlon);
+        String calculatedDistance = totalDistanceStr;
+        String calculatedAmount = totalTravelCostStr;
+        String address = transitAddressStr + " - " + networkProvider;
+        String actualDistance = strActualKmsStr;
+        String actualAmount = strActualTravelCostStr;
+        String remarks = strRemarksStr;
+        String hotelExpenses = strHotelExpStr;
+        hotelExpenses = hotelExpenses.replace("Rs.", "0");
+        String actualHotelExpenses = strActualHotelExp;
+        if (Double.parseDouble(calculatedAmount) > 1000) {
+            calculatedDistance = "0";
+            calculatedAmount = "0";
+        }
+
+        if (calculatedDistance.equals("") || calculatedDistance.equals(null)) {
+            calculatedDistance = "0";
+        }
+        if (calculatedAmount.equals("") || calculatedAmount.equals(null)) {
+            calculatedAmount = "0";
+        }
+        if (address.equals("") || address.equals(null)) {
+            address = "NA";
+        }
+        if (actualDistance.equals("") || actualDistance.equals(null)) {
+            actualDistance = "0";
+        }
+        if (actualAmount.equals("") || actualAmount.equals(null)) {
+            actualAmount = "0";
+        }
+        if (remarks.equals("") || remarks.equals(null)) {
+            remarks = "NA";
+        }
+
+        serviceURL = Contants.BASE_URL + Contants.ADD_TRANSIT_URL;
+
+        serviceURL += "&uid=" + userId + "&sid=" + siteNumId + "&btnid=" + transitType + "&transittime=" + date +
+                "&distance=" + calculatedDistance + "&address=" + address + "&calculatedamt=" + calculatedAmount + "&actualtravelamt=" + actualAmount + "&remark=" + remarks +
+                "&actualkms=" + actualDistance + "&actualhotelprice=" + hotelExpenses + "&hotelprice=" + actualHotelExpenses + "&lat=" + lat + "&lon=" + lon;
+        serviceURL = serviceURL.replace(" ", "^^");
+        ServiceCaller serviceCaller = new ServiceCaller(getContext());
+        serviceCaller.CallCommanServiceMethod(serviceURL, "getEbrhData", new IAsyncWorkCompletedCallback() {
+            @Override
+            public void onDone(String result, boolean isComplete) {
+                if (isComplete) {
+                    parseandsaveTransitData(result, userIdStr, siteIdStr, selectedButtonTypeStr, newlat, newlon, totalDistanceStr, totalTravelCostStr, transitAddressStr, strActualKmsStr, strActualTravelCostStr, strRemarksStr, strHotelExpStr, strActualHotelExp);
+                } else {
+                    ASTUIUtil.showToast("Transit Data Not Saved");
+                }
+            }
+        });
+    }
+
+    public void parseandsaveTransitData(String result, String userIdStr, String siteIdStr, String selectedButtonTypeStr, double newlat, double newlon, String totalDistanceStr, String totalTravelCostStr, String transitAddressStr, String strActualKmsStr, String strActualTravelCostStr, String strRemarksStr, String strHotelExpStr, String strActualHotelExp) {
+        if (result != null) {
+            try {
+                JSONObject jsonRootObject = new JSONObject(result);
+                String jsonStatus = jsonRootObject.optString("status").toString();
+                if (jsonStatus.equals("2")) {
+                    updateTodaySiteTable(siteIdStr);
+                } else {
+                    transitSaveIntoDB(userIdStr, siteIdStr, selectedButtonTypeStr, newlat, newlon, totalDistanceStr, totalTravelCostStr, transitAddressStr, strActualKmsStr, strActualTravelCostStr, strRemarksStr, strHotelExpStr, strActualHotelExp);
+                }
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                //   e.printStackTrace();
+            }
+        }
+    }
+
 }

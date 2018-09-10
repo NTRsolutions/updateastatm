@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.atm.ast.astatm.ASTGson;
 import com.atm.ast.astatm.model.ActivitySheetReportDataModel;
+import com.atm.ast.astatm.model.CallTrackerDataModel;
+import com.atm.ast.astatm.model.FeTrackerEmployeeModel;
+import com.atm.ast.astatm.model.TransitDataModel;
 import com.atm.ast.astatm.model.newmodel.Activity;
 import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.model.newmodel.Data;
@@ -31,6 +34,65 @@ public class ATMDBHelper extends SQLiteOpenHelper {
     public ATMDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
+
+    //--------------------------FE Tracker Data-------------------------------------
+    private static final String FE_ID = "fe_id";
+    private static final String FE_NAME = "fe_name";
+    private static final String FE_CONTACT_NO = "contact_no";
+    private static final String FE_COLOR = "color";
+    private static final String FE_DISTANCE = "distance";
+    private static final String FE_ADDRESS = "address";
+    private static final String FE_STATUS = "status";
+    private static final String FE_LAST_TRACKED_TIME = "last_tracked_time";
+    private static final String FE_CIRCLE = "circle";
+    private static final String FE_ACTIVITY = "acivity";
+
+    //--------------------------FE Tracker Transit Data-------------------------------------
+    private static final String FE_TRACKER_ID = "fe_id";
+    private static final String FE_TRACKER_TRANSIT_TIME = "transit_time";
+    private static final String FE_TRACKER_STATUS = "status";
+    private static final String FE_TRACKER_COLOR = "color";
+    private static final String FE_TRACKER_SITE_ID = "site_id";
+    private static final String FE_TRACKER_SITE_NAME = "site_name";
+    private static final String FE_TRACKER_CUSTOMER_SITE_ID = "customer_site_id";
+    private static final String FE_TRACKER_CIRCLE = "circle";
+    private static final String FE_TRACKER_DISTRICT = "district";
+    private static final String FE_TRACKER_ACTIVITY_STATUS = "activity_status";
+    private static final String FE_TRACKER_DISTANCE = "distance";
+    private static final String FE_TRACKER_LAT = "lat";
+    private static final String FE_TRACKER_LON = "lon";
+    private static final String TABLE_FE_TRACKER = "table_fe_tracker";
+    private static final String TABLE_FE_TRACKER_TRANSIT = "table_fe_tracker_transit";
+
+
+    //--------------------------FE Call Tracking Data-------------------------------------
+    private static final String TABLE_FE_CALL_TRACKER = "table_fe_call_tracker";
+    private static final String CALL_TRACKING_DURATION = "duration";
+    private static final String CALL_TRACKING_DIALLED_NUMBER = "dialled_number";
+    private static final String CALL_TRACKING_DIALLED_EMP_ID = "status_emp_id";
+    private static final String CALL_TRACKING_CALL_TYPE = "call_type";
+    private static final String CALL_TRACKING_DIALER_USER_ID = "dialer_user_id";
+    private static final String CALL_TRACKING_CALL_TIME = "call_time";
+    private static final String KEY_ID = "id";
+    private static final String LAST_UPDATED = "last_updated";
+
+    //----------------------------------Activity Transit Data-------------------------------------
+    private static final String TRANSIT_ID = "transit_id";
+    private static final String TRANSIT_TYPE = "transit_type";
+    private static final String TRANSIT_UID = "transit_uid";
+    private static final String TRANSIT_SITE_ID = "transit_site_id";
+    private static final String TRANSIT_DATETIME = "transit_datetime";
+    private static final String TRANSIT_LONGITUDE = "transit_longitude";
+    private static final String TRANSIT_LATITUDE = "transit_latitiude";
+    private static final String TRANSIT_CALCULATED_DISTANCE = "transit_calculated_distance";
+    private static final String TRANSIT_CALCULATED_AMOUNT = "transit_calculated_amount";
+    private static final String TRANSIT_ADDRESS = "transit_address";
+    private static final String TRANSIT_ACTUAL_AMOUNT = "transit_actual_amount";
+    private static final String TRANSIT_ACTUAL_KMS = "transit_actual_kms";
+    private static final String TRANSIT_HOTEL_EXPENSE = "transit_hotel_expense";
+    private static final String TRANSIT_ACTUAL_HOTEL_EXPENSE = "transit_actual_hotel_expense";
+    private static final String TRANSIT_REMARKS = "transit_remarks";
+    private static final String TABLE_TRANSIT = "transit";
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -64,6 +126,43 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_ActivitySheetReportHeaderDetails_TABLE);
         String CREATE_ActivitySheetReportDetails_TABLE = "CREATE TABLE ActivitySheetReportDetails(siteName TEXT,Customer TEXT, ActivityDate TEXT,ActivityTime TEXT,ZoneType TEXT,TotalAmount TEXT,Status TEXT,Days TEXT,Color TEXT,NOCApprovel TEXT,Activity TEXT,TADA TEXT,Bonus TEXT,Penalty TEXT,Reason TEXT,CircleId TEXT,Circle TEXT,FEId TEXT,FEName TEXT)";
         db.execSQL(CREATE_ActivitySheetReportDetails_TABLE);
+
+        String CREATE_FE_TRACKER_TABLE = "CREATE TABLE " + TABLE_FE_TRACKER + "("
+                + "id INTEGER PRIMARY KEY," + FE_ID + " TEXT, "
+                + FE_NAME + " TEXT, " + FE_CONTACT_NO + " TEXT, "
+                + FE_COLOR + " TEXT, " + FE_DISTANCE + " TEXT, "
+                + FE_ADDRESS + " TEXT, " + FE_STATUS + " TEXT, "
+                + FE_CIRCLE + " TEXT, " + FE_ACTIVITY + " TEXT, "
+                + FE_LAST_TRACKED_TIME + " TEXT)";
+        db.execSQL(CREATE_FE_TRACKER_TABLE);
+
+        String CREATE_FE_TRACKER_TRANSIT_TABLE = "CREATE TABLE " + TABLE_FE_TRACKER_TRANSIT + "("
+                + "id INTEGER PRIMARY KEY," + FE_TRACKER_ID + " TEXT,"
+                + FE_TRACKER_TRANSIT_TIME + " TEXT," + FE_TRACKER_STATUS + " TEXT,"
+                + FE_TRACKER_COLOR + " TEXT," + FE_TRACKER_SITE_ID + " TEXT,"
+                + FE_TRACKER_SITE_NAME + " TEXT," + FE_TRACKER_CUSTOMER_SITE_ID + " TEXT,"
+                + FE_TRACKER_CIRCLE + " TEXT," + FE_TRACKER_DISTRICT + " TEXT,"
+                + FE_TRACKER_ACTIVITY_STATUS + " TEXT," + FE_TRACKER_DISTANCE + " TEXT,"
+                + FE_TRACKER_LAT + " TEXT," + FE_TRACKER_LON + " TEXT)";
+
+        db.execSQL(CREATE_FE_TRACKER_TRANSIT_TABLE);
+
+        String CREATE_CALL_TRACKING = "CREATE TABLE " + TABLE_FE_CALL_TRACKER + "("
+                + KEY_ID + " INTEGER PRIMARY KEY," + CALL_TRACKING_DURATION + " TEXT,"
+                + CALL_TRACKING_DIALLED_NUMBER + " TEXT," + CALL_TRACKING_DIALLED_EMP_ID + " INTEGER,"
+                + CALL_TRACKING_CALL_TYPE + " TEXT, " + CALL_TRACKING_DIALER_USER_ID + " TEXT,"
+                + CALL_TRACKING_CALL_TIME + " TEXT, " + LAST_UPDATED + " TEXT)";
+        db.execSQL(CREATE_CALL_TRACKING);
+
+        String CREATE_TRANSIT_TABLE = "CREATE TABLE " + TABLE_TRANSIT + "("
+                + TRANSIT_ID + " INTEGER PRIMARY KEY autoincrement," + TRANSIT_TYPE + " TEXT,"
+                + TRANSIT_UID + " TEXT," + TRANSIT_SITE_ID + " TEXT," + TRANSIT_DATETIME + " TEXT,"
+                + TRANSIT_CALCULATED_DISTANCE + " TEXT," + TRANSIT_CALCULATED_AMOUNT + " TEXT," + TRANSIT_ADDRESS + " TEXT,"
+                + TRANSIT_ACTUAL_AMOUNT + " TEXT," + TRANSIT_ACTUAL_KMS + " TEXT," + TRANSIT_REMARKS + " TEXT,"
+                + TRANSIT_HOTEL_EXPENSE + " TEXT," + TRANSIT_ACTUAL_HOTEL_EXPENSE + " TEXT,"
+                + TRANSIT_LATITUDE + " TEXT," + TRANSIT_LONGITUDE + " TEXT)";
+
+        db.execSQL(CREATE_TRANSIT_TABLE);
     }
 
     @Override
@@ -83,6 +182,9 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS ActivtyFormData");
         db.execSQL("DROP TABLE IF EXISTS ActivitySheetReportHeaderDetails");
         db.execSQL("DROP TABLE IF EXISTS ActivitySheetReportDetails");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FE_TRACKER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FE_TRACKER_TRANSIT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FE_CALL_TRACKER);
         onCreate(db);
     }
 
@@ -1229,6 +1331,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return list;
     }
+
     //populate ActivitySheetReportDetails
     private void populateActivitySheetReportDetails(Cursor cursor, ActivitySheetReportDataModel ob) {
         ob.setSiteName(cursor.getString(0));
@@ -1300,5 +1403,275 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         }
         db.close();
         return list;
+    }
+
+    //------------------------------Save FE Tracker Activity Data-------------------------------
+    public void addFeTrackerData(ArrayList<FeTrackerEmployeeModel> arrayFeTrackerListData) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        long time = System.currentTimeMillis();
+        for (int i = 0; i < arrayFeTrackerListData.size(); i++) {
+            ContentValues values = new ContentValues();
+            values.put(FE_ID, arrayFeTrackerListData.get(i).getUserId());
+            values.put(FE_NAME, arrayFeTrackerListData.get(i).getName());
+            values.put(FE_CONTACT_NO, arrayFeTrackerListData.get(i).getContactNo());
+            values.put(FE_COLOR, arrayFeTrackerListData.get(i).getColor());
+            values.put(FE_DISTANCE, arrayFeTrackerListData.get(i).getDistance());
+            values.put(FE_ADDRESS, arrayFeTrackerListData.get(i).getShortAddress());
+            values.put(FE_STATUS, arrayFeTrackerListData.get(i).getStatus());
+            values.put(FE_LAST_TRACKED_TIME, arrayFeTrackerListData.get(i).getLastTrackedTime());
+            values.put(FE_ACTIVITY, arrayFeTrackerListData.get(i).getActivity());
+            values.put(FE_CIRCLE, arrayFeTrackerListData.get(i).getCircle());
+
+            for (int j = 0; j < arrayFeTrackerListData.get(i).getArrayListFeTrackerChild().size(); j++) {
+                ContentValues childValues = new ContentValues();
+                childValues.put(FE_TRACKER_ID, arrayFeTrackerListData.get(i).getUserId());
+                childValues.put(FE_TRACKER_TRANSIT_TIME, arrayFeTrackerListData.get(i).getArrayListFeTrackerChild().get(j).getTransitTime());
+                childValues.put(FE_TRACKER_STATUS, arrayFeTrackerListData.get(i).getArrayListFeTrackerChild().get(j).getStatus());
+                childValues.put(FE_TRACKER_COLOR, arrayFeTrackerListData.get(i).getArrayListFeTrackerChild().get(j).getColor());
+                childValues.put(FE_TRACKER_SITE_ID, arrayFeTrackerListData.get(i).getArrayListFeTrackerChild().get(j).getSiteId());
+                childValues.put(FE_TRACKER_SITE_NAME, arrayFeTrackerListData.get(i).getArrayListFeTrackerChild().get(j).getSiteName());
+                childValues.put(FE_TRACKER_CUSTOMER_SITE_ID, arrayFeTrackerListData.get(i).getArrayListFeTrackerChild().get(j).getCustomerSiteId());
+                childValues.put(FE_TRACKER_CIRCLE, arrayFeTrackerListData.get(i).getArrayListFeTrackerChild().get(j).getCircle());
+                childValues.put(FE_TRACKER_DISTRICT, arrayFeTrackerListData.get(i).getArrayListFeTrackerChild().get(j).getDistrict());
+                childValues.put(FE_TRACKER_ACTIVITY_STATUS, arrayFeTrackerListData.get(i).getArrayListFeTrackerChild().get(j).getActivityStatus());
+                childValues.put(FE_TRACKER_DISTANCE, arrayFeTrackerListData.get(i).getArrayListFeTrackerChild().get(j).getDistance());
+                childValues.put(FE_TRACKER_LAT, arrayFeTrackerListData.get(i).getArrayListFeTrackerChild().get(j).getLat());
+                childValues.put(FE_TRACKER_LON, arrayFeTrackerListData.get(i).getArrayListFeTrackerChild().get(j).getLon());
+
+                db.insert(TABLE_FE_TRACKER_TRANSIT, null, childValues);
+            }
+
+            // Inserting Row
+            db.insert(TABLE_FE_TRACKER, null, values);
+        }
+        db.close(); // Closing database connection
+    }
+
+    public ArrayList<FeTrackerEmployeeModel> getFETrackerData(String circles, String activities) {
+        ArrayList<FeTrackerEmployeeModel> arrFeTrackerData = new ArrayList<>();
+
+        String selectQuery = "SELECT * FROM " + TABLE_FE_TRACKER + " WHERE " + FE_CIRCLE + " =circles ";
+
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                FeTrackerEmployeeModel feTrackerEmployeeModel = new FeTrackerEmployeeModel();
+                feTrackerEmployeeModel.setName(cursor.getString(cursor.getColumnIndex(FE_NAME)));
+                feTrackerEmployeeModel.setContactNo(cursor.getString(cursor.getColumnIndex(FE_CONTACT_NO)));
+                feTrackerEmployeeModel.setColor(cursor.getString(cursor.getColumnIndex(FE_COLOR)));
+                feTrackerEmployeeModel.setDistance(cursor.getString(cursor.getColumnIndex(FE_DISTANCE)));
+                feTrackerEmployeeModel.setShortAddress(cursor.getString(cursor.getColumnIndex(FE_ADDRESS)));
+                feTrackerEmployeeModel.setStatus(cursor.getString(cursor.getColumnIndex(FE_STATUS)));
+                feTrackerEmployeeModel.setCircle(cursor.getString(cursor.getColumnIndex(FE_CIRCLE)));
+                feTrackerEmployeeModel.setActivity(cursor.getString(cursor.getColumnIndex(FE_ACTIVITY)));
+                feTrackerEmployeeModel.setLastTrackedTime(cursor.getString(cursor.getColumnIndex(FE_LAST_TRACKED_TIME)));
+
+                // Adding contact to list
+                arrFeTrackerData.add(feTrackerEmployeeModel);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+
+        return arrFeTrackerData;
+    }
+    //------------------------------Save FE CALL Tracker Activity Data-------------------------------
+
+    public void addFeCallTrackerData(ArrayList<CallTrackerDataModel> arrayFeCallTrackerListData) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        long time = System.currentTimeMillis();
+        for (int i = 0; i < arrayFeCallTrackerListData.size(); i++) {
+            ContentValues values = new ContentValues();
+            values.put(CALL_TRACKING_DURATION, arrayFeCallTrackerListData.get(i).getDuration());
+            values.put(CALL_TRACKING_DIALLED_NUMBER, arrayFeCallTrackerListData.get(i).getDialledNumber());
+            values.put(CALL_TRACKING_DIALLED_EMP_ID, arrayFeCallTrackerListData.get(i).getDialledEmpId());
+            values.put(CALL_TRACKING_CALL_TYPE, arrayFeCallTrackerListData.get(i).getCallType());
+            values.put(CALL_TRACKING_DIALER_USER_ID, arrayFeCallTrackerListData.get(i).getDialerUserId());
+            values.put(CALL_TRACKING_CALL_TIME, arrayFeCallTrackerListData.get(i).getCallTime());
+
+            // Inserting Row
+            db.insert(TABLE_FE_CALL_TRACKER, null, values);
+        }
+        db.close();
+    }
+
+    public ArrayList<CallTrackerDataModel> getFECallTrackerData() {
+        ArrayList<CallTrackerDataModel> arrFeCallTrackerData = new ArrayList<>();
+
+        String selectQuery = "SELECT * FROM " + TABLE_FE_CALL_TRACKER;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                CallTrackerDataModel feCallTrackerDataModel = new CallTrackerDataModel();
+                feCallTrackerDataModel.setCallTime(cursor.getString(cursor.getColumnIndex(CALL_TRACKING_CALL_TIME)));
+                feCallTrackerDataModel.setCallType(cursor.getString(cursor.getColumnIndex(CALL_TRACKING_CALL_TYPE)));
+                feCallTrackerDataModel.setDialerUserId(cursor.getString(cursor.getColumnIndex(CALL_TRACKING_DIALER_USER_ID)));
+                feCallTrackerDataModel.setDialledEmpId(cursor.getString(cursor.getColumnIndex(CALL_TRACKING_DIALLED_EMP_ID)));
+                feCallTrackerDataModel.setDialledNumber(cursor.getString(cursor.getColumnIndex(CALL_TRACKING_DIALLED_NUMBER)));
+                feCallTrackerDataModel.setDuration(cursor.getString(cursor.getColumnIndex(CALL_TRACKING_DURATION)));
+                feCallTrackerDataModel.setId(cursor.getString(cursor.getColumnIndex(KEY_ID)));
+
+                // Adding contact to list
+                arrFeCallTrackerData.add(feCallTrackerDataModel);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+
+        return arrFeCallTrackerData;
+    }
+
+    //------------------------------Save Transit Screen Data-------------------------------
+
+    public boolean upsertTransitData(TransitDataModel ob) {
+        boolean done = false;
+        TransitDataModel data = null;
+        if (!ob.getSiteId().equals("0")) {
+            data = getTransitDataBySiteId(ob.getSiteId(), ob.getType());
+            if (data == null) {
+                done = insertTransitData(ob);
+            } else {
+                done = updateTransitData(ob);
+            }
+        }
+        return done;
+    }
+
+    public TransitDataModel getTransitDataBySiteId(String siteId, String type) {
+        String query = "Select * FROM transit WHERE transit_site_id = '" + siteId + "' AND transit_type='" + type + "' ";
+
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        TransitDataModel ob = new TransitDataModel();
+
+        if (cursor.moveToFirst()) {
+            cursor.moveToFirst();
+            populateTransitData(cursor, ob);
+
+            cursor.close();
+        } else {
+            ob = null;
+        }
+        db.close();
+        return ob;
+    }
+
+    public boolean insertTransitData(TransitDataModel ob) {
+        ContentValues values = new ContentValues();
+        populateTransitValueData(values, ob);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        long i = db.insert("transit", null, values);
+        db.close();
+        return i > 0;
+    }
+
+    public boolean updateTransitData(TransitDataModel ob) {
+        ContentValues values = new ContentValues();
+        populateTransitValueData(values, ob);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = 0;
+        i = db.update("transit", values, "transit_site_id = '" + ob.getSiteId() + "' AND transit_type='" + ob.getType() + "'", null);
+
+        db.close();
+        return i > 0;
+    }
+
+    public void populateTransitValueData(ContentValues values, TransitDataModel ob) {
+        values.put(TRANSIT_SITE_ID, ob.getSiteId());
+        values.put(TRANSIT_TYPE, ob.getType());
+        values.put(TRANSIT_UID, ob.getUserId());
+        values.put(TRANSIT_LATITUDE, ob.getLatitude());
+        values.put(TRANSIT_LONGITUDE, ob.getLongitude());
+        values.put(TRANSIT_DATETIME, ob.getDateTime());
+        values.put(TRANSIT_CALCULATED_DISTANCE, ob.getCalcilatedDistance());
+        values.put(TRANSIT_CALCULATED_AMOUNT, ob.getCalculatedAmount());
+        values.put(TRANSIT_ADDRESS, ob.getAddress());
+        values.put(TRANSIT_ACTUAL_AMOUNT, ob.getActualAmt());
+        values.put(TRANSIT_ACTUAL_KMS, ob.getActualKms());
+        values.put(TRANSIT_ACTUAL_KMS, ob.getActualKms());
+        values.put(TRANSIT_HOTEL_EXPENSE, ob.getHotelExpense());
+        values.put(TRANSIT_ACTUAL_HOTEL_EXPENSE, ob.getActualHotelExpense());
+        values.put(TRANSIT_REMARKS, ob.getRemarks());
+    }
+
+    public void addTransitData(ArrayList<TransitDataModel> arrayTransitData) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        long time = System.currentTimeMillis();
+        for (int i = 0; i < arrayTransitData.size(); i++) {
+            ContentValues values = new ContentValues();
+            values.put(TRANSIT_SITE_ID, arrayTransitData.get(i).getSiteId());
+            values.put(TRANSIT_TYPE, arrayTransitData.get(i).getType());
+            values.put(TRANSIT_UID, arrayTransitData.get(i).getUserId());
+            values.put(TRANSIT_LATITUDE, arrayTransitData.get(i).getLatitude());
+            values.put(TRANSIT_LONGITUDE, arrayTransitData.get(i).getLongitude());
+            values.put(TRANSIT_DATETIME, arrayTransitData.get(i).getDateTime());
+            values.put(TRANSIT_CALCULATED_DISTANCE, arrayTransitData.get(i).getCalcilatedDistance());
+            values.put(TRANSIT_CALCULATED_AMOUNT, arrayTransitData.get(i).getCalculatedAmount());
+            values.put(TRANSIT_ADDRESS, arrayTransitData.get(i).getAddress());
+            values.put(TRANSIT_ACTUAL_AMOUNT, arrayTransitData.get(i).getActualAmt());
+            values.put(TRANSIT_ACTUAL_KMS, arrayTransitData.get(i).getActualKms());
+            values.put(TRANSIT_ACTUAL_KMS, arrayTransitData.get(i).getActualKms());
+            values.put(TRANSIT_HOTEL_EXPENSE, arrayTransitData.get(i).getHotelExpense());
+            values.put(TRANSIT_ACTUAL_HOTEL_EXPENSE, arrayTransitData.get(i).getActualHotelExpense());
+            values.put(TRANSIT_REMARKS, arrayTransitData.get(i).getRemarks());
+
+            // Inserting Row
+            db.insert(TABLE_TRANSIT, null, values);
+        }
+        db.close(); // Closing database connection
+    }
+
+    private void populateTransitData(Cursor cursor, TransitDataModel transitDataModel) {
+        transitDataModel.setId(cursor.getString(cursor.getColumnIndex(TRANSIT_ID)));
+        transitDataModel.setSiteId(cursor.getString(cursor.getColumnIndex(TRANSIT_SITE_ID)));
+        transitDataModel.setUserId(cursor.getString(cursor.getColumnIndex(TRANSIT_UID)));
+        transitDataModel.setType(cursor.getString(cursor.getColumnIndex(TRANSIT_TYPE)));
+        transitDataModel.setDateTime(cursor.getString(cursor.getColumnIndex(TRANSIT_DATETIME)));
+        transitDataModel.setLatitude(cursor.getString(cursor.getColumnIndex(TRANSIT_LATITUDE)));
+        transitDataModel.setLongitude(cursor.getString(cursor.getColumnIndex(TRANSIT_LONGITUDE)));
+        transitDataModel.setCalcilatedDistance(cursor.getString(cursor.getColumnIndex(TRANSIT_CALCULATED_DISTANCE)));
+        transitDataModel.setCalculatedAmount(cursor.getString(cursor.getColumnIndex(TRANSIT_CALCULATED_AMOUNT)));
+        transitDataModel.setAddress(cursor.getString(cursor.getColumnIndex(TRANSIT_ADDRESS)));
+        transitDataModel.setActualAmt(cursor.getString(cursor.getColumnIndex(TRANSIT_ACTUAL_AMOUNT)));
+        transitDataModel.setActualKms(cursor.getString(cursor.getColumnIndex(TRANSIT_ACTUAL_KMS)));
+        transitDataModel.setRemarks(cursor.getString(cursor.getColumnIndex(TRANSIT_REMARKS)));
+        transitDataModel.setHotelExpense(cursor.getString(cursor.getColumnIndex(TRANSIT_HOTEL_EXPENSE)));
+        transitDataModel.setActualHotelExpense(cursor.getString(cursor.getColumnIndex(TRANSIT_ACTUAL_HOTEL_EXPENSE)));
+    }
+
+    public ArrayList<TransitDataModel> getTransitData(String allData) {
+        ArrayList<TransitDataModel> arrTransitData = new ArrayList<>();
+
+        String selectQuery = "";
+
+        if (allData.equals("1")) {
+            selectQuery = "SELECT * FROM " + TABLE_TRANSIT + " ORDER BY " + TRANSIT_ID;
+        } else {
+            selectQuery = "SELECT * FROM " + TABLE_TRANSIT + " ORDER BY " + TRANSIT_ID + " DESC LIMIT 1 ";
+        }
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                TransitDataModel transitDataModel = new TransitDataModel();
+                populateTransitData(cursor, transitDataModel);
+                // Adding contact to list
+                arrTransitData.add(transitDataModel);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+
+        return arrTransitData;
     }
 }
