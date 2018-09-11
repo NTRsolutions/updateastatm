@@ -69,7 +69,6 @@ import static android.content.Context.MODE_PRIVATE;
 public class TransitFragment extends MainFragment {
     FloatingActionButton btnSyncData;
     TextView btnStartHome, btnReachedSite, btnLeftSite, btnReachedHome;
-    CardView CardbtnReachedHome, CardbtnLeftSite, CardbtnReachedSite, CardbtnStartHome;
     ImageView startHomeTick, rechedSiteTick, leftSiteTick, reachedHomeTick;
     Button btnAddSiteData;
     TextView tvSelectedSite, tvTestButton, tvRemainingDistance;
@@ -106,7 +105,10 @@ public class TransitFragment extends MainFragment {
         tvRemainingDistance = findViewById(R.id.tvRemainingDistance);
         tvRemainingDistance.setVisibility(View.GONE);
         tvCurrentDate = findViewById(R.id.tvCurrentDate);
-
+        startHomeTick = (ImageView) findViewById(R.id.startHomeTick);
+        rechedSiteTick = (ImageView) findViewById(R.id.rechedSiteTick);
+        leftSiteTick = (ImageView) findViewById(R.id.leftSiteTick);
+        reachedHomeTick = (ImageView) findViewById(R.id.reachedHomeTick);
     }
 
     @Override
@@ -696,10 +698,6 @@ public class TransitFragment extends MainFragment {
                 btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
                 btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
 
-                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#666699"));
-                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#666699"));
-                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#666699"));
-                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#FFA500"));
                 startHomeTick.setVisibility(View.VISIBLE);
                 rechedSiteTick.setVisibility(View.GONE);
                 leftSiteTick.setVisibility(View.GONE);
@@ -719,10 +717,6 @@ public class TransitFragment extends MainFragment {
                 btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
                 btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
 
-                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#666699"));
-                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#666699"));
-                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#078f4b"));
-                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#FFA500"));
 
                 startHomeTick.setVisibility(View.VISIBLE);
                 rechedSiteTick.setVisibility(View.VISIBLE);
@@ -743,10 +737,6 @@ public class TransitFragment extends MainFragment {
                 btnLeftSite.setBackgroundColor(Color.parseColor("#1E90FF"));
                 btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
 
-                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#666699"));
-                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#1E90FF"));
-                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#078f4b"));
-                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#FFA500"));
 
                 startHomeTick.setVisibility(View.VISIBLE);
                 rechedSiteTick.setVisibility(View.VISIBLE);
@@ -768,10 +758,6 @@ public class TransitFragment extends MainFragment {
                 btnLeftSite.setBackgroundColor(Color.parseColor("#1E90FF"));
                 btnReachedHome.setBackgroundColor(Color.parseColor("#FF4500"));
 
-                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#FF4500"));
-                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#1E90FF"));
-                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#078f4b"));
-                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#FFA500"));
                 btnReachedHome.setEnabled(false);
                 btnReachedSite.setEnabled(false);
                 btnLeftSite.setEnabled(false);
@@ -791,10 +777,6 @@ public class TransitFragment extends MainFragment {
                 btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
                 btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
 
-                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#666699"));
-                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#666699"));
-                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#666699"));
-                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#666699"));
                 btnReachedSite.setEnabled(false);
                 btnLeftSite.setEnabled(false);
                 btnReachedHome.setEnabled(false);

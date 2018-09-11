@@ -131,67 +131,69 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="fill_parent"
-                    android:orientation="vertical">
+            </HorizontalScrollView>
 
-                    <LinearLayout
-                        android:id="@+id/linearLayout1"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:background="#015093">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/tvSNo"
-                            android:layout_width="60dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="S. No."
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                <LinearLayout
+                    android:id="@+id/linearLayout1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#015093">
 
-                        <TextView
-                            android:id="@+id/tvDate"
-                            android:layout_width="100dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="Date"
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvSNo"
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="S. No."
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvSiteName"
-                            android:layout_width="200dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="Site Name"
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvDate"
+                        android:layout_width="100dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="Date"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvAttendance"
-                            android:layout_width="50dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="Attn."
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvSiteName"
+                        android:layout_width="200dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="Site Name"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                        <!--<RelativeLayout
+                    <TextView
+                        android:id="@+id/tvAttendance"
+                        android:layout_width="50dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="Attn."
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
+
+                    <!--<RelativeLayout
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:background="@drawable/cell_shape"
@@ -215,206 +217,204 @@
                                 android:visibility="gone" />
                         </RelativeLayout>-->
 
-                        <TextView
-                            android:id="@+id/tvDA"
-                            android:layout_width="70dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="DA"
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvDA"
+                        android:layout_width="70dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="DA"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvTA"
-                            android:layout_width="70dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="TA"
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvTA"
+                        android:layout_width="70dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="TA"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvHotel"
-                            android:layout_width="70dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="Hotel"
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvHotel"
+                        android:layout_width="70dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="Hotel"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvBonus"
-                            android:layout_width="100dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="Bonus/Penalty"
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvBonus"
+                        android:layout_width="100dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="Bonus/Penalty"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvWaterCost"
-                            android:layout_width="100dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="Water Cost"
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvWaterCost"
+                        android:layout_width="100dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="Water Cost"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvOtherExp"
-                            android:layout_width="100dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="Other Exp."
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvOtherExp"
+                        android:layout_width="100dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="Other Exp."
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvTotal"
-                            android:layout_width="70dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="Total"
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvTotal"
+                        android:layout_width="70dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="Total"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                    </LinearLayout>
+                </LinearLayout>
 
-                    <ListView
-                        android:id="@+id/listview"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/linearLayout1"
-                        android:layout_marginBottom="30dp"
-                        android:divider="@null" />
+                <ListView
+                    android:id="@+id/listview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/linearLayout1"
+                    android:layout_marginBottom="30dp"
+                    android:divider="@null" />
 
-                    <LinearLayout
-                        android:id="@+id/linearLayoutTotal"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:background="#015093">
+                <LinearLayout
+                    android:id="@+id/linearLayoutTotal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:background="#015093">
 
-                        <TextView
-                            android:id="@+id/tvTotalText"
-                            android:layout_width="410dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:gravity="center"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="Total"
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvTotalText"
+                        android:layout_width="410dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="Total"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvDATotal"
-                            android:layout_width="70dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="3000"
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvDATotal"
+                        android:layout_width="70dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="3000"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvTATotal"
-                            android:layout_width="70dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="5000"
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvTATotal"
+                        android:layout_width="70dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="5000"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvHotelTotal"
-                            android:layout_width="70dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="@dimen/_5dp"
-                            android:singleLine="true"
-                            android:text="7000"
-                            android:textAlignment="center"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvHotelTotal"
+                        android:layout_width="70dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="@dimen/_5dp"
+                        android:singleLine="true"
+                        android:text="7000"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvBonusTotal"
-                            android:layout_width="100dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="5dp"
-                            android:singleLine="true"
-                            android:text="700"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvBonusTotal"
+                        android:layout_width="100dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="5dp"
+                        android:singleLine="true"
+                        android:text="700"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvWaterCostTotal"
-                            android:layout_width="100dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="5dp"
-                            android:singleLine="true"
-                            android:text="1000"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvWaterCostTotal"
+                        android:layout_width="100dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="5dp"
+                        android:singleLine="true"
+                        android:text="1000"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvOtherExpTotal"
-                            android:layout_width="100dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="5dp"
-                            android:singleLine="true"
-                            android:text="800"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvOtherExpTotal"
+                        android:layout_width="100dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="5dp"
+                        android:singleLine="true"
+                        android:text="800"
+                        android:textColor="#ffffff" />
 
-                        <TextView
-                            android:id="@+id/tvTotalTotal"
-                            android:layout_width="70dp"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/cell_shape"
-                            android:ellipsize="end"
-                            android:padding="5dp"
-                            android:singleLine="true"
-                            android:text="16000"
-                            android:textColor="#ffffff" />
+                    <TextView
+                        android:id="@+id/tvTotalTotal"
+                        android:layout_width="70dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/cell_shape"
+                        android:ellipsize="end"
+                        android:padding="5dp"
+                        android:singleLine="true"
+                        android:text="16000"
+                        android:textColor="#ffffff" />
 
-                    </LinearLayout>
+                </LinearLayout>
 
-                </RelativeLayout>
-
-            </HorizontalScrollView>
+            </RelativeLayout>
 
 
         </android.support.v7.widget.CardView>

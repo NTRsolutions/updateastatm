@@ -271,7 +271,7 @@ public class FillSiteAddressFragment extends MainFragment {
         arrSiteId = new String[siteDetailArrayList.size()];
         for (int i = 0; i < siteDetailArrayList.size(); i++) {
             arrSiteName[i] = siteDetailArrayList.get(i).getSiteName();
-            arrSiteId[i] = String.valueOf(siteDetailArrayList.get(i).getSiteId());
+            arrSiteId[i] = String.valueOf(siteDetailArrayList.get(i).getCustomerSiteId());
         }
         setSiteNameAdapter();
     }

@@ -9,6 +9,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.atm.ast.astatm.ASTGson;
 import com.atm.ast.astatm.model.ActivitySheetReportDataModel;
 import com.atm.ast.astatm.model.CallTrackerDataModel;
+import com.atm.ast.astatm.model.ComplaintDataModel;
+import com.atm.ast.astatm.model.ComplaintDescriptionDataModel;
+import com.atm.ast.astatm.model.ExpenseScreenDataModel;
 import com.atm.ast.astatm.model.FeTrackerEmployeeModel;
 import com.atm.ast.astatm.model.TransitDataModel;
 import com.atm.ast.astatm.model.newmodel.Activity;
@@ -94,6 +97,54 @@ public class ATMDBHelper extends SQLiteOpenHelper {
     private static final String TRANSIT_REMARKS = "transit_remarks";
     private static final String TABLE_TRANSIT = "transit";
 
+
+    //------------------------------Expense Sheet--------------------------------------
+    private static final String EXPENSE_DATE = "expense_date";
+    private static final String EXPENSE_SITE_NAME = "expense_site_name";
+    private static final String EXPENSE_ATTENDANCE = "expense_attendance";
+    private static final String EXPENSE_DA = "expense_da";
+    private static final String EXPENSE_TA = "expense_ta";
+    private static final String EXPENSE_HOTEL = "expense_hotel";
+    private static final String EXPENSE_BONUS = "expense_bonus";
+    private static final String EXPENSE_PENALTY = "expense_penalty";
+    private static final String EXPENSE_WATER_COST = "expense_water_cost";
+    private static final String EXPENSE_OTHER_EXP = "expense_other_exp";
+    private static final String EXPENSE_TOTAL = "expense_total";
+    private static final String EXPENSE_TOTAL_DA = "expense_total_da";
+    private static final String EXPENSE_TOTAL_TA = "expense_total_ta";
+    private static final String EXPENSE_TOTAL_HOTEL = "expense_total_hotel";
+    private static final String EXPENSE_TOTAL_BONUS = "expense_total_bonus";
+    private static final String EXPENSE_TOTAL_PENALTY = "expense_total_penalty";
+    private static final String EXPENSE_TOTAL_WATER_COST = "expense_total_water_cost";
+    private static final String EXPENSE_TOTAL_OTHER_EXP = "expense_total_other_exp";
+    private static final String EXPENSE_TOTAL_TOTAL = "expense_total_total";
+    private static final String EXPENSE_ADDITIONAL_BONUS = "expense_additional_bonus";
+    private static final String EXPENSE_ADDITIONAL_PENALTY = "expense_additional_penalty";
+    private static final String EXPENSE_GRAND_TOTAL = "expense_grand_total";
+    private static final String EXPENSE_LAST_UPDATED_DATE = "expense_last_updated_date";
+    private static final String EXPENSE_MONTH = "expense_month";
+    private static final String TABLE_EXPENSE_SHEET = "expense_sheet";
+
+    //------------------------------Complaint Description--------------------------------------
+    private static final String COMPLAINT_DESCRIPTION_TEXT = "complaint_description_text";
+    private static final String COMPLAINT_DESCRIPTION_TYPE = "complaint_description_type";
+    private static final String COMPLAINT_DESCRIPTION_LAST_UPDATED = "complaint_description_last_updated";
+    private static final String TABLE_COMPLAINT_DESCRIPTION = "complaint_description";
+
+    //-----------------------------Complaint-------------------------------------------
+    private static final String COMPLAINT_USER_ID = "user_id";
+    private static final String COMPLAINT_SITE_ID = "site_id";
+    private static final String COMPLAINT_NAME = "name";
+    private static final String COMPLAINT_MOBILE_NUMBER = "mobile_number";
+    private static final String COMPLAINT_EMAIL_ID = "email_id";
+    private static final String COMPLAINT_TYPE = "type";
+    private static final String COMPLAINT_PRIORITY = "priority";
+    private static final String COMPLAINT_DESCRIPTION = "description";
+    private static final String COMPLAINT_PROPOSE_PLAN = "propose_plan";
+    private static final String COMPLAINT_TIME = "time";
+    private static final String COMPLAINT_CLIENT_NAME = "client_name";
+    private static final String TABLE_COMPLAINTS = "table_complaints";
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_Today_Plan_TABLE = "CREATE TABLE todaySitePlan(SiteId TEXT,CustomerSiteId TEXT, SiteName TEXT,siteStatus INTEGER DEFAULT 0)";
@@ -163,6 +214,34 @@ public class ATMDBHelper extends SQLiteOpenHelper {
                 + TRANSIT_LATITUDE + " TEXT," + TRANSIT_LONGITUDE + " TEXT)";
 
         db.execSQL(CREATE_TRANSIT_TABLE);
+
+        String CREATE_EXPENSE_SHEET_TABLE = "CREATE TABLE " + TABLE_EXPENSE_SHEET + "("
+                + KEY_ID + " INTEGER PRIMARY KEY autoincrement," + EXPENSE_DATE + " TEXT,"
+                + EXPENSE_SITE_NAME + " TEXT," + EXPENSE_ATTENDANCE + " TEXT," + EXPENSE_DA + " INTEGER,"
+                + EXPENSE_TA + " TEXT," + EXPENSE_HOTEL + " TEXT, " + EXPENSE_BONUS + " TEXT,"
+                + EXPENSE_PENALTY + " TEXT, " + EXPENSE_WATER_COST + " TEXT,"
+                + EXPENSE_OTHER_EXP + " TEXT, " + EXPENSE_TOTAL + " TEXT," + EXPENSE_MONTH + " TEXT,"
+                + EXPENSE_TOTAL_DA + " TEXT, " + EXPENSE_TOTAL_TA + " TEXT,"
+                + EXPENSE_TOTAL_HOTEL + " TEXT, " + EXPENSE_TOTAL_BONUS + " TEXT,"
+                + EXPENSE_TOTAL_PENALTY + " TEXT, " + EXPENSE_TOTAL_WATER_COST + " TEXT,"
+                + EXPENSE_TOTAL_OTHER_EXP + " TEXT, " + EXPENSE_TOTAL_TOTAL + " TEXT,"
+                + EXPENSE_ADDITIONAL_BONUS + " TEXT, " + EXPENSE_ADDITIONAL_PENALTY + " TEXT,"
+                + EXPENSE_GRAND_TOTAL + " TEXT, " + EXPENSE_LAST_UPDATED_DATE + " TEXT)";
+        db.execSQL(CREATE_EXPENSE_SHEET_TABLE);
+
+        String CREATE_COMPLAINT_DESCRIPTION_TABLE = "CREATE TABLE " + TABLE_COMPLAINT_DESCRIPTION + "("
+                + KEY_ID + " INTEGER PRIMARY KEY autoincrement," + COMPLAINT_DESCRIPTION_TEXT + " TEXT,"
+                + COMPLAINT_DESCRIPTION_TYPE + " TEXT," + COMPLAINT_DESCRIPTION_LAST_UPDATED + " TEXT)";
+        db.execSQL(CREATE_COMPLAINT_DESCRIPTION_TABLE);
+
+        String CREATE_COMPLAINT_TABLE = "CREATE TABLE " + TABLE_COMPLAINTS + "("
+                + KEY_ID + " INTEGER PRIMARY KEY autoincrement," + COMPLAINT_USER_ID + " TEXT,"
+                + COMPLAINT_SITE_ID + " TEXT," + COMPLAINT_NAME + " TEXT," + COMPLAINT_MOBILE_NUMBER + " TEXT,"
+                + COMPLAINT_EMAIL_ID + " TEXT," + COMPLAINT_TYPE + " TEXT," + COMPLAINT_PRIORITY + " TEXT,"
+                + COMPLAINT_CLIENT_NAME + " TEXT," + COMPLAINT_DESCRIPTION + " TEXT,"
+                + COMPLAINT_PROPOSE_PLAN + " TEXT," + COMPLAINT_TIME + " TEXT)";
+        db.execSQL(CREATE_COMPLAINT_TABLE);
+
     }
 
     @Override
@@ -185,6 +264,9 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FE_TRACKER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FE_TRACKER_TRANSIT);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FE_CALL_TRACKER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXPENSE_SHEET);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMPLAINT_DESCRIPTION);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMPLAINTS);
         onCreate(db);
     }
 
@@ -1673,5 +1755,202 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
 
         return arrTransitData;
+    }
+
+    //------------------------------Select ExpenseSheet-------------------------------
+
+    public void addExpenseSheetData(ArrayList<ExpenseScreenDataModel> arrExpenseSheet) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        //db.delete("activity_search_details", null, null);
+
+        long time = System.currentTimeMillis();
+        for (int i = 0; i < arrExpenseSheet.size(); i++) {
+            ContentValues values = new ContentValues();
+            values.put(EXPENSE_DATE, arrExpenseSheet.get(i).getDate());
+            values.put(EXPENSE_SITE_NAME, arrExpenseSheet.get(i).getSiteName());
+            values.put(EXPENSE_ATTENDANCE, arrExpenseSheet.get(i).getAttendance());
+            values.put(EXPENSE_DA, arrExpenseSheet.get(i).getDa());
+            values.put(EXPENSE_TA, arrExpenseSheet.get(i).getTa());
+            values.put(EXPENSE_HOTEL, arrExpenseSheet.get(i).getHotel());
+            values.put(EXPENSE_BONUS, arrExpenseSheet.get(i).getBonus());
+            values.put(EXPENSE_PENALTY, arrExpenseSheet.get(i).getPenalty());
+            values.put(EXPENSE_WATER_COST, arrExpenseSheet.get(i).getWaterCost());
+            values.put(EXPENSE_OTHER_EXP, arrExpenseSheet.get(i).getOtherExp());
+            values.put(EXPENSE_TOTAL, arrExpenseSheet.get(i).getTotal());
+            values.put(EXPENSE_TOTAL_DA, arrExpenseSheet.get(i).getDaTotal());
+            values.put(EXPENSE_TOTAL_TA, arrExpenseSheet.get(i).getTaTotal());
+            values.put(EXPENSE_TOTAL_HOTEL, arrExpenseSheet.get(i).getHotelTotal());
+            values.put(EXPENSE_TOTAL_BONUS, arrExpenseSheet.get(i).getBonusTotal());
+            values.put(EXPENSE_TOTAL_PENALTY, arrExpenseSheet.get(i).getPenaltyTotal());
+            values.put(EXPENSE_TOTAL_WATER_COST, arrExpenseSheet.get(i).getWaterCostTotal());
+            values.put(EXPENSE_TOTAL_OTHER_EXP, arrExpenseSheet.get(i).getOtherExpTotal());
+            values.put(EXPENSE_TOTAL_TOTAL, arrExpenseSheet.get(i).getTotalTotal());
+            values.put(EXPENSE_ADDITIONAL_BONUS, arrExpenseSheet.get(i).getAdditionalBonus());
+            values.put(EXPENSE_ADDITIONAL_PENALTY, arrExpenseSheet.get(i).getAdditionalPenalty());
+            values.put(EXPENSE_GRAND_TOTAL, arrExpenseSheet.get(i).getGrandTotal());
+            values.put(EXPENSE_MONTH, arrExpenseSheet.get(i).getMonth());
+            values.put(EXPENSE_LAST_UPDATED_DATE, String.valueOf(time));
+
+            // Inserting Row
+            db.insert(TABLE_EXPENSE_SHEET, null, values);
+        }
+        db.close(); // Closing database connection
+    }
+
+    public ArrayList<ExpenseScreenDataModel> getExpenseSheetData(int month) {
+        ArrayList<ExpenseScreenDataModel> arrExpenseSheet = new ArrayList<>();
+
+        String selectQuery = "";
+
+        selectQuery = "SELECT * FROM " + TABLE_EXPENSE_SHEET + " WHERE " + EXPENSE_MONTH + " = " + month;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                ExpenseScreenDataModel expenseScreenDataModel = new ExpenseScreenDataModel();
+                expenseScreenDataModel.setDate(cursor.getString(cursor.getColumnIndex(EXPENSE_DATE)));
+                expenseScreenDataModel.setSiteName(cursor.getString(cursor.getColumnIndex(EXPENSE_SITE_NAME)));
+                expenseScreenDataModel.setAttendance(cursor.getString(cursor.getColumnIndex(EXPENSE_ATTENDANCE)));
+                expenseScreenDataModel.setDa(cursor.getString(cursor.getColumnIndex(EXPENSE_DA)));
+                expenseScreenDataModel.setTa(cursor.getString(cursor.getColumnIndex(EXPENSE_TA)));
+                expenseScreenDataModel.setHotel(cursor.getString(cursor.getColumnIndex(EXPENSE_HOTEL)));
+                expenseScreenDataModel.setBonus(cursor.getString(cursor.getColumnIndex(EXPENSE_BONUS)));
+                expenseScreenDataModel.setPenalty(cursor.getString(cursor.getColumnIndex(EXPENSE_PENALTY)));
+                expenseScreenDataModel.setWaterCost(cursor.getString(cursor.getColumnIndex(EXPENSE_WATER_COST)));
+                expenseScreenDataModel.setOtherExp(cursor.getString(cursor.getColumnIndex(EXPENSE_OTHER_EXP)));
+                expenseScreenDataModel.setTotal(cursor.getString(cursor.getColumnIndex(EXPENSE_TOTAL)));
+                expenseScreenDataModel.setDaTotal(cursor.getString(cursor.getColumnIndex(EXPENSE_TOTAL_DA)));
+                expenseScreenDataModel.setTaTotal(cursor.getString(cursor.getColumnIndex(EXPENSE_TOTAL_TA)));
+                expenseScreenDataModel.setHotelTotal(cursor.getString(cursor.getColumnIndex(EXPENSE_TOTAL_HOTEL)));
+                expenseScreenDataModel.setBonusTotal(cursor.getString(cursor.getColumnIndex(EXPENSE_TOTAL_BONUS)));
+                expenseScreenDataModel.setPenaltyTotal(cursor.getString(cursor.getColumnIndex(EXPENSE_TOTAL_PENALTY)));
+                expenseScreenDataModel.setWaterCostTotal(cursor.getString(cursor.getColumnIndex(EXPENSE_TOTAL_WATER_COST)));
+                expenseScreenDataModel.setOtherExpTotal(cursor.getString(cursor.getColumnIndex(EXPENSE_TOTAL_OTHER_EXP)));
+                expenseScreenDataModel.setTotalTotal(cursor.getString(cursor.getColumnIndex(EXPENSE_TOTAL_TOTAL)));
+                expenseScreenDataModel.setAdditionalBonus(cursor.getString(cursor.getColumnIndex(EXPENSE_ADDITIONAL_BONUS)));
+                expenseScreenDataModel.setAdditionalPenalty(cursor.getString(cursor.getColumnIndex(EXPENSE_ADDITIONAL_PENALTY)));
+                expenseScreenDataModel.setGrandTotal(cursor.getString(cursor.getColumnIndex(EXPENSE_GRAND_TOTAL)));
+                expenseScreenDataModel.setMonth(cursor.getString(cursor.getColumnIndex(EXPENSE_MONTH)));
+                expenseScreenDataModel.setLastUpdatedTime(cursor.getString(cursor.getColumnIndex(EXPENSE_LAST_UPDATED_DATE)));
+                // Adding contact to list
+                arrExpenseSheet.add(expenseScreenDataModel);
+            } while (cursor.moveToNext());
+        }
+
+        db.close();
+        return arrExpenseSheet;
+    }
+    //----------------------------Delete Selected Row----------------------------------
+
+    public void deleteSelectedRows(String tableName, String columnName, String columnValue) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(tableName, columnName + "=" + columnValue, null);
+        db.close();
+    }
+
+    //-----------------------------------Complaint Description-------------------------------------
+
+    public void addComplaintDesription(ArrayList<ComplaintDescriptionDataModel> complaintArrayList) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        long time = System.currentTimeMillis();
+        for (int i = 0; i < complaintArrayList.size(); i++) {
+            ContentValues values = new ContentValues();
+            values.put(COMPLAINT_DESCRIPTION_TYPE, complaintArrayList.get(i).getType());
+            values.put(COMPLAINT_DESCRIPTION_TEXT, complaintArrayList.get(i).getDescription());
+            values.put(COMPLAINT_DESCRIPTION_LAST_UPDATED, String.valueOf(time));
+
+            // Inserting Row
+            db.insert(TABLE_COMPLAINT_DESCRIPTION, null, values);
+        }
+        db.close();
+    }
+
+    public ArrayList<ComplaintDescriptionDataModel> getComplaintDesription(String descriptionType) {
+        ArrayList<ComplaintDescriptionDataModel> arrComplaintData = new ArrayList<>();
+
+        String selectQuery = "";
+
+        selectQuery = "SELECT * FROM " + TABLE_COMPLAINT_DESCRIPTION + " WHERE " + COMPLAINT_DESCRIPTION_TYPE + " = '" + descriptionType + "'";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ComplaintDescriptionDataModel complaintDataModel = new ComplaintDescriptionDataModel();
+                complaintDataModel.setDescription(cursor.getString(cursor.getColumnIndex(COMPLAINT_DESCRIPTION_TEXT)));
+                complaintDataModel.setType(cursor.getString(cursor.getColumnIndex(COMPLAINT_DESCRIPTION_TYPE)));
+                complaintDataModel.setLastUpdatedTime(cursor.getString(cursor.getColumnIndex(COMPLAINT_DESCRIPTION_LAST_UPDATED)));
+
+                // Adding contact to list
+                arrComplaintData.add(complaintDataModel);
+            } while (cursor.moveToNext());
+        }
+
+        db.close();
+        return arrComplaintData;
+    }
+
+    public void addComplaintData(ComplaintDataModel complaint) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COMPLAINT_USER_ID, complaint.getUserId());
+        values.put(COMPLAINT_SITE_ID, complaint.getSiteID());
+        values.put(COMPLAINT_NAME, complaint.getName());
+        values.put(COMPLAINT_MOBILE_NUMBER, complaint.getMobile());
+        values.put(COMPLAINT_EMAIL_ID, complaint.getEmailId());
+        values.put(COMPLAINT_TYPE, complaint.getType());
+        values.put(COMPLAINT_PRIORITY, complaint.getPriority());
+        values.put(COMPLAINT_DESCRIPTION, complaint.getDescription());
+        values.put(COMPLAINT_PROPOSE_PLAN, complaint.getProposePlan());
+        values.put(COMPLAINT_CLIENT_NAME, complaint.getClientName());
+        values.put(COMPLAINT_TIME, complaint.getTime());
+
+        db.insert(TABLE_COMPLAINTS, null, values);
+        db.close(); // Closing database connection
+    }
+
+    public ArrayList<ComplaintDataModel> getComplaintData() {
+        ArrayList<ComplaintDataModel> arrComplaintData = new ArrayList<>();
+
+        String selectQuery = "";
+
+        selectQuery = "SELECT * FROM " + TABLE_COMPLAINTS + " LIMIT 1";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ComplaintDataModel complaintDataModel = new ComplaintDataModel();
+                complaintDataModel.setId(cursor.getString(cursor.getColumnIndex(KEY_ID)));
+                complaintDataModel.setUserId(cursor.getString(cursor.getColumnIndex(COMPLAINT_USER_ID)));
+                complaintDataModel.setSiteID(cursor.getString(cursor.getColumnIndex(COMPLAINT_SITE_ID)));
+                complaintDataModel.setName(cursor.getString(cursor.getColumnIndex(COMPLAINT_NAME)));
+                complaintDataModel.setMobile(cursor.getString(cursor.getColumnIndex(COMPLAINT_MOBILE_NUMBER)));
+                complaintDataModel.setEmailId(cursor.getString(cursor.getColumnIndex(COMPLAINT_EMAIL_ID)));
+                complaintDataModel.setType(cursor.getString(cursor.getColumnIndex(COMPLAINT_TYPE)));
+                complaintDataModel.setPriority(cursor.getString(cursor.getColumnIndex(COMPLAINT_PRIORITY)));
+                complaintDataModel.setDescription(cursor.getString(cursor.getColumnIndex(COMPLAINT_DESCRIPTION)));
+                complaintDataModel.setProposePlan(cursor.getString(cursor.getColumnIndex(COMPLAINT_PROPOSE_PLAN)));
+                complaintDataModel.setTime(cursor.getString(cursor.getColumnIndex(COMPLAINT_TIME)));
+                complaintDataModel.setClientName(cursor.getString(cursor.getColumnIndex(COMPLAINT_CLIENT_NAME)));
+                arrComplaintData.add(complaintDataModel);
+            } while (cursor.moveToNext());
+        }
+
+        db.close();
+        return arrComplaintData;
+    }
+    public void deleteComplaintData(int complaintId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_COMPLAINTS, KEY_ID + "=" + complaintId,
+                null);
+        db.close();
     }
 }

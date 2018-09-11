@@ -134,13 +134,13 @@ public class ActivitySheetFragment extends MainFragment {
         712	Material Shifting WH to Site  nm
         713	Dismantling nm
         714	Sign Off     m
-        715	Material Shifting Site to WH
+        715	Material Shifting Site to WH nm  new
         716	Others   nm
         878	Rework (Civil and Electrical)    m
         885	Site Upgrade     m
         890	Dismantling and Reinstallation    m
         1168 Electrical+Civil     m
-        1179 Material Shifting Site to Site    m
+        1179 Material Shifting Site to Site    nm
         1282 Commisioning Rework    m
         1371 Long Distance Travel    nm
         1380 System Upgrade    m
@@ -149,15 +149,15 @@ public class ActivitySheetFragment extends MainFragment {
         858	Leave    nm
         859	Absent   nm
         860	No Plan   nm
-        730	Joint Visit  m
+        730	Joint Visit  nm
         749	PM    m
         750	CM     m
-        886	Recivil Repair   m
+        886	Recivil Repair   nm
         1180 Special Project    m
         1238 Material Shifting WH to Site    nm
         1239 Material Shifting Site to WH  nm
         1281 WH  nm
-        1303 Material Shifting Site to Site   m
+        1303 Material Shifting Site to Site   nm
         1372 Long Distance Travel       nm*/
 
 
@@ -208,7 +208,7 @@ public class ActivitySheetFragment extends MainFragment {
 
     @Override
     protected void dataToView() {
-        if (activityId.equals("711") || activityId.equals("714") || activityId.equals("878") || activityId.equals("885") || activityId.equals("890") || activityId.equals("1168") || activityId.equals("1179") || activityId.equals("1282") || activityId.equals("1380") || activityId.equals("730") || activityId.equals("749") || activityId.equals("750") || activityId.equals("886") || activityId.equals("1180") || activityId.equals("1303")) {//PM check list mandatory for all these activitys
+        if (activityId.equals("711") || activityId.equals("714") || activityId.equals("878") || activityId.equals("885") || activityId.equals("890") || activityId.equals("1168")  || activityId.equals("1282") || activityId.equals("1380")  || activityId.equals("749") || activityId.equals("750") || activityId.equals("1180")) {//PM check list mandatory for all these activitys
             btnsave.setText("Next");
             pmChecklistFlag = true;
         } else {

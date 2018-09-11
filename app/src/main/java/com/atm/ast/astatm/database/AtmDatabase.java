@@ -2845,7 +2845,6 @@ public class AtmDatabase extends SQLiteOpenHelper {
         return arrComplaintData;
     }
 
-    //---------------------------------------------------------------------------------------------
 
     //------------------------------Select Complaint Creation-------------------------------
 

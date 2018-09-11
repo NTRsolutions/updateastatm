@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
+import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
@@ -24,6 +25,7 @@ import com.atm.ast.astatm.model.ComplaintDataModel;
 import com.atm.ast.astatm.model.ComplaintDescriptionDataModel;
 import com.atm.ast.astatm.model.ContentData;
 import com.atm.ast.astatm.model.SiteDisplayDataModel;
+import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.google.gson.Gson;
 
@@ -32,6 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -47,8 +50,8 @@ public class ComplaintFragment extends MainFragment {
     int isCustomer;
     String[] arrSiteName, arrSiteId;
     int isProposed = 0;
-    AtmDatabase atmDatabase;
-    ArrayList<SiteDisplayDataModel> siteDetailArrayList;
+    ATMDBHelper atmdbHelper;
+    List<Data> siteDetailArrayList;
     String[] arrRoleIds;
 
     @Override
@@ -126,20 +129,20 @@ public class ComplaintFragment extends MainFragment {
                 cbProposePlan.setVisibility(View.GONE);
             }
         }
-    //    etClientName.setEnabled(false);
+        //    etClientName.setEnabled(false);
         etMobile.setText(mobileNo);
         etMobile.setEnabled(false);
         etEmail.setText(email);
         etEmail.setEnabled(false);
         etName.setText(userName);
         etName.setEnabled(false);
-        atmDatabase = new AtmDatabase(getContext());
-        siteDetailArrayList = atmDatabase.getFilteredData("site_search_name", "", "Survey");
+        atmdbHelper = new ATMDBHelper(getContext());
+        siteDetailArrayList = atmdbHelper.getAllSiteListData();
         arrSiteName = new String[siteDetailArrayList.size()];
         arrSiteId = new String[siteDetailArrayList.size()];
         for (int i = 0; i < siteDetailArrayList.size(); i++) {
             arrSiteName[i] = siteDetailArrayList.get(i).getSiteName();
-            arrSiteId[i] = siteDetailArrayList.get(i).getSiteId();
+            arrSiteId[i] = String.valueOf(siteDetailArrayList.get(i).getCustomerSiteId());
         }
 
         setSiteNameAdapter();
@@ -158,7 +161,7 @@ public class ComplaintFragment extends MainFragment {
                 ArrayList<String> arrStringComplaintDes = new ArrayList<String>();
                 if (i == 1) {
                     ArrayList<ComplaintDescriptionDataModel> arrComplaintDes = new ArrayList<>();
-                    arrComplaintDes = atmDatabase.getComplaintDesription("SA");
+                    arrComplaintDes = atmdbHelper.getComplaintDesription("SA");
                     for (int j = 0; j < arrComplaintDes.size(); j++) {
                         arrStringComplaintDes.add(arrComplaintDes.get(j).getDescription());
                     }
@@ -168,7 +171,7 @@ public class ComplaintFragment extends MainFragment {
 
                 } else if (i == 2) {
                     ArrayList<ComplaintDescriptionDataModel> arrComplaintDes = new ArrayList<>();
-                    arrComplaintDes = atmDatabase.getComplaintDesription("NSA");
+                    arrComplaintDes = atmdbHelper.getComplaintDesription("NSA");
                     for (int j = 0; j < arrComplaintDes.size(); j++) {
                         arrStringComplaintDes.add(arrComplaintDes.get(j).getDescription());
                     }
@@ -220,15 +223,15 @@ public class ComplaintFragment extends MainFragment {
                     complaintDescription = etComplaintDescriptionOthers.getText().toString();
                 }
                 if (siteId.equalsIgnoreCase("")) {
-                    ASTUIUtil.showToast( "Please Select a Site");
+                    ASTUIUtil.showToast("Please Select a Site");
                 } else if (complaintTypeId == 0) {
-                    ASTUIUtil.showToast( "Please Select Complaint Type");
+                    ASTUIUtil.showToast("Please Select Complaint Type");
                 } else if (priorityId == 0) {
-                    ASTUIUtil.showToast( "Please Select Priority");
+                    ASTUIUtil.showToast("Please Select Priority");
                 } else if (complaintDescription.equalsIgnoreCase("")) {
-                    ASTUIUtil.showToast( "Please Select Complaint Description");
+                    ASTUIUtil.showToast("Please Select Complaint Description");
                 } else if (clientName == null) {
-                    ASTUIUtil.showToast( "Client Name Not Found");
+                    ASTUIUtil.showToast("Client Name Not Found");
                 } else {
                     if (spPriority.getSelectedItemPosition() == 1) {
                         priorityId = 1279;
@@ -236,40 +239,9 @@ public class ComplaintFragment extends MainFragment {
                         priorityId = 1280;
                     }
                     if (ASTUIUtil.isOnline(getContext())) {
-                        JSONObject mainObj = new JSONObject();
-                        try {
-                            mainObj.put("CustomerCode", clientName);
-                            mainObj.put("SiteID", siteId);
-                            mainObj.put("Name", name);
-                            mainObj.put("Mobile", mobileNumber);
-                            mainObj.put("Email", email);
-                            mainObj.put("ComplaintType", String.valueOf(complaintTypeId));
-                            mainObj.put("Priority", String.valueOf(priorityId));
-                            mainObj.put("Remarks", complaintDescription);
-                            mainObj.put("IsProposedPlan", String.valueOf(proposePlanId));
-                            mainObj.put("UserId", uid);
-                            saveComplainData(mainObj);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        saveComplainData(siteId, name, mobileNumber, email, complaintTypeId, priorityId, complaintDescription, proposePlanId, clientName);
                     } else {
-                        ArrayList<ComplaintDataModel> complaintArrayList = new ArrayList<ComplaintDataModel>();
-                        ComplaintDataModel complaintDataModel = new ComplaintDataModel();
-                        complaintDataModel.setUserId(uid);
-                        complaintDataModel.setSiteID(siteId);
-                        complaintDataModel.setName(name);
-                        complaintDataModel.setMobile(mobileNumber);
-                        complaintDataModel.setEmailId(email);
-                        complaintDataModel.setType(String.valueOf(complaintTypeId));
-                        complaintDataModel.setPriority(String.valueOf(priorityId));
-                        complaintDataModel.setDescription(complaintDescription);
-                        complaintDataModel.setProposePlan(String.valueOf(proposePlanId));
-                        complaintDataModel.setTime(String.valueOf(System.currentTimeMillis()));
-                        complaintDataModel.setClientName(clientName);
-                        complaintArrayList.add(complaintDataModel);
-                        atmDatabase.addComplaintData(complaintArrayList);
-                        ASTUIUtil.showToast( "Your ticket has been submitted successfully");
-                        getHostActivity().redirectToHomeMenu();
+                        saveOffLineComplaint(siteId, name, mobileNumber, email, complaintTypeId, priorityId, complaintDescription, proposePlanId, clientName);
                     }
                 }
             }
@@ -285,12 +257,32 @@ public class ComplaintFragment extends MainFragment {
             }
         });
 
-        ArrayList<ComplaintDescriptionDataModel> arrComplaintDes = new ArrayList<>();
+      /*  ArrayList<ComplaintDescriptionDataModel> arrComplaintDes = new ArrayList<>();
         arrComplaintDes = atmDatabase.getComplaintDesription("SA");
         if (arrComplaintDes.size() < 1) {
             getComplaintDescriptionData();
         } else if (arrComplaintDes.size() > 0) {
-        }
+        }*/
+        getComplaintDescriptionData();
+    }
+
+    //save off line complaint
+    private void saveOffLineComplaint(String siteId, String name, String mobileNumber, String email, int complaintTypeId, int priorityId, String complaintDescription, int proposePlanId, String clientName) {
+        ComplaintDataModel complaintDataModel = new ComplaintDataModel();
+        complaintDataModel.setUserId(uid);
+        complaintDataModel.setSiteID(siteId);
+        complaintDataModel.setName(name);
+        complaintDataModel.setMobile(mobileNumber);
+        complaintDataModel.setEmailId(email);
+        complaintDataModel.setType(String.valueOf(complaintTypeId));
+        complaintDataModel.setPriority(String.valueOf(priorityId));
+        complaintDataModel.setDescription(complaintDescription);
+        complaintDataModel.setProposePlan(String.valueOf(proposePlanId));
+        complaintDataModel.setTime(String.valueOf(System.currentTimeMillis()));
+        complaintDataModel.setClientName(clientName);
+        atmdbHelper.addComplaintData(complaintDataModel);
+        ASTUIUtil.showToast("Your ticket has been submitted successfully");
+        getHostActivity().redirectToHomeMenu();
     }
 
     private void setSiteNameAdapter() {
@@ -303,7 +295,7 @@ public class ComplaintFragment extends MainFragment {
                 for (int i = 0; i <= arrSiteName.length - 1; i++) {
                     if (siteName.equalsIgnoreCase(arrSiteName[i])) {
                         etSiteId.setText(arrSiteId[i]);
-                        etClientName.setText(siteDetailArrayList.get(i).getClientName());
+                        etClientName.setText(siteDetailArrayList.get(i).getClient());
                     }
                 }
             }
@@ -318,7 +310,7 @@ public class ComplaintFragment extends MainFragment {
                 for (int i = 0; i <= arrSiteId.length - 1; i++) {
                     if (siteId.equalsIgnoreCase(arrSiteId[i])) {
                         etSiteName.setText(arrSiteName[i]);
-                        etClientName.setText(siteDetailArrayList.get(i).getClientName());
+                        etClientName.setText(siteDetailArrayList.get(i).getClient());
                     }
                 }
             }
@@ -329,7 +321,7 @@ public class ComplaintFragment extends MainFragment {
         String siteNumId = "";
         for (int i = 0; i < arrSiteId.length; i++) {
             if (arrSiteId[i].equalsIgnoreCase(selectedSiteId)) {
-                siteNumId = siteDetailArrayList.get(i).getSiteNumId();
+                siteNumId = String.valueOf(siteDetailArrayList.get(i).getSiteId());
             }
         }
         return siteNumId;
@@ -382,13 +374,13 @@ public class ComplaintFragment extends MainFragment {
                         complaintDescriptionDataModel.setLastUpdatedTime(lastUpdated);
                         arrComplaintDes.add(complaintDescriptionDataModel);
                     }
-                    atmDatabase.deleteAllRows("complaint_description");
-                    atmDatabase.addComplaintDesription(arrComplaintDes);
-                    arrComplaintDes = atmDatabase.getComplaintDesription("SA");
-                    arrComplaintDes = atmDatabase.getComplaintDesription("NSA");
+                    atmdbHelper.deleteAllRows("complaint_description");
+                    atmdbHelper.addComplaintDesription(arrComplaintDes);
+                    arrComplaintDes = atmdbHelper.getComplaintDesription("SA");
+                    arrComplaintDes = atmdbHelper.getComplaintDesription("NSA");
                     String test = "";
                 } else if (jsonStatus.equals("0")) {
-                    ASTUIUtil.showToast( "Data is not available");
+                    ASTUIUtil.showToast("Data is not available");
                 }
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
@@ -400,13 +392,27 @@ public class ComplaintFragment extends MainFragment {
 
     /**
      * call web services to web foesaveComplain Data
-     *
-     * @param mainObj
      */
-    private void saveComplainData(JSONObject mainObj) {
+    private void saveComplainData(String siteId, String name, String mobileNumber, String email, int complaintTypeId, int priorityId, String complaintDescription, int proposePlanId, String clientName) {
         ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
         _progrssBar.show();
         ServiceCaller serviceCaller = new ServiceCaller(getContext());
+        JSONObject mainObj = new JSONObject();
+        try {
+            mainObj.put("CustomerCode", clientName);
+            mainObj.put("SiteID", siteId);
+            mainObj.put("Name", name);
+            mainObj.put("Mobile", mobileNumber);
+            mainObj.put("Email", email);
+            mainObj.put("ComplaintType", String.valueOf(complaintTypeId));
+            mainObj.put("Priority", String.valueOf(priorityId));
+            mainObj.put("Remarks", complaintDescription);
+            mainObj.put("IsProposedPlan", String.valueOf(proposePlanId));
+            mainObj.put("UserId", uid);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         String serviceURL = "";
         serviceURL = Contants.BASE_URL_API + Contants.SAVE_COMPLAINT_URL;
         serviceCaller.CallCommanServiceMethod(serviceURL, mainObj, "ComplaintDescriptionData", new IAsyncWorkCompletedCallback() {
@@ -431,7 +437,7 @@ public class ComplaintFragment extends MainFragment {
             try {
                 ContentData data = new Gson().fromJson(result, ContentData.class);
                 if (data.getStatus() == 2) {
-                    ASTUIUtil.showToast( "Your ticket has been submitted successfully");
+                    ASTUIUtil.showToast("Your ticket has been submitted successfully");
                     getHostActivity().redirectToHomeMenu();
                 } else {
                     ASTUIUtil.showToast(data.getMessage());
@@ -442,7 +448,6 @@ public class ComplaintFragment extends MainFragment {
             }
         } else {
             ASTUIUtil.showToast("Your ticket not submitted successfully!");
-
         }
     }
 }

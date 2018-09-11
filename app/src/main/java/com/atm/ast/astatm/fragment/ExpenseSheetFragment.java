@@ -16,6 +16,7 @@ import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.adapter.ExpenseScreenAdapter;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
+import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
@@ -42,7 +43,7 @@ public class ExpenseSheetFragment extends MainFragment {
     ImageView imgRefresh, imgSendEmail;
     String[][] arrAllMonths;
     ListView lview;
-    AtmDatabase atmDatabase;
+    ATMDBHelper atmdbHelper;
     ExpenseScreenDataModel expenseScreenDataModel;
     int year;
     int month;
@@ -84,14 +85,12 @@ public class ExpenseSheetFragment extends MainFragment {
 
     @Override
     protected void dataToView() {
-        atmDatabase = new AtmDatabase(getContext());
+        atmdbHelper = new ATMDBHelper(getContext());
         getSharedPrefData();
         arrExpenseData = new ArrayList<>();
         Calendar c = Calendar.getInstance();
         year = c.get(Calendar.YEAR);
         month = c.get(Calendar.MONTH) + 1;
-        lview.setOnItemClickListener((parent, view, position, id) -> {
-        });
         spMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int postion, long l) {
@@ -301,23 +300,23 @@ public class ExpenseSheetFragment extends MainFragment {
                     }
 
                     if (spMonth.getSelectedItemPosition() == 0) {
-                        atmDatabase.deleteSelectedRows("expense_sheet", "expense_month", String.valueOf(month));
-                        atmDatabase.addExpenseSheetData(arrExpenseScreen);
+                        atmdbHelper.deleteSelectedRows("expense_sheet", "expense_month", String.valueOf(month));
+                        atmdbHelper.addExpenseSheetData(arrExpenseScreen);
                     } else if (spMonth.getSelectedItemPosition() == 1) {
                         if (month == 1) {
-                            atmDatabase.deleteSelectedRows("expense_sheet", "expense_month", String.valueOf(12));
-                            atmDatabase.addExpenseSheetData(arrExpenseScreen);
+                            atmdbHelper.deleteSelectedRows("expense_sheet", "expense_month", String.valueOf(12));
+                            atmdbHelper.addExpenseSheetData(arrExpenseScreen);
                         } else {
-                            atmDatabase.deleteSelectedRows("expense_sheet", "expense_month", String.valueOf(month - 1));
-                            atmDatabase.addExpenseSheetData(arrExpenseScreen);
+                            atmdbHelper.deleteSelectedRows("expense_sheet", "expense_month", String.valueOf(month - 1));
+                            atmdbHelper.addExpenseSheetData(arrExpenseScreen);
                         }
                     } else if (spMonth.getSelectedItemPosition() == 2) {
                         if (month == 2) {
-                            atmDatabase.deleteSelectedRows("expense_sheet", "expense_month", String.valueOf(12));
-                            atmDatabase.addExpenseSheetData(arrExpenseScreen);
+                            atmdbHelper.deleteSelectedRows("expense_sheet", "expense_month", String.valueOf(12));
+                            atmdbHelper.addExpenseSheetData(arrExpenseScreen);
                         } else {
-                            atmDatabase.deleteSelectedRows("expense_sheet", "expense_month", String.valueOf(month - 2));
-                            atmDatabase.addExpenseSheetData(arrExpenseScreen);
+                            atmdbHelper.deleteSelectedRows("expense_sheet", "expense_month", String.valueOf(month - 2));
+                            atmdbHelper.addExpenseSheetData(arrExpenseScreen);
                         }
                     }
                     String test = "";
@@ -344,9 +343,9 @@ public class ExpenseSheetFragment extends MainFragment {
      * @return
      */
     public boolean checkDataReload(int selectedMonth) {
-        ArrayList<ExpenseScreenDataModel> arrExpenseScreen = atmDatabase.getExpenseSheetData(selectedMonth);
+        ArrayList<ExpenseScreenDataModel> arrExpenseScreen = atmdbHelper.getExpenseSheetData(selectedMonth);
         boolean result = true;
-        if (arrExpenseScreen.size() > 0) {
+        if (arrExpenseScreen != null && arrExpenseScreen.size() > 0) {
             String lastUpdatedDate = arrExpenseScreen.get(0).getLastUpdatedTime();
             Calendar calendarLastUpdated = Calendar.getInstance();
             calendarLastUpdated.setTimeInMillis(Long.parseLong(lastUpdatedDate));
@@ -369,7 +368,7 @@ public class ExpenseSheetFragment extends MainFragment {
      * @param month
      */
     public void setOfflineExpenseData(int month) {
-        ArrayList<ExpenseScreenDataModel> arrExpenseScreen = atmDatabase.getExpenseSheetData(month);
+        ArrayList<ExpenseScreenDataModel> arrExpenseScreen = atmdbHelper.getExpenseSheetData(month);
         tvAdditionalPenalty.setText("Additional Penalty: " + arrExpenseScreen.get(0).getAdditionalPenalty());
         tvAdditionalBonus.setText("Additional Bonus: " + arrExpenseScreen.get(0).getAdditionalBonus());
         tvGrandTotal.setText("Grand Total: " + arrExpenseScreen.get(0).getGrandTotal());
@@ -420,7 +419,7 @@ public class ExpenseSheetFragment extends MainFragment {
             getimageRefreshgData();
         } else if (view.getId() == R.id.imgEmail) {
             Intent email = new Intent(Intent.ACTION_SEND);
-            email.putExtra(Intent.EXTRA_EMAIL, new String[]{"mohit.chaudhary@appliedsolartechnologies.com"});
+            email.putExtra(Intent.EXTRA_EMAIL, new String[]{"alert@appliedsolartechnologies.com"});
             email.putExtra(Intent.EXTRA_SUBJECT, "Subject");
             email.putExtra(Intent.EXTRA_TEXT, "MEssage");
             email.setType("message/rfc822");
@@ -473,8 +472,7 @@ public class ExpenseSheetFragment extends MainFragment {
         ArrayAdapter<String> dataAdapterMonth = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, arrMonthList);
         dataAdapterMonth.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spMonth.setAdapter(dataAdapterMonth);
-        atmDatabase.deleteAllRows("expense_sheet");
+        atmdbHelper.deleteAllRows("expense_sheet");
         getExpenseData(userId, getContext(), String.valueOf(year), String.valueOf(month));
-        spMonth.setAdapter(dataAdapterMonth);
     }
 }
