@@ -880,7 +880,8 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         } else {
             ob = null;
         }
-        db.close();
+        //cursor.close();
+       // db.close();
         return ob;
     }
 

@@ -3,6 +3,7 @@ package com.atm.ast.astatm.fragment;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,6 +19,7 @@ import android.support.v7.widget.CardView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -50,7 +52,9 @@ import com.atm.ast.astatm.model.SiteDisplayDataModel;
 import com.atm.ast.astatm.model.TransitDataModel;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.ServiceContentData;
+import com.atm.ast.astatm.runtimepermission.PermissionUtils;
 import com.atm.ast.astatm.utils.ASTUIUtil;
+import com.atm.ast.astatm.utils.CustomDialog;
 import com.atm.ast.astatm.utils.GPSTracker;
 import com.atm.ast.astatm.utils.SiteNotFoundPopup;
 import com.google.gson.Gson;
@@ -64,29 +68,35 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import static android.content.Context.MODE_PRIVATE;
 
 public class TransitFragment extends MainFragment {
     FloatingActionButton btnSyncData;
+    public Context context;
     TextView btnStartHome, btnReachedSite, btnLeftSite, btnReachedHome;
-    ImageView startHomeTick, rechedSiteTick, leftSiteTick, reachedHomeTick;
+    CardView CardbtnReachedHome, CardbtnLeftSite, CardbtnReachedSite, CardbtnStartHome;
     Button btnAddSiteData;
-    TextView tvSelectedSite, tvTestButton, tvRemainingDistance;
+    TextView tvSelectedSite, tvRemainingDistance;
     TextView tvCurrentDate;
     String networkProvider;
     String serviceURL;
     public double lat = 0.0000, lon = 0.0000;
+    ProgressDialog siteprogressbar;
     ArrayList<Data> todayPlannedSiteArrayList;
+
     SharedPreferences pref;
     String userId;
     String userName = "";
     Location location;
     String selectedButtonType = "";
     String selectedSite;
+
     public String TRANSIT_PREFERENCES = "TransitPrefs";
     SharedPreferences transitsharedpreferences;
     ATMDBHelper atmdbHelper;
-    ProgressDialog trprogressbar;
+    ImageView startHomeTick, rechedSiteTick, leftSiteTick, reachedHomeTick;
+    ASTProgressBar _progrssBar;
 
     @Override
     protected int fragmentLayout() {
@@ -95,20 +105,29 @@ public class TransitFragment extends MainFragment {
 
     @Override
     protected void loadView() {
+        context = getContext();
         btnStartHome = findViewById(R.id.btnStartHome);
         btnReachedSite = findViewById(R.id.btnReachedSite);
         btnLeftSite = findViewById(R.id.btnLeftSite);
         btnReachedHome = findViewById(R.id.btnReachedHome);
         btnAddSiteData = findViewById(R.id.btnAddSiteData);
+
+        CardbtnReachedHome = findViewById(R.id.CardbtnReachedHome);
+        CardbtnLeftSite = findViewById(R.id.CardbtnLeftSite);
+        CardbtnReachedSite = findViewById(R.id.CardbtnReachedSite);
+        CardbtnStartHome = findViewById(R.id.CardbtnStartHome);
+
         btnSyncData = findViewById(R.id.btnSyncData);
         tvSelectedSite = findViewById(R.id.tvSelectedSiteName);
+        //tvSelectedSite.setVisibility(View.GONE);
         tvRemainingDistance = findViewById(R.id.tvRemainingDistance);
         tvRemainingDistance.setVisibility(View.GONE);
         tvCurrentDate = findViewById(R.id.tvCurrentDate);
-        startHomeTick = (ImageView) findViewById(R.id.startHomeTick);
-        rechedSiteTick = (ImageView) findViewById(R.id.rechedSiteTick);
-        leftSiteTick = (ImageView) findViewById(R.id.leftSiteTick);
-        reachedHomeTick = (ImageView) findViewById(R.id.reachedHomeTick);
+        startHomeTick = findViewById(R.id.startHomeTick);
+        rechedSiteTick = findViewById(R.id.rechedSiteTick);
+        leftSiteTick = findViewById(R.id.leftSiteTick);
+        reachedHomeTick = findViewById(R.id.reachedHomeTick);
+
     }
 
     @Override
@@ -129,38 +148,88 @@ public class TransitFragment extends MainFragment {
     @Override
     protected void dataToView() {
         getUserInfo();
-        String appversionName = ASTUIUtil.getAppVersionName(getContext());
+        atmdbHelper = new ATMDBHelper(getContext());
+        String appversionName = ASTUIUtil.getAppVersionName(context);
         if (appversionName != null) {
             String formattedDate = ASTUIUtil.getCurrentDate();
             tvCurrentDate.setText(formattedDate + " : " + appversionName);
         }
-        atmdbHelper = new ATMDBHelper(getContext());
         todayPlannedSiteArrayList = new ArrayList<>();
         deletePreviousDateSiteFromDB();
     }
 
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.btnAddSiteData) {
+            FillSiteAddressFragment fillSiteAddressFragment = new FillSiteAddressFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("headerTxt", "Fill Site Data");
+            getHostActivity().updateFragment(fillSiteAddressFragment, bundle);
+        } else if (view.getId() == R.id.btnStartHome) {
+            if (ASTUIUtil.checkGpsEnabled(context)) {
+                selectedButtonType = "1";
+                getSiteIdPopup();//open site popup
+            }
+        } else if (view.getId() == R.id.btnLeftSite) {
+            getLocation();
+            LeftSiteAlertMessage();
+        } else if (view.getId() == R.id.btnReachedHome) {
+            if (ASTUIUtil.checkGpsEnabled(context)) {
+                getLocation();
+                String siteId = transitsharedpreferences.getString("SITE_ID", "");
+
+                if (siteId == null || siteId.equals("")) {
+                    Toast.makeText(context, "Please Press Reached Site first.", Toast.LENGTH_SHORT).show();
+                } else {
+                    checkAndSaveSourceAndDestinationLocation();
+                    try {
+                        generateTravelExpensePopup("ReachedHome");
+                    } catch (IOException e) {
+                        // e.printStackTrace();
+                    }
+                    selectedButton();
+                }
+            }
+        } else if (view.getId() == R.id.btnSyncData) {
+            List<TransitDataModel> transitDataArrayList = atmdbHelper.getTransitData("1");
+            if (transitDataArrayList != null && transitDataArrayList.size() > 0) {
+                showUnsyncedTransitDataList(transitDataArrayList);//synce save data
+            } else {
+                ASTUIUtil.showToast("No Pending Entries");
+            }
+        } else if (view.getId() == R.id.btnReachedSite) {
+            if (ASTUIUtil.checkGpsEnabled(context)) {
+                getLocation();
+                checkAndSaveSourceAndDestinationLocation();
+                try {
+                    generateTravelExpensePopup("ReachedSite");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     //if previous date site exist in Db then it will delete
-
     private void deletePreviousDateSiteFromDB() {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         Date date = new Date();
         String currentDateStr = formatter.format(date);
-        String preDateStr = ASTUIUtil.getCurrentDateFromPre(getContext());
+        String preDateStr = ASTUIUtil.getCurrentDateFromPre(context);
         if (preDateStr != null && !preDateStr.equals("")) {
             try {
                 Date currentDate = formatter.parse(currentDateStr);
                 Date preDate = formatter.parse(preDateStr);
                 if (currentDate.after(preDate)) {
-                    // ASTUIUtil.showToast( "Pre Date " + preDateStr + "----current Date " + currentDateStr);
+                    // Toast.makeText(context, "Pre Date " + preDateStr + "----current Date " + currentDateStr, Toast.LENGTH_SHORT).show();
                     atmdbHelper.deleteAllRows("todaySitePlan");//delete previous date all site
-                    ASTUIUtil.saveCurrentDateToPre(currentDateStr, getContext());
+                    ASTUIUtil.saveCurrentDateToPre(currentDateStr, context);
                 }
             } catch (ParseException e) {
                 //e.printStackTrace();
             }
         } else {
-            ASTUIUtil.saveCurrentDateToPre(currentDateStr, getContext());
+            ASTUIUtil.saveCurrentDateToPre(currentDateStr, context);
         }
     }
 
@@ -170,19 +239,15 @@ public class TransitFragment extends MainFragment {
         userId = pref.getString("userId", "");
         userName = pref.getString("userName", "");
 
-        transitsharedpreferences = getContext().getSharedPreferences(TRANSIT_PREFERENCES, MODE_PRIVATE);
+        transitsharedpreferences = getContext().getSharedPreferences(TRANSIT_PREFERENCES, Context.MODE_PRIVATE);
         final String selectedButton = transitsharedpreferences.getString("SELECTED_BUTTON", "");
         selectedSite = transitsharedpreferences.getString("SITE_NAME", "");
         if (!selectedSite.equals("")) {
-            //tvSelectedSite.setVisibility(View.VISIBLE);
-            //tvRemainingDistance.setVisibility(View.VISIBLE);
             tvSelectedSite.setText(selectedSite + "(" + transitsharedpreferences.getString("SITE_ID", "") + ")");
             tvRemainingDistance.setText("Distance From Site - 10 KM");
         }
-
         selectedButtonType = selectedButton;
         getTodayPlannedActivityData();
-
         selectedButton();
     }
 
@@ -203,7 +268,7 @@ public class TransitFragment extends MainFragment {
         if (todayPlannedSiteArrayList != null && todayPlannedSiteArrayList.size() > 0) {
             noSiteFound.setVisibility(View.GONE);
             lvPlannedActivities.setVisibility(View.VISIBLE);
-            lvPlannedActivities.setAdapter(new TodayPlanListAdapter(getContext(), todayPlannedSiteArrayList));
+            lvPlannedActivities.setAdapter(new TodayPlanListAdapter(context, todayPlannedSiteArrayList));
             tvTitlePlannedActivity.setVisibility(View.VISIBLE);
         } else {
             noSiteFound.setVisibility(View.VISIBLE);
@@ -211,9 +276,9 @@ public class TransitFragment extends MainFragment {
             siteIdPopupDialog.dismiss();
 
             SiteNotFoundPopup siteNotFoundPopup = new SiteNotFoundPopup();
-            PopupWindow siteNotFoundPopupWindow = new PopupWindow(getContext());
-            Toast.makeText(getContext(), "Site ID not found. please press Refresh button Or Contact NOC", Toast.LENGTH_SHORT).show();
-            siteNotFoundPopup.getSitePopup(siteNotFoundPopupWindow, getContext(), "Enter Site Id for sending message to NOC.", "Send", userId, "SMS", userName);
+            PopupWindow siteNotFoundPopupWindow = new PopupWindow(context);
+            Toast.makeText(context, "Site ID not found. please press Refresh button Or Contact NOC", Toast.LENGTH_SHORT).show();
+            siteNotFoundPopup.getSitePopup(siteNotFoundPopupWindow, context, "Enter Site Id for sending message to NOC.", "Send", userId, "SMS", userName);
 
         }
         lvPlannedActivities.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -259,45 +324,34 @@ public class TransitFragment extends MainFragment {
 
     }
 
-    //save transit data into DB
+   /* //save transit data into DB
     private void saveTransitDataIntoDB(String transitAddress, String siteId, String totalTravelCost, String totalDistance, String strActualKms, String strActualTravelCost, String strRemarks, String strHotelExp, String strActualHotelExp) {
-        String transitAddressStr = transitAddress + " - " + networkProvider;
-        if (ASTUIUtil.isOnline(getContext())) {
-            saveTransitData(userId, siteId, selectedButtonType, lat, lon, totalDistance, totalTravelCost, transitAddressStr, strActualKms, strActualTravelCost, strRemarks, strHotelExp, strActualHotelExp);
-        } else {
-            transitSaveIntoDB(userId, siteId, selectedButtonType, lat, lon, totalDistance, totalTravelCost, transitAddressStr, strActualKms, strActualTravelCost, strRemarks, strHotelExp, strActualHotelExp);
-        }
-    }
-
-    //save data into db if offline
-    private void transitSaveIntoDB(String userIdStr, String siteIdStr, String selectedButtonTypeStr, double newlat, double newlon, String totalDistanceStr, String totalTravelCostStr, String transitAddressStr, String strActualKmsStr, String strActualTravelCostStr, String strRemarksStr, String strHotelExpStr, String strActualHotelExp) {
+        //ArrayList<TransitDataModel> arrTransitData = new ArrayList<>();
         TransitDataModel transitDataModel = new TransitDataModel();
-        transitDataModel.setSiteId(siteIdStr);
-        transitDataModel.setUserId(userIdStr);
+        transitDataModel.setSiteId(siteId);
+        transitDataModel.setUserId(userId);
         transitDataModel.setDateTime(String.valueOf(System.currentTimeMillis()));
-        transitDataModel.setType(selectedButtonTypeStr);
-        transitDataModel.setLatitude(String.valueOf(newlat));
-        transitDataModel.setLongitude(String.valueOf(newlon));
-        transitDataModel.setCalculatedAmount(totalTravelCostStr);
-        transitDataModel.setCalcilatedDistance(totalDistanceStr);
-        transitDataModel.setAddress(transitAddressStr);
-        transitDataModel.setActualKms(strActualKmsStr);
-        transitDataModel.setActualAmt(strActualTravelCostStr);
-        transitDataModel.setRemarks(strRemarksStr);
-        transitDataModel.setHotelExpense(strHotelExpStr);
+        transitDataModel.setType(selectedButtonType);
+        transitDataModel.setLatitude(String.valueOf(lat));
+        transitDataModel.setLongitude(String.valueOf(lon));
+        transitDataModel.setCalculatedAmount(totalTravelCost);
+        transitDataModel.setCalcilatedDistance(totalDistance);
+        transitDataModel.setAddress(transitAddress + " - " + networkProvider);
+        transitDataModel.setActualKms(strActualKms);
+        transitDataModel.setActualAmt(strActualTravelCost);
+        transitDataModel.setRemarks(strRemarks);
+        transitDataModel.setHotelExpense(strHotelExp);
         transitDataModel.setActualHotelExpense(strActualHotelExp);
 
         //arrTransitData.add(transitDataModel);
         atmdbHelper.upsertTransitData(transitDataModel);//save in data base
-        updateTodaySiteTable(siteIdStr);
-    }
 
-    private void updateTodaySiteTable(String siteId) {
         if (selectedButtonType.equals("4")) {
             atmdbHelper.updateTodaySiteTransitComplete(1, siteId);//update today planed site status so that it will show only uncomplete site
         }
+
         Toast.makeText(getContext(), "Your Transit is saved", Toast.LENGTH_LONG).show();
-    }
+    }*/
 
     //open Travel Expense Popup and set expense related data
     public void generateTravelExpensePopup(String buttonClick) throws IOException {
@@ -316,24 +370,24 @@ public class TransitFragment extends MainFragment {
         final LinearLayout llHotelExpChkBox, llBaseToSiteDistance;
         ImageView btnHotelExpRateChart;
 
-        btnSubmit = (Button) travelClaimDialog.findViewById(R.id.btnSubmit);
-        btnChangeSite = (Button) travelClaimDialog.findViewById(R.id.btnChangeSite);
-        tvTotalDistance = (TextView) travelClaimDialog.findViewById(R.id.tvTotalDistance);
-        tvFromCity = (TextView) travelClaimDialog.findViewById(R.id.tvFromCity);
-        tvTotalTravelCost = (TextView) travelClaimDialog.findViewById(R.id.tvTotalTravelCost);
-        tvBaseToSiteDistance = (TextView) travelClaimDialog.findViewById(R.id.tvBaseToSiteDistance);
-        etActualTravelCost = (EditText) travelClaimDialog.findViewById(R.id.etActualTravelCost);
-        etActualDistance = (EditText) travelClaimDialog.findViewById(R.id.etActualKms);
-        etRemarks = (EditText) travelClaimDialog.findViewById(R.id.etRemarks);
-        etActualKms = (EditText) travelClaimDialog.findViewById(R.id.etActualKms);
-        etHotelExp = (EditText) travelClaimDialog.findViewById(R.id.etHotelExp);
-        etActualHotelExp = (EditText) travelClaimDialog.findViewById(R.id.etActualHotelExp);
-        btnHotelExpRateChart = (ImageView) travelClaimDialog.findViewById(R.id.btnHotelExpRateChart);
-        llBaseToSiteDistance = (LinearLayout) travelClaimDialog.findViewById(R.id.llBaseToSiteDistance);
-        llHotelExpChkBox = (LinearLayout) travelClaimDialog.findViewById(R.id.llHotelExpChkBox);
-        llHotelExp = (LinearLayout) travelClaimDialog.findViewById(R.id.llHotelExp);
-        llActualHotelExp = (LinearLayout) travelClaimDialog.findViewById(R.id.llActualHotelExp);
-        chkHotelExpense = (CheckBox) travelClaimDialog.findViewById(R.id.chkHotelExpense);
+        btnSubmit = travelClaimDialog.findViewById(R.id.btnSubmit);
+        btnChangeSite = travelClaimDialog.findViewById(R.id.btnChangeSite);
+        tvTotalDistance = travelClaimDialog.findViewById(R.id.tvTotalDistance);
+        tvFromCity = travelClaimDialog.findViewById(R.id.tvFromCity);
+        tvTotalTravelCost = travelClaimDialog.findViewById(R.id.tvTotalTravelCost);
+        tvBaseToSiteDistance = travelClaimDialog.findViewById(R.id.tvBaseToSiteDistance);
+        etActualTravelCost = travelClaimDialog.findViewById(R.id.etActualTravelCost);
+        etActualDistance = travelClaimDialog.findViewById(R.id.etActualKms);
+        etRemarks = travelClaimDialog.findViewById(R.id.etRemarks);
+        etActualKms = travelClaimDialog.findViewById(R.id.etActualKms);
+        etHotelExp = travelClaimDialog.findViewById(R.id.etHotelExp);
+        etActualHotelExp = travelClaimDialog.findViewById(R.id.etActualHotelExp);
+        btnHotelExpRateChart = travelClaimDialog.findViewById(R.id.btnHotelExpRateChart);
+        llBaseToSiteDistance = travelClaimDialog.findViewById(R.id.llBaseToSiteDistance);
+        llHotelExpChkBox = travelClaimDialog.findViewById(R.id.llHotelExpChkBox);
+        llHotelExp = travelClaimDialog.findViewById(R.id.llHotelExp);
+        llActualHotelExp = travelClaimDialog.findViewById(R.id.llActualHotelExp);
+        chkHotelExpense = travelClaimDialog.findViewById(R.id.chkHotelExpense);
 
         btnHotelExpRateChart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -389,7 +443,6 @@ public class TransitFragment extends MainFragment {
         });
 
         btnQue = (ImageView) travelClaimDialog.findViewById(R.id.btnQue);
-
         btnQue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -421,9 +474,9 @@ public class TransitFragment extends MainFragment {
                                              String strRemarks = "NA";
                                              strRemarks = etRemarks.getText().toString();
                                              if (strActualKms.equals("")) {
-                                                 Toast.makeText(getContext(), "Please Provide Actual KMs", Toast.LENGTH_SHORT).show();
+                                                 Toast.makeText(context, "Please Provide Actual KMs", Toast.LENGTH_SHORT).show();
                                              } else if (strActualTravelCost.equals("")) {
-                                                 Toast.makeText(getContext(), "Please Provide Actual Travel Cost", Toast.LENGTH_SHORT).show();
+                                                 Toast.makeText(context, "Please Provide Actual Travel Cost", Toast.LENGTH_SHORT).show();
                                              } else {
                                                  if (etRemarks.equals("")) {
                                                      strRemarks = "NA";
@@ -454,6 +507,7 @@ public class TransitFragment extends MainFragment {
                                                      editor.putString("DESTINATION_LONG", "");
                                                      editor.putString("SELECTED_BUTTON", "");//for restart transit
                                                      editor.commit();
+
                                                      TransitFragment transitFragment = new TransitFragment();
                                                      Bundle bundle = new Bundle();
                                                      bundle.putString("headerTxt", "Transit");
@@ -509,9 +563,9 @@ public class TransitFragment extends MainFragment {
         } else if (distance > 150) {
             perKmCost = 1.25;
         }
-        double newDistance = Math.round(distance * 100.0) / 100.0;
+
         /*tvTotalTravelCost.setText(String.valueOf((int) distance * 2));*/
-        tvTotalTravelCost.setText(String.valueOf(perKmCost * newDistance));
+        tvTotalTravelCost.setText(String.valueOf(perKmCost * distance));
         tvFromCity.setText(sourceAddress + " - " + destinationAddress);
 
     }
@@ -559,11 +613,11 @@ public class TransitFragment extends MainFragment {
 
     //get current location
     public void getLocation() {
-        GPSTracker gpsTracker = new GPSTracker(getContext());
+        GPSTracker gpsTracker = new GPSTracker(context);
         location = gpsTracker.getLocation();
 
         if (location == null) {
-            //Toast.makeText(TransitActivity.this, "Location Not Available");
+            //Toast.makeText(TransitActivity.this, "Location Not Available", Toast.LENGTH_SHORT).show();
         } else {
             lat = location.getLatitude();
             lon = location.getLongitude();
@@ -599,12 +653,12 @@ public class TransitFragment extends MainFragment {
                     case DialogInterface.BUTTON_POSITIVE:
                         checkAndSaveSourceAndDestinationLocation();
                         String transitAddress = getAddressThroughLatLong(lat, lon, "short");
-                        String siteNumId = transitsharedpreferences.getString("SITE_ID", "");
-                        if (siteNumId.equals("") || siteNumId.equals(null)) {
-                            ASTUIUtil.showToast("Please Select a Site");
+                        String siteId = transitsharedpreferences.getString("SITE_ID", "");
+                        if (siteId.equals("") || siteId.equals(null)) {
+                            Toast.makeText(context, "Please Select a Site", Toast.LENGTH_SHORT).show();
                         } else {
                             selectedButtonType = "3";
-                            saveTransitDataIntoDB(transitAddress, siteNumId, "0", "0", "0", "0", "NA", "0", "0");
+                            saveTransitDataIntoDB(transitAddress, siteId, "0", "0", "0", "0", "NA", "0", "0");
                             selectedButton();
                         }
                         break;
@@ -629,7 +683,7 @@ public class TransitFragment extends MainFragment {
         locationTransit.setLongitude(lon);
         String address = "NA";
         try {
-            address = ASTUIUtil.getLocationAddress(locationTransit, getContext(), addresType);
+            address = ASTUIUtil.getLocationAddress(locationTransit, context, addresType);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -646,14 +700,14 @@ public class TransitFragment extends MainFragment {
         ListView lvTransit = (ListView) unsyncedDialog.findViewById(R.id.lvTransit);
         Button btnSyncData = (Button) unsyncedDialog.findViewById(R.id.btnSyncData);
         Button cancel = (Button) unsyncedDialog.findViewById(R.id.cancel);
-        lvTransit.setAdapter(new UnsyncedTransitAdapter(getContext(),
+        lvTransit.setAdapter(new UnsyncedTransitAdapter(context,
                 transitDataArrayList));
         btnSyncData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 syncSaveDataIntoServer(transitDataArrayList);
                 unsyncedDialog.dismiss();
-                Toast.makeText(getContext(), "Syncing with server.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Syncing with server.", Toast.LENGTH_SHORT).show();
             }
         });
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -663,6 +717,166 @@ public class TransitFragment extends MainFragment {
             }
         });
         unsyncedDialog.show();
+    }
+
+    //show button which is selected
+    private void selectedButton() {
+        SharedPreferences.Editor editor = transitsharedpreferences.edit();
+        switch (selectedButtonType) {
+            case "1":
+                btnStartHome.setBackgroundColor(Color.parseColor("#FFA500"));
+                btnReachedSite.setBackgroundColor(Color.parseColor("#666699"));
+                btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
+                btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
+
+                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#FFA500"));
+                startHomeTick.setVisibility(View.VISIBLE);
+                rechedSiteTick.setVisibility(View.GONE);
+                leftSiteTick.setVisibility(View.GONE);
+                reachedHomeTick.setVisibility(View.GONE);
+
+                editor.putString("SELECTED_BUTTON", "1");
+                editor.commit();
+
+                btnReachedHome.setEnabled(false);
+                btnReachedSite.setEnabled(true);
+                btnLeftSite.setEnabled(false);
+                btnStartHome.setEnabled(false);
+                break;
+            case "2":
+                btnStartHome.setBackgroundColor(Color.parseColor("#FFA500"));
+                btnReachedSite.setBackgroundColor(Color.parseColor("#078f4b"));
+                btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
+                btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
+
+                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#078f4b"));
+                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#FFA500"));
+
+                startHomeTick.setVisibility(View.VISIBLE);
+                rechedSiteTick.setVisibility(View.VISIBLE);
+                leftSiteTick.setVisibility(View.GONE);
+                reachedHomeTick.setVisibility(View.GONE);
+
+                editor.putString("SELECTED_BUTTON", "2");
+                editor.commit();
+                btnReachedHome.setEnabled(false);
+                btnReachedSite.setEnabled(false);
+                btnLeftSite.setEnabled(true);
+                btnStartHome.setEnabled(false);
+
+                break;
+            case "3":
+                btnStartHome.setBackgroundColor(Color.parseColor("#FFA500"));
+                btnReachedSite.setBackgroundColor(Color.parseColor("#078f4b"));
+                btnLeftSite.setBackgroundColor(Color.parseColor("#1E90FF"));
+                btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
+
+                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#1E90FF"));
+                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#078f4b"));
+                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#FFA500"));
+
+                startHomeTick.setVisibility(View.VISIBLE);
+                rechedSiteTick.setVisibility(View.VISIBLE);
+                leftSiteTick.setVisibility(View.VISIBLE);
+                reachedHomeTick.setVisibility(View.GONE);
+
+                editor.putString("SELECTED_BUTTON", "3");
+                editor.commit();
+
+                btnReachedHome.setEnabled(true);
+                btnReachedSite.setEnabled(true);
+                btnLeftSite.setEnabled(false);
+                btnStartHome.setEnabled(false);
+
+                break;
+            case "4":
+                btnStartHome.setBackgroundColor(Color.parseColor("#FFA500"));
+                btnReachedSite.setBackgroundColor(Color.parseColor("#078f4b"));
+                btnLeftSite.setBackgroundColor(Color.parseColor("#1E90FF"));
+                btnReachedHome.setBackgroundColor(Color.parseColor("#FF4500"));
+
+                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#FF4500"));
+                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#1E90FF"));
+                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#078f4b"));
+                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#FFA500"));
+                btnReachedHome.setEnabled(false);
+                btnReachedSite.setEnabled(false);
+                btnLeftSite.setEnabled(false);
+                btnStartHome.setEnabled(true);
+
+                startHomeTick.setVisibility(View.VISIBLE);
+                rechedSiteTick.setVisibility(View.VISIBLE);
+                leftSiteTick.setVisibility(View.VISIBLE);
+                reachedHomeTick.setVisibility(View.VISIBLE);
+
+                //editor.putString("SELECTED_BUTTON", "4");
+                //editor.commit();
+                break;
+            default:
+                btnStartHome.setBackgroundColor(Color.parseColor("#666699"));
+                btnReachedSite.setBackgroundColor(Color.parseColor("#666699"));
+                btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
+                btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
+
+                CardbtnReachedHome.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnLeftSite.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnReachedSite.setCardBackgroundColor(Color.parseColor("#666699"));
+                CardbtnStartHome.setCardBackgroundColor(Color.parseColor("#666699"));
+                btnReachedSite.setEnabled(false);
+                btnLeftSite.setEnabled(false);
+                btnReachedHome.setEnabled(false);
+                btnStartHome.setEnabled(true);
+
+                startHomeTick.setVisibility(View.GONE);
+                rechedSiteTick.setVisibility(View.GONE);
+                leftSiteTick.setVisibility(View.GONE);
+                reachedHomeTick.setVisibility(View.GONE);
+                break;
+        }
+    }
+
+    private void getTodayPlannedActivityData() {
+        ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
+        _progrssBar.show();
+        ServiceCaller serviceCaller = new ServiceCaller(getContext());
+        String serviceURL = "";
+        serviceURL = Contants.BASE_URL + Contants.TODAY_PLAN_LIST_URL;
+        serviceURL += "&uid=" + userId + "&lat=" + lat + "&lon=" + lon;
+        serviceCaller.CallCommanServiceMethod(serviceURL, "getTodayPlannedActivityData", new IAsyncWorkCompletedCallback() {
+            @Override
+            public void onDone(String result, boolean isComplete) {
+                if (isComplete) {
+                    parseandsaveTodayPlannedActivityData(result);
+                } else {
+                    ASTUIUtil.showToast("No Plan find!");
+                }
+                _progrssBar.dismiss();
+            }
+        });
+    }
+
+    //Parse and Save TodayPlannedActivityData
+    public void parseandsaveTodayPlannedActivityData(String result) {
+        if (result != null) {
+            ServiceContentData contentData = new Gson().fromJson(result, ServiceContentData.class);
+            if (contentData != null) {
+                if (contentData.getStatus() == 2) {
+                    if (contentData.getData() != null) {
+                        for (Data data : contentData.getData()) {
+                            atmdbHelper.upsertTodaySitePlanData(data);
+                        }
+                    }
+
+                }
+
+            }
+        }
     }
 
     //sync save transit data into server
@@ -688,203 +902,49 @@ public class TransitFragment extends MainFragment {
         }
     }
 
-    //show button which is selected
-    private void selectedButton() {
-        SharedPreferences.Editor editor = transitsharedpreferences.edit();
-        switch (selectedButtonType) {
-            case "1":
-                btnStartHome.setBackgroundColor(Color.parseColor("#FFA500"));
-                btnReachedSite.setBackgroundColor(Color.parseColor("#666699"));
-                btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
-                btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
+    //save data into db
+    private void saveTransitIntoDB(String userId, String siteId, String selectedButtonType, double lat, double lon, String totalDistance, String totalTravelCost, String transitAddress, String strActualKms, String strActualTravelCost, String strRemarks, String strHotelExp, String strActualHotelExp) {
+        TransitDataModel transitDataModel = new TransitDataModel();
+        transitDataModel.setSiteId(siteId);
+        transitDataModel.setUserId(userId);
+        transitDataModel.setDateTime(String.valueOf(System.currentTimeMillis()));
+        transitDataModel.setType(selectedButtonType);
+        transitDataModel.setLatitude(String.valueOf(lat));
+        transitDataModel.setLongitude(String.valueOf(lon));
+        transitDataModel.setCalculatedAmount(totalTravelCost);
+        transitDataModel.setCalcilatedDistance(totalDistance);
+        transitDataModel.setAddress(transitAddress + " - " + networkProvider);
+        transitDataModel.setActualKms(strActualKms);
+        transitDataModel.setActualAmt(strActualTravelCost);
+        transitDataModel.setRemarks(strRemarks);
+        transitDataModel.setHotelExpense(strHotelExp);
+        transitDataModel.setActualHotelExpense(strActualHotelExp);
 
-                startHomeTick.setVisibility(View.VISIBLE);
-                rechedSiteTick.setVisibility(View.GONE);
-                leftSiteTick.setVisibility(View.GONE);
-                reachedHomeTick.setVisibility(View.GONE);
+        atmdbHelper.upsertTransitData(transitDataModel);//save in data base
+        updateTodaySiteTable(siteId);
+    }
 
-                editor.putString("SELECTED_BUTTON", "1");
-                editor.commit();
-
-                btnReachedHome.setEnabled(false);
-                btnReachedSite.setEnabled(true);
-                btnLeftSite.setEnabled(false);
-                btnStartHome.setEnabled(false);
-                break;
-            case "2":
-                btnStartHome.setBackgroundColor(Color.parseColor("#FFA500"));
-                btnReachedSite.setBackgroundColor(Color.parseColor("#078f4b"));
-                btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
-                btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
-
-
-                startHomeTick.setVisibility(View.VISIBLE);
-                rechedSiteTick.setVisibility(View.VISIBLE);
-                leftSiteTick.setVisibility(View.GONE);
-                reachedHomeTick.setVisibility(View.GONE);
-
-                editor.putString("SELECTED_BUTTON", "2");
-                editor.commit();
-                btnReachedHome.setEnabled(false);
-                btnReachedSite.setEnabled(false);
-                btnLeftSite.setEnabled(true);
-                btnStartHome.setEnabled(false);
-
-                break;
-            case "3":
-                btnStartHome.setBackgroundColor(Color.parseColor("#FFA500"));
-                btnReachedSite.setBackgroundColor(Color.parseColor("#078f4b"));
-                btnLeftSite.setBackgroundColor(Color.parseColor("#1E90FF"));
-                btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
-
-
-                startHomeTick.setVisibility(View.VISIBLE);
-                rechedSiteTick.setVisibility(View.VISIBLE);
-                leftSiteTick.setVisibility(View.VISIBLE);
-                reachedHomeTick.setVisibility(View.GONE);
-
-                editor.putString("SELECTED_BUTTON", "3");
-                editor.commit();
-
-                btnReachedHome.setEnabled(true);
-                btnReachedSite.setEnabled(true);
-                btnLeftSite.setEnabled(false);
-                btnStartHome.setEnabled(false);
-
-                break;
-            case "4":
-                btnStartHome.setBackgroundColor(Color.parseColor("#FFA500"));
-                btnReachedSite.setBackgroundColor(Color.parseColor("#078f4b"));
-                btnLeftSite.setBackgroundColor(Color.parseColor("#1E90FF"));
-                btnReachedHome.setBackgroundColor(Color.parseColor("#FF4500"));
-
-                btnReachedHome.setEnabled(false);
-                btnReachedSite.setEnabled(false);
-                btnLeftSite.setEnabled(false);
-                btnStartHome.setEnabled(true);
-
-                startHomeTick.setVisibility(View.VISIBLE);
-                rechedSiteTick.setVisibility(View.VISIBLE);
-                leftSiteTick.setVisibility(View.VISIBLE);
-                reachedHomeTick.setVisibility(View.VISIBLE);
-
-                //editor.putString("SELECTED_BUTTON", "4");
-                //editor.commit();
-                break;
-            default:
-                btnStartHome.setBackgroundColor(Color.parseColor("#666699"));
-                btnReachedSite.setBackgroundColor(Color.parseColor("#666699"));
-                btnLeftSite.setBackgroundColor(Color.parseColor("#666699"));
-                btnReachedHome.setBackgroundColor(Color.parseColor("#666699"));
-
-                btnReachedSite.setEnabled(false);
-                btnLeftSite.setEnabled(false);
-                btnReachedHome.setEnabled(false);
-                btnStartHome.setEnabled(true);
-
-                startHomeTick.setVisibility(View.GONE);
-                rechedSiteTick.setVisibility(View.GONE);
-                leftSiteTick.setVisibility(View.GONE);
-                reachedHomeTick.setVisibility(View.GONE);
-                break;
+    //save transit data into DB
+    private void saveTransitDataIntoDB(String transitAddress, String siteId, String totalTravelCost, String totalDistance, String strActualKms, String strActualTravelCost, String strRemarks, String strHotelExp, String strActualHotelExp) {
+        String transitAddressStr = transitAddress + " - " + networkProvider;
+        if (ASTUIUtil.isOnline(getContext())) {
+            saveTransitData(userId, siteId, selectedButtonType, lat, lon, totalDistance, totalTravelCost, transitAddressStr, strActualKms, strActualTravelCost, strRemarks, strHotelExp, strActualHotelExp);
+        } else {
+            saveTransitIntoDB(userId, siteId, selectedButtonType, lat, lon, totalDistance, totalTravelCost, transitAddressStr, strActualKms, strActualTravelCost, strRemarks, strHotelExp, strActualHotelExp);
         }
     }
 
-    /*
-     *
-     * Calling Web Service Today Planned ActivityData
-     */
-    private void getTodayPlannedActivityData() {
-        ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
-        _progrssBar.show();
-        ServiceCaller serviceCaller = new ServiceCaller(getContext());
-        String serviceURL = "";
-        serviceURL = Contants.BASE_URL + Contants.TODAY_PLAN_LIST_URL;
-        serviceURL += "&uid=" + userId + "&lat=" + lat + "&lon=" + lon;
-        serviceCaller.CallCommanServiceMethod(serviceURL, "getTodayPlannedActivityData", new IAsyncWorkCompletedCallback() {
-            @Override
-            public void onDone(String result, boolean isComplete) {
-                if (isComplete) {
-                    parseandsaveTodayPlannedActivityData(result);
-                } else {
-                    ASTUIUtil.showToast("Data Not Avilable");
-                }
-                _progrssBar.dismiss();
-            }
-        });
-    }
-
-
-    /*
-     *
-     * Parse and Save TodayPlannedActivityData
-     */
-
-    public void parseandsaveTodayPlannedActivityData(String result) {
-        if (result != null) {
-            ServiceContentData contentData = new Gson().fromJson(result, ServiceContentData.class);
-            if (contentData != null) {
-                if (contentData.getStatus() == 2) {
-                    if (contentData.getData() != null) {
-                        for (Data data : contentData.getData()) {
-                            atmdbHelper.upsertTodaySitePlanData(data);
-                        }
-                    }
-
-                }
-
-            }
+    private void updateTodaySiteTable(String siteId) {
+        if (selectedButtonType.equals("4")) {
+            atmdbHelper.updateTodaySiteTransitComplete(1, siteId);//update today planed site status so that it will show only uncomplete site
         }
+        Toast.makeText(getContext(), "Your Transit is saved", Toast.LENGTH_LONG).show();
     }
 
-
-    @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.btnAddSiteData) {
-            FillSiteAddressFragment fillSiteAddressFragment = new FillSiteAddressFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("headerTxt", "Fill Site Data");
-            getHostActivity().updateFragment(fillSiteAddressFragment, bundle);
-        } else if (view.getId() == R.id.btnStartHome) {
-            if (ASTUIUtil.checkGpsEnabled(getContext())) {
-                selectedButtonType = "1";
-                getSiteIdPopup();//open site popup
-            }
-        } else if (view.getId() == R.id.btnLeftSite) {
-            getLocation();
-            LeftSiteAlertMessage();
-        } else if (view.getId() == R.id.btnReachedHome) {
-            if (ASTUIUtil.checkGpsEnabled(getContext())) {
-                getLocation();
-                String siteId = transitsharedpreferences.getString("SITE_ID", "");
-                if (siteId == null || siteId.equals("")) {
-                    ASTUIUtil.showToast("Please Press Reached Site first.");
-                } else {
-                    checkAndSaveSourceAndDestinationLocation();
-                    try {
-                        generateTravelExpensePopup("ReachedHome");
-                    } catch (IOException e) {
-                        // e.printStackTrace();
-                    }
-                    selectedButton();
-                }
-            }
-        } else if (view.getId() == R.id.btnSyncData) {
-            List<TransitDataModel> transitDataArrayList = atmdbHelper.getTransitData("1");
-            if (transitDataArrayList != null && transitDataArrayList.size() > 0) {
-                showUnsyncedTransitDataList(transitDataArrayList);//synce save data
-            } else {
-                ASTUIUtil.showToast("No Pending Entries");
-            }
-        }
-    }
-
-    //call service-------------------------
-
+    //-----------call service-------------------------
     private void saveTransitData(String userIdStr, String siteIdStr, String selectedButtonTypeStr, double newlat, double newlon, String totalDistanceStr, String totalTravelCostStr, String transitAddressStr, String strActualKmsStr, String strActualTravelCostStr, String strRemarksStr, String strHotelExpStr, String strActualHotelExp) {
-        trprogressbar = ProgressDialog.show(getContext(), "",
-                "Please wait..", true);
-
+        _progrssBar = new ASTProgressBar(getContext());
+        _progrssBar.show();
         String userId = userIdStr;
         String siteNumId = siteIdStr;
         String transitType = selectedButtonTypeStr;
@@ -938,6 +998,9 @@ public class TransitFragment extends MainFragment {
                     parseandsaveTransitData(result, userIdStr, siteIdStr, selectedButtonTypeStr, newlat, newlon, totalDistanceStr, totalTravelCostStr, transitAddressStr, strActualKmsStr, strActualTravelCostStr, strRemarksStr, strHotelExpStr, strActualHotelExp);
                 } else {
                     ASTUIUtil.showToast("Transit Data Not Saved");
+                    if (_progrssBar.isShowing()) {
+                        _progrssBar.dismiss();
+                    }
                 }
             }
         });
@@ -951,13 +1014,15 @@ public class TransitFragment extends MainFragment {
                 if (jsonStatus.equals("2")) {
                     updateTodaySiteTable(siteIdStr);
                 } else {
-                    transitSaveIntoDB(userIdStr, siteIdStr, selectedButtonTypeStr, newlat, newlon, totalDistanceStr, totalTravelCostStr, transitAddressStr, strActualKmsStr, strActualTravelCostStr, strRemarksStr, strHotelExpStr, strActualHotelExp);
+                    saveTransitIntoDB(userIdStr, siteIdStr, selectedButtonTypeStr, newlat, newlon, totalDistanceStr, totalTravelCostStr, transitAddressStr, strActualKmsStr, strActualTravelCostStr, strRemarksStr, strHotelExpStr, strActualHotelExp);
                 }
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
                 //   e.printStackTrace();
             }
         }
+        if (_progrssBar.isShowing()) {
+            _progrssBar.dismiss();
+        }
     }
-
 }
