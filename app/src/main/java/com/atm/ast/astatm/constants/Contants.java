@@ -10,7 +10,7 @@ public class Contants {
     public static String BASE_URL = "http://54.255.164.25/WCF_AndroidATM/ASTAndroidService.svc/?req=";
     public static String BASE_URL_NEW = "http://14.141.142.61:80/ATMAndroidServices/ASTAndroidService.svc/?req=";
     public static String BASE_URL_API = "http://54.255.164.25/ASTATMWebAPI/api/";
-
+    public static String SITE_EQUIPMENT_LIST_URL = "Equipment/GetSiteEquipment";
     public static String COMPLAINT_DESCRIPTION = "ComplaintCreation/Complaintdescription";
     public static String EQUIPMENT_LIST_URL = "Equipment/Getequipment";
     public static String LOGIN_URL = "login";

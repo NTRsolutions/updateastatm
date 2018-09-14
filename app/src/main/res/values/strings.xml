@@ -64,4 +64,11 @@
     <string name="text_selected">%d item(s) selected</string>
     <string name="error_image_select_size_limit">Total file size cannot be greater than %1$s.</string>
     <string name="error_create_image_file">Failed to create image file</string>
+
+    <string-array name="avilableSpinner">
+        <item>Installed</item>
+        <item>Not Installed</item>
+        <item>Not Required</item>
+    </string-array>
+
 </resources>

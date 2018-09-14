@@ -18,6 +18,8 @@ import com.atm.ast.astatm.model.newmodel.Activity;
 import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.District;
+import com.atm.ast.astatm.model.newmodel.Equipment;
+import com.atm.ast.astatm.model.newmodel.EquipmnetContentData;
 import com.atm.ast.astatm.model.newmodel.FieldEngineer;
 import com.atm.ast.astatm.model.newmodel.Header;
 import com.atm.ast.astatm.model.newmodel.NOCEngineer;
@@ -149,6 +151,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_Today_Plan_TABLE = "CREATE TABLE todaySitePlan(SiteId TEXT,CustomerSiteId TEXT, SiteName TEXT,siteStatus INTEGER DEFAULT 0)";
         db.execSQL(CREATE_Today_Plan_TABLE);
+
         String CREATE_State_Detail_TABLE = "CREATE TABLE stateDetails(CircleId TEXT,Circle TEXT,DistrictJsonStr TEXT)";
         db.execSQL(CREATE_State_Detail_TABLE);
         String CREATE_Circle_Details_TABLE = "CREATE TABLE circleDetailsData(header TEXT,data TEXT)";
@@ -242,6 +245,9 @@ public class ATMDBHelper extends SQLiteOpenHelper {
                 + COMPLAINT_PROPOSE_PLAN + " TEXT," + COMPLAINT_TIME + " TEXT)";
         db.execSQL(CREATE_COMPLAINT_TABLE);
 
+
+        String CREATE_SITEQUIPMENT_TABLE = "CREATE TABLE SiteEquipment(id INTEGER PRIMARY KEY autoincrement,equpimentData TEXT)";
+        db.execSQL(CREATE_SITEQUIPMENT_TABLE);
     }
 
     @Override
@@ -267,6 +273,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXPENSE_SHEET);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMPLAINT_DESCRIPTION);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMPLAINTS);
+        db.execSQL("DROP TABLE IF EXISTS SiteEquipment");
         onCreate(db);
     }
 
@@ -1947,10 +1954,58 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return arrComplaintData;
     }
+
     public void deleteComplaintData(int complaintId) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_COMPLAINTS, KEY_ID + "=" + complaintId,
                 null);
         db.close();
     }
+
+    /**
+     * @param cursor
+     * @param ob     populate Site Equipment List and Accessories  Data
+     */
+
+
+    private void populateSiteEquipmentData(Cursor cursor, Data ob) {
+        ob.setId(cursor.getInt(0));
+        EquipmnetContentData equipmentData = new Gson().fromJson(cursor.getString(1), new TypeToken<EquipmnetContentData>() {
+        }.getType());
+        ob.setEquipmnetContentData(equipmentData);
+
+    }
+
+    public boolean insertSiteEquipmentData(Data ob) {
+        ContentValues values = new ContentValues();
+        populateSiteEquipmentValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = db.insert("SiteEquipment", null, values);
+        db.close();
+        return i > 0;
+    }
+
+    public void populateSiteEquipmentValueData(ContentValues values, Data ob) {
+        String EquipmentListStr = ASTGson.store().toJson(ob.getEquipmnetContentData());
+        values.put("equpimentData", EquipmentListStr);
+    }
+
+    public ArrayList<Data> getAllEquipmentListData() {
+        String query = "Select *  FROM SiteEquipment ";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<Data> list = new ArrayList<Data>();
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+                Data ob = new Data();
+                populateSiteEquipmentData(cursor, ob);
+                list.add(ob);
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        return list;
+    }
+
 }

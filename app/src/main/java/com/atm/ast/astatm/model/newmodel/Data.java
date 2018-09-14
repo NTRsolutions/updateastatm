@@ -622,6 +622,26 @@ public class Data extends FNObject {
         ActivityName = activityName;
     }
 
+    public EquipmnetContentData equipmnetContentData;
+    public int id;
+
+
+    public EquipmnetContentData getEquipmnetContentData() {
+        return equipmnetContentData;
+    }
+
+    public void setEquipmnetContentData(EquipmnetContentData equipmnetContentData) {
+        this.equipmnetContentData = equipmnetContentData;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "ClassPojo [SiteName = " + SiteName + ", CustomerSiteId = " + CustomerSiteId + ", SiteId = " + SiteId + "]";

@@ -140,4 +140,17 @@ public class ServiceCaller {
     }
 
 
+    //call getEquipListData
+    public void callgetEquopentList(final String url, final IAsyncWorkCompletedCallback workCompletedCallback) {
+        new ServiceHelper().callGetService(url, null, new IServiceSuccessCallback() {
+            @Override
+            public void onDone(String doneWhatCode, String result, String error) {
+                if (result != null) {
+                    workCompletedCallback.onDone(result, true);
+                } else {
+                    workCompletedCallback.onDone("getEquipListData done", false);
+                }
+            }
+        });
+    }
 }

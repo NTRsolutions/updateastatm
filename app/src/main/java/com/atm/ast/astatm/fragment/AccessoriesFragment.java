@@ -4,24 +4,27 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import com.atm.ast.astatm.R;
+import com.atm.ast.astatm.adapter.AccessoriesAdapter;
 import com.atm.ast.astatm.adapter.EquipmentListAdapter;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
+import com.atm.ast.astatm.model.newmodel.Accessories;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.Equipment;
 import com.atm.ast.astatm.model.newmodel.EquipmnetContentData;
+import com.atm.ast.astatm.model.newmodel.Make;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class EquipmnetQRCodeMain extends MainFragment {
+public class AccessoriesFragment extends MainFragment {
     private List<Data> allDataList;
-    ArrayList<Equipment> equipmentList;
+    ArrayList<Accessories> accessoriesArrayList;
     private RecyclerView recyclerView;
     private ATMDBHelper atmdbHelper;
 
@@ -35,7 +38,7 @@ public class EquipmnetQRCodeMain extends MainFragment {
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        StaggeredGridLayoutManager gaggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL);
+        StaggeredGridLayoutManager gaggeredGridLayoutManager = new StaggeredGridLayoutManager(1, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(gaggeredGridLayoutManager);
         //  RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 2);
         //    recyclerView.setLayoutManager(mLayoutManager);
@@ -94,18 +97,17 @@ public class EquipmnetQRCodeMain extends MainFragment {
                 if (contentData.getStatus() == 2) {
                     Data data = new Data();
                     data.setEquipmnetContentData(contentData);
-                    atmdbHelper.deleteAllRows("SiteEquipment");
                     atmdbHelper.insertSiteEquipmentData(data);
                     allDataList = new ArrayList<>();
                     allDataList = atmdbHelper.getAllEquipmentListData();
                     if (allDataList != null) {
                         for (Data dataModel : allDataList) {
                             EquipmnetContentData contentDataa = dataModel.getEquipmnetContentData();
-                            equipmentList = new ArrayList<Equipment>(Arrays.asList(contentDataa.getEquipment()));
+                            accessoriesArrayList = new ArrayList<Accessories>(Arrays.asList(contentDataa.getAccessories()));
 
                         }
-                        if (equipmentList != null) {
-                            EquipmentListAdapter adapter = new EquipmentListAdapter(getContext(), equipmentList, allDataList);
+                        if (accessoriesArrayList != null) {
+                            AccessoriesAdapter adapter = new AccessoriesAdapter(getContext(), accessoriesArrayList);
                             recyclerView.setAdapter(adapter);
                         }
                     }

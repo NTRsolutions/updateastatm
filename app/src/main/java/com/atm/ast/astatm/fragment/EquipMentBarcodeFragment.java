@@ -1,86 +1,186 @@
 package com.atm.ast.astatm.fragment;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.AppCompatTextView;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 
 import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.R;
+import com.atm.ast.astatm.constants.Contants;
+import com.atm.ast.astatm.database.ATMDBHelper;
+import com.atm.ast.astatm.model.newmodel.Capacity;
+import com.atm.ast.astatm.model.newmodel.Data;
+import com.atm.ast.astatm.model.newmodel.Equipment;
+import com.atm.ast.astatm.model.newmodel.EquipmnetContentData;
+import com.atm.ast.astatm.model.newmodel.Make;
+import com.atm.ast.astatm.model.newmodel.SCMCode;
+import com.atm.ast.astatm.model.newmodel.SCMDescription;
 import com.atm.ast.astatm.utils.ASTReqResCode;
 import com.atm.ast.astatm.utils.ASTUIUtil;
+import com.atm.ast.astatm.utils.FNObjectUtil;
+import com.google.gson.Gson;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.atm.ast.astatm.utils.FNObjectUtil.isEmptyStr;
 
-public class EquipMentBarcodeFragment extends MainFragment {
-    AppCompatEditText etmake, etqty, etCapacity, etSerailNumber, etcapacitypanel, etSCMCode, etSCMDiscription, etQrCodeScreen;
-            AppCompatTextView etQrCodestore;
-    Button btnSubmit;
-    String strCapacity, strSerailNumber, strcapacitypanel, strSCMCode, strSCMDiscription, strQrCodeScreen, strQrCodestore;
-    String strUserId, strSiteId;
-    SharedPreferences userPref;
-    ImageView qrCodeImage;
-    String searchWord;
+@SuppressLint("ValidFragment")
+public class EquipMentBarcodeFragment extends Fragment implements View.OnClickListener {
+    private AppCompatEditText etSerailNumber;
+    private Spinner etSCMCode, etSCMDiscription;
+    private Spinner etCapacity;
+    private AppCompatEditText etRemarks;
+    private AppCompatEditText etQrCodeScreen;
+    private Button btnSubmit;
+    private String strCapacity, strSerailNumber, strcapacitypanel, strSCMCode, strSCMDiscription, strQrCodeScreen, stretRemarks;
+    private String strUserId, strSiteId;
+    private SharedPreferences userPref;
+    private ImageView qrCodeImage;
+    private List<Data> allDataList;
+    private ATMDBHelper atmdbHelper;
 
-    @Override
-    protected int fragmentLayout() {
-        return R.layout.eqibarcode_fragment;
+    private View view;
+    private Context context;
+    int qty;
+    int  makeID;
+    String Equipmentdataa;
+    int capacityId;
+    EquipmnetContentData contentDataa;
+    Equipment equipmentdata;
+
+    @SuppressLint("ValidFragment")
+    public EquipMentBarcodeFragment(String Equipmentdata) {
+        Equipmentdataa = Equipmentdata;
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        view = inflater.inflate(R.layout.eqibarcode_fragment, container, false);
+        loadView();
+        dataToView();
+        setClickListeners();
+        return view;
+    }
+
     protected void loadView() {
-        etmake = findViewById(R.id.etmake);
-        etqty = findViewById(R.id.etqty);
-        this.etCapacity = findViewById(R.id.etCapacity);
-        this.etSerailNumber = findViewById(R.id.etSerailNumber);
-        this.etcapacitypanel = findViewById(R.id.etcapacitypanel);
-        this.etSCMCode = findViewById(R.id.etSCMCode);
-        this.etSCMDiscription = findViewById(R.id.etSCMDiscription);
-        this.etQrCodeScreen = findViewById(R.id.etQrCodeScreen);
-        this.etQrCodestore = findViewById(R.id.etQrCodestore);
-        qrCodeImage= findViewById(R.id.qrCodeImage);
+        this.etCapacity = view.findViewById(R.id.etCapacity);
+        this.etSerailNumber = view.findViewById(R.id.etSerailNumber);
+        this.etSCMCode = view.findViewById(R.id.etSCMCode);
+        this.etSCMDiscription = view.findViewById(R.id.etSCMDiscription);
+        this.etQrCodeScreen = view.findViewById(R.id.etQrCodeScreen);
+        this.etRemarks = view.findViewById(R.id.etRemarks);
+        qrCodeImage = view.findViewById(R.id.qrCodeImage);
         //this.btnSubmit = findViewById(R.id.btnSubmit);
+        equipmentdata = new Gson().fromJson(Equipmentdataa, Equipment.class);
     }
 
-    @Override
     protected void setClickListeners() {
-       // btnSubmit.setOnClickListener(this);
         qrCodeImage.setOnClickListener(this);
     }
 
-    @Override
     protected void setAccessibility() {
 
     }
 
-    @Override
-    protected void dataToView() {
-        getSharedPrefSaveData();
-        getUserPref();
 
-        if (!isEmptyStr(strCapacity) || !isEmptyStr(strSerailNumber) ||
-                !isEmptyStr(strcapacitypanel) || !isEmptyStr(strSCMCode)) {
+    protected void dataToView() {
+        getUserPref();
+        atmdbHelper = new ATMDBHelper(getContext());
+        allDataList = new ArrayList<>();
+        allDataList = atmdbHelper.getAllEquipmentListData();
+        if (allDataList != null) {
+            for (Data dataModel : allDataList) {
+                contentDataa = dataModel.getEquipmnetContentData();
+            }
 
         }
 
+        setcpacityData();
     }
-    /*
-     *
-     * get Data in Shared Pref.
+
+    /**
+     * set Capacity Data Spinner value
      */
 
-    public void getSharedPrefSaveData() {
-    /*    solarPannelSharedPref = getContext().getSharedPreferences("SolarPannelSharedPref", MODE_PRIVATE);
-        strNoofPanel = solarPannelSharedPref.getString("SOLARPAN_NoofPanel", "");
-        serMake = solarPannelSharedPref.getString("SOLARPAN_Make", "");
-        strcapacitypanel = solarPannelSharedPref.getString("SOLARPAN_capacitypanel", "");
-        strAgb = solarPannelSharedPref.getString("SOLARPAN_noOfAgb", "");*/
+    public void setcpacityData() {
+        makeID = equipmentdata.getMakeID();
+        ArrayList<String> capacityList = new ArrayList<>();
+        ArrayList<Integer> capacityIdList = new ArrayList<>();
+        for (Capacity capacity : contentDataa.getCapacity()) {
+            if (makeID == capacity.getMakeId())
+                capacityList.add(capacity.getName());
+            capacityIdList.add(capacity.getId());
+        }
+        ArrayAdapter<String> capacityAdtapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_row, capacityList);
+        etCapacity.setAdapter(capacityAdtapter);
+
+
+        etCapacity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                capacityId = capacityIdList.get(arg2);
+                Log.d(Contants.LOG_TAG, "capacityIdList.get(arg2)8888888888" + capacityIdList.get(arg2));
+                setScMCodeData(capacityId);
+                setscmcodeiscriptionData(capacityId);
+            }
+
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
+    }
+
+    /**
+     * set Data
+     */
+    public void setScMCodeData(int capacityId) {
+        ArrayList<String> scmcodeList = new ArrayList<>();
+        for (SCMCode scmCode : contentDataa.getSCMCode()) {
+            if (capacityId == scmCode.getCapcityId()) {
+                scmcodeList.add(scmCode.getName());
+            }
+        }
+        ArrayAdapter<String> scmeadapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_row, scmcodeList);
+        etSCMCode.setAdapter(scmeadapter);
+
+
+    }
+
+
+    public void setscmcodeiscriptionData(int capacityId) {
+        ArrayList<String> scmcodeiscriptionList = new ArrayList<>();
+        for (SCMDescription scmDescription : contentDataa.getSCMDescription()) {
+            if (capacityId == scmDescription.getCapcityId())
+                scmcodeiscriptionList.add(scmDescription.getName());
+        }
+        ArrayAdapter<String> scmcodedesdapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_row, scmcodeiscriptionList);
+        etSCMDiscription.setAdapter(scmcodedesdapter);
+
+
     }
 
     private void getUserPref() {
@@ -92,25 +192,23 @@ public class EquipMentBarcodeFragment extends MainFragment {
 
     @Override
     public void onClick(View view) {
-        if(view.getId()== R.id.qrCodeImage){
-            getHostActivity().requestPermission(ASTReqResCode.PERMISSION_REQ_CAMERA);
+        if (view.getId() == R.id.qrCodeImage) {
+            //  getHostActivity().requestPermission(ASTReqResCode.PERMISSION_REQ_CAMERA);
+         /*   IntentIntegrator scanIntegrator = new IntentIntegrator(getActivity());
+            scanIntegrator.initiateScan();*/
+            IntentIntegrator.forSupportFragment(EquipMentBarcodeFragment.this).initiateScan();
+            ASTUIUtil.showToast("granteed");
         }
-       /* if (view.getId() == R.id.btnSubmit) {
-            if (isValidate()) {
-
-            }
-        }*/
     }
 
 
     public boolean isValidate() {
-        strCapacity = getTextFromView(this.etCapacity);
-        strSerailNumber = getTextFromView(this.etSerailNumber);
-        strcapacitypanel = getTextFromView(this.etcapacitypanel);
-        strSCMCode = getTextFromView(this.etSCMCode);
-        strSCMDiscription = getTextFromView(this.etSCMDiscription);
-        strQrCodeScreen = getTextFromView(this.etQrCodeScreen);
-        strQrCodestore = getTextFromView(this.etQrCodestore);
+        strCapacity = FNObjectUtil.getTextFromView(this.etCapacity);
+        strSerailNumber = FNObjectUtil.getTextFromView(this.etSerailNumber);
+        strSCMCode = FNObjectUtil.getTextFromView(this.etSCMCode);
+        strSCMDiscription = FNObjectUtil.getTextFromView(this.etSCMDiscription);
+        strQrCodeScreen = FNObjectUtil.getTextFromView(this.etQrCodeScreen);
+        stretRemarks = FNObjectUtil.getTextFromView(this.etRemarks);
         if (isEmptyStr(strCapacity)) {
             ASTUIUtil.shownewErrorIndicator(getContext(), "Please Enter Capacity");
             return false;
@@ -129,40 +227,29 @@ public class EquipMentBarcodeFragment extends MainFragment {
         } else if (isEmptyStr(strQrCodeScreen)) {
             ASTUIUtil.shownewErrorIndicator(getContext(), "Please Enter No QrCodeScreen ");
             return false;
-        } else if (isEmptyStr(strQrCodestore)) {
+        } else if (isEmptyStr(stretRemarks)) {
             ASTUIUtil.shownewErrorIndicator(getContext(), "Please Enter No  Qr Code store)");
             return false;
         }
 
         return true;
     }
-    @Override
-    public void permissionGranted(int requestCode) {
-        super.permissionGranted(requestCode);
-        if (requestCode == ASTReqResCode.PERMISSION_REQ_CAMERA) {
-            IntentIntegrator scanIntegrator = new IntentIntegrator(ApplicationHelper.application().getActivity());
-            scanIntegrator.initiateScan();
-            ASTUIUtil.showToast("granteed");
-        }
-    }
 
 
     @Override
-    public void updateOnResult(int requestCode, int resultCode, Intent data) {
-        super.updateOnResult(requestCode, resultCode, data);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (data != null && requestCode == IntentIntegrator.REQUEST_CODE) {
             IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
             if (scanningResult != null) {
                 String scanContent = scanningResult.getContents();
                 String scanFormat = scanningResult.getFormatName();
-                this.searchWord = scanContent;
-                ASTUIUtil.showToast("update result");
                 ASTUIUtil.showToast(scanContent);
-                etQrCodestore.setText(scanContent);
+                this.etRemarks.setText(scanContent);
+                this.etQrCodeScreen.setText(scanContent);
             } else {
                 ASTUIUtil.showToast("no bar");
             }
         }
     }
-
 }

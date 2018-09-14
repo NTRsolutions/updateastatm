@@ -21,80 +21,40 @@
             android:orientation="vertical"
             android:padding="@dimen/_5dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/_4dp"
-                android:minHeight="@dimen/_30dp"
-                android:orientation="horizontal">
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    app:counterOverflowTextAppearance="@style/CounterOverFlow"
-                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
-
-                    <android.support.v7.widget.AppCompatEditText
-                        android:id="@+id/etmake"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:autoSizeTextType="uniform"
-                        android:hint="Enter Make "
-                        android:inputType="number"
-                        android:textSize="@dimen/_14dp" />
-                </android.support.design.widget.TextInputLayout>
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_4dp"
-                android:minHeight="@dimen/_30dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <android.support.design.widget.TextInputLayout
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    app:counterOverflowTextAppearance="@style/CounterOverFlow"
-                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+                    android:layout_marginLeft="@dimen/_5dp"
+                    android:layout_marginTop="@dimen/_10dp"
+                    android:gravity="left"
+                    android:text="Select Capacity"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
 
-                    <android.support.v7.widget.AppCompatEditText
-                        android:id="@+id/etqty"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:autoSizeTextType="uniform"
-                        android:hint="Enter Qunatity "
-                        android:inputType="number"
-                        android:textSize="@dimen/_14dp" />
-                </android.support.design.widget.TextInputLayout>
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/_4dp"
-                android:minHeight="@dimen/_30dp"
-                android:orientation="horizontal">
-
-                <android.support.design.widget.TextInputLayout
+                <Spinner
+                    android:id="@+id/etCapacity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    app:counterOverflowTextAppearance="@style/CounterOverFlow"
-                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+                    android:layout_marginLeft="@dimen/_5dp"
+                    android:layout_marginTop="@dimen/_10dp"
+                    android:gravity="left"
+                    android:padding="@dimen/_5dp"
+                    android:text="Select Capacity"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_1dp"
+                    android:layout_marginRight="@dimen/_10dp"
+                    android:background="@color/backgroundColor" />
 
-                    <android.support.v7.widget.AppCompatEditText
-                        android:id="@+id/etCapacity"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:autoSizeTextType="uniform"
-                        android:hint="Enter Capacity "
-                        android:inputType="number"
-                        android:textSize="@dimen/_14dp" />
-                </android.support.design.widget.TextInputLayout>
             </LinearLayout>
 
 
@@ -127,51 +87,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_4dp"
-                android:minHeight="@dimen/_30dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <android.support.design.widget.TextInputLayout
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    app:counterOverflowTextAppearance="@style/CounterOverFlow"
-                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+                    android:layout_marginLeft="@dimen/_5dp"
+                    android:layout_marginTop="@dimen/_10dp"
+                    android:gravity="left"
+                    android:text="Select SCM Code"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
 
-                    <android.support.v7.widget.AppCompatEditText
-                        android:id="@+id/etcapacitypanel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:autoSizeTextType="uniform"
-                        android:hint="Enter capacity per panel"
-                        android:inputType="numberDecimal"
-                        android:textSize="@dimen/_14dp" />
-                </android.support.design.widget.TextInputLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/_4dp"
-                android:minHeight="@dimen/_30dp"
-                android:orientation="horizontal">
-
-                <android.support.design.widget.TextInputLayout
+                <Spinner
+                    android:id="@+id/etSCMCode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    app:counterOverflowTextAppearance="@style/CounterOverFlow"
-                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+                    android:layout_marginLeft="@dimen/_5dp"
+                    android:layout_marginTop="@dimen/_10dp"
+                    android:gravity="left"
+                    android:padding="@dimen/_5dp"
+                    android:text="Select SCM Code"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_1dp"
+                    android:layout_marginRight="@dimen/_10dp"
+                    android:background="@color/backgroundColor" />
 
-                    <android.support.v7.widget.AppCompatEditText
-                        android:id="@+id/etSCMCode"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:autoSizeTextType="uniform"
-                        android:hint="Enter SCM Code"
-                        android:inputType="numberDecimal"
-                        android:textSize="@dimen/_14dp" />
-                </android.support.design.widget.TextInputLayout>
 
 
             </LinearLayout>
@@ -180,26 +124,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_4dp"
-                android:minHeight="@dimen/_30dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <android.support.design.widget.TextInputLayout
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    app:counterOverflowTextAppearance="@style/CounterOverFlow"
-                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+                    android:layout_marginLeft="@dimen/_5dp"
+                    android:layout_marginTop="@dimen/_10dp"
+                    android:gravity="left"
+                    android:text="Select SCM Discription"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
 
-                    <android.support.v7.widget.AppCompatEditText
-                        android:id="@+id/etSCMDiscription"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:autoSizeTextType="uniform"
-                        android:hint="Enter SCM Discription"
-                        android:inputType="numberDecimal"
-                        android:textSize="@dimen/_14dp" />
-                </android.support.design.widget.TextInputLayout>
-
+                <Spinner
+                    android:id="@+id/etSCMDiscription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_5dp"
+                    android:layout_marginTop="@dimen/_10dp"
+                    android:gravity="left"
+                    android:padding="@dimen/_5dp"
+                    android:text="Select SCM Discription"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_1dp"
+                    android:layout_marginRight="@dimen/_10dp"
+                    android:background="@color/backgroundColor" />
 
             </LinearLayout>
 
@@ -232,11 +184,11 @@
                 <ImageView
                     android:id="@+id/qrCodeImage"
                     android:layout_width="@dimen/_40dp"
-                    android:layout_marginRight="@dimen/_5dp"
+                    android:layout_height="@dimen/_40dp"
                     android:layout_gravity="center"
+                    android:layout_marginRight="@dimen/_5dp"
                     android:padding="@dimen/_5dp"
-                    android:src="@drawable/ic_qr_code"
-                    android:layout_height="@dimen/_40dp" />
+                    android:src="@drawable/ic_qr_code" />
 
             </LinearLayout>
 
@@ -245,7 +197,8 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_4dp"
                 android:minHeight="@dimen/_30dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="@dimen/_5dp">
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
@@ -254,12 +207,12 @@
                     app:counterOverflowTextAppearance="@style/CounterOverFlow"
                     app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
 
-                    <android.support.v7.widget.AppCompatTextView
-                        android:id="@+id/etQrCodestore"
+                    <android.support.v7.widget.AppCompatEditText
+                        android:id="@+id/etRemarks"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:autoSizeTextType="uniform"
-                        android:hint="Qr Code store"
+                        android:hint="Remarks"
                         android:inputType="numberDecimal"
                         android:textSize="@dimen/_14dp" />
                 </android.support.design.widget.TextInputLayout>
@@ -268,65 +221,6 @@
             </LinearLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
-
-
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/_3dp"
-        app:cardElevation="@dimen/_6dp">
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#fff"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/previous"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="left|center"
-                android:padding="10dp"
-                android:text="Previous"
-                android:textColor="@color/colorPrimary"
-                android:textSize="22sp" />
-
-            <LinearLayout
-                android:id="@+id/nextLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#fff"
-                android:gravity="right"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/next"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="right|center"
-                    android:padding="10dp"
-                    android:text="Next"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="22sp" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/done"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingBottom="16dp"
-                android:paddingRight="20dp"
-                android:paddingTop="16dp"
-                android:text="Confirm"
-                android:textColor="@color/colorPrimary"
-                android:textSize="16sp"
-                android:visibility="gone" />
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
 
 
 </LinearLayout>

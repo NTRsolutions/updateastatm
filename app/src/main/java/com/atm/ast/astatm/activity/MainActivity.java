@@ -39,6 +39,7 @@ import com.atm.ast.astatm.fragment.AboutFragment;
 import com.atm.ast.astatm.fragment.CircleFragment;
 import com.atm.ast.astatm.fragment.ComplaintFragment;
 import com.atm.ast.astatm.fragment.EquipMentBarcodeFragment;
+import com.atm.ast.astatm.fragment.EquipmentandAccessoriesTab;
 import com.atm.ast.astatm.fragment.ExpenseSheetFragment;
 import com.atm.ast.astatm.fragment.HeaderFragment;
 import com.atm.ast.astatm.fragment.MainFragment;
@@ -259,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             bundle.putString("headerTxt", "Complaint");
             this.updateFragment(complaintFragment, bundle);
         } else if (id == R.id.nav_tvAbout) {
-            EquipMentBarcodeFragment aboutFragment = new EquipMentBarcodeFragment();
+            EquipmentandAccessoriesTab aboutFragment = new EquipmentandAccessoriesTab();
             bundle.putString("headerTxt", "About");
             this.updateFragment(aboutFragment, bundle);
         }
@@ -442,13 +443,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         onNavigationItemSelected(navigationView.getMenu().getItem(0));
     }
 
-    @Override
+   /* @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (this.getPageFragment() != null) {
             this.getPageFragment().updateOnResult(requestCode, resultCode, data);
         }
-    }
+    }*/
 
 
     public void getSharedPrefData() {
@@ -614,6 +615,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             e.printStackTrace();
         }
     }
+
     //for hid keyboard when tab outside edittext box
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
