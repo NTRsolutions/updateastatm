@@ -11,6 +11,7 @@ import com.atm.ast.astatm.model.ActivitySheetReportDataModel;
 import com.atm.ast.astatm.model.CallTrackerDataModel;
 import com.atm.ast.astatm.model.ComplaintDataModel;
 import com.atm.ast.astatm.model.ComplaintDescriptionDataModel;
+import com.atm.ast.astatm.model.EquipListDataModel;
 import com.atm.ast.astatm.model.ExpenseScreenDataModel;
 import com.atm.ast.astatm.model.FeTrackerEmployeeModel;
 import com.atm.ast.astatm.model.TransitDataModel;
@@ -181,6 +182,9 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         String CREATE_ActivitySheetReportDetails_TABLE = "CREATE TABLE ActivitySheetReportDetails(siteName TEXT,Customer TEXT, ActivityDate TEXT,ActivityTime TEXT,ZoneType TEXT,TotalAmount TEXT,Status TEXT,Days TEXT,Color TEXT,NOCApprovel TEXT,Activity TEXT,TADA TEXT,Bonus TEXT,Penalty TEXT,Reason TEXT,CircleId TEXT,Circle TEXT,FEId TEXT,FEName TEXT)";
         db.execSQL(CREATE_ActivitySheetReportDetails_TABLE);
 
+        String CREATE_EquipmentList_TABLE = "CREATE TABLE EquipmentList(equip_id INTEGER,equip_name TEXT, updated_time TEXT,parent_id TEXT)";
+        db.execSQL(CREATE_EquipmentList_TABLE);
+
         String CREATE_FE_TRACKER_TABLE = "CREATE TABLE " + TABLE_FE_TRACKER + "("
                 + "id INTEGER PRIMARY KEY," + FE_ID + " TEXT, "
                 + FE_NAME + " TEXT, " + FE_CONTACT_NO + " TEXT, "
@@ -274,6 +278,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMPLAINT_DESCRIPTION);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMPLAINTS);
         db.execSQL("DROP TABLE IF EXISTS SiteEquipment");
+        db.execSQL("DROP TABLE IF EXISTS EquipmentList");
         onCreate(db);
     }
 
@@ -881,7 +886,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
             ob = null;
         }
         //cursor.close();
-       // db.close();
+        // db.close();
         return ob;
     }
 
@@ -2001,6 +2006,51 @@ public class ATMDBHelper extends SQLiteOpenHelper {
             while (cursor.isAfterLast() == false) {
                 Data ob = new Data();
                 populateSiteEquipmentData(cursor, ob);
+                list.add(ob);
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        return list;
+    }
+
+
+    //----------EquipmentList---------
+    private void populateEquipmentList(Cursor cursor, EquipListDataModel ob) {
+        ob.setEquipId(String.valueOf(cursor.getInt(0)));
+        ob.setEquipName(cursor.getString(1));
+        ob.setEquipTime(cursor.getString(2));
+        ob.setEquipParentId(cursor.getString(3));
+
+    }
+
+    public boolean insertEquipmentList(EquipListDataModel ob) {
+        ContentValues values = new ContentValues();
+        populateEquipmentListValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = db.insert("EquipmentList", null, values);
+        db.close();
+        return i > 0;
+    }
+
+    public void populateEquipmentListValueData(ContentValues values, EquipListDataModel ob) {
+        long time = System.currentTimeMillis();
+        values.put("equip_id", ob.getEquipId());
+        values.put("equip_name", ob.getEquipName());
+        values.put("updated_time", String.valueOf(time));
+        values.put("parent_id", ob.getEquipParentId());
+    }
+
+    public ArrayList<EquipListDataModel> getAllEquipmentData() {
+        String query = "Select *  FROM EquipmentList ";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<EquipListDataModel> list = new ArrayList<EquipListDataModel>();
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+                EquipListDataModel ob = new EquipListDataModel();
+                populateEquipmentList(cursor, ob);
                 list.add(ob);
                 cursor.moveToNext();
             }

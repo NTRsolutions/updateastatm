@@ -14,7 +14,6 @@ import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.adapter.SiteDetailAdapter;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
-import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
 import com.atm.ast.astatm.model.newmodel.Data;
@@ -39,7 +38,6 @@ public class SiteDetailFragment extends MainFragment implements AbsListView.OnSc
     TextView tvUptime, tvVisit, tvEBRunHour;
     TextView tvLastUpdated;
     ListView lvSiteDetails;
-    AtmDatabase atmDatabase;
     String uid = "";
     String userName = "";
     String customerSiteId = "";
@@ -99,7 +97,6 @@ public class SiteDetailFragment extends MainFragment implements AbsListView.OnSc
 
     @Override
     protected void dataToView() {
-        atmDatabase = new AtmDatabase(getContext());
         commonFunction = new ASTUIUtil();
         pref = getContext().getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
         uid = pref.getString("userId", "");

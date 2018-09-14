@@ -700,6 +700,7 @@ public class TransitFragment extends MainFragment {
         ListView lvTransit = (ListView) unsyncedDialog.findViewById(R.id.lvTransit);
         Button btnSyncData = (Button) unsyncedDialog.findViewById(R.id.btnSyncData);
         Button cancel = (Button) unsyncedDialog.findViewById(R.id.cancel);
+
         lvTransit.setAdapter(new UnsyncedTransitAdapter(context,
                 transitDataArrayList));
         btnSyncData.setOnClickListener(new View.OnClickListener() {

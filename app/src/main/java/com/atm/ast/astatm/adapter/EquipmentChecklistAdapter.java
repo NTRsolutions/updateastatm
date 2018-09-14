@@ -13,19 +13,22 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
-import com.atm.ast.astatm.database.AtmDatabase;
+import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.fragment.CircleFragment;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
 import com.atm.ast.astatm.model.ActivityListDataModel;
 import com.atm.ast.astatm.model.EquipListDataModel;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,16 +43,16 @@ public class EquipmentChecklistAdapter extends BaseAdapter {
     String lat = "0.0000", lon = "0.0000";
     Dialog confermationDialog = null;
     ArrayList<EquipListDataModel> arrEquipLIstData;
-    AtmDatabase atmDatabase;
+    ATMDBHelper atmDatabase;
 
     public EquipmentChecklistAdapter(Context context, String activityType) {
         this.context = context;
-        atmDatabase = new AtmDatabase(context);
+        atmDatabase = new ATMDBHelper(context);
         this.first = first;
         this.uid = uid;
         this.activityType = activityType;
         arrEquipLIstData = new ArrayList<>();
-        arrEquipLIstData = atmDatabase.getEquipDataData(activityType);
+        arrEquipLIstData = atmDatabase.getAllEquipmentData();
         String test = "";
     }
 
