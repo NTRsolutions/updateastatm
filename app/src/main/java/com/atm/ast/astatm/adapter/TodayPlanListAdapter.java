@@ -39,7 +39,7 @@ public class TodayPlanListAdapter extends BaseAdapter {
         this.rowItems = items;
         mInflater = LayoutInflater.from(context);
         transitsharedpreferences = context.getSharedPreferences("TransitPrefs", Context.MODE_PRIVATE);
-        siteId = transitsharedpreferences.getString("SITE_NUM_ID", "");
+        siteId = transitsharedpreferences.getString("SITE_ID", "");
         materialdesignicons_font = FontManager.getFontTypefaceMaterialDesignIcons(context, "fonts/materialdesignicons-webfont.otf");
     }
 

@@ -4,11 +4,11 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-
     <android.support.v7.widget.CardView
         android:id="@+id/headerCardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/llActionBar"
         app:cardCornerRadius="@dimen/_2dp"
         app:cardElevation="@dimen/_10dp">
 
@@ -18,21 +18,16 @@
             android:background="#078f4b"
             android:orientation="vertical">
 
-            <View
-                android:id="@+id/vew"
-                android:layout_width="match_parent"
-                android:layout_height="1sp"
-                android:layout_marginBottom="2dp"
-                android:background="#cccccc" />
+
 
             <TextView
                 android:id="@+id/tvCurrentDate"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/llActionBar"
-                android:layout_marginLeft="@dimen/_6dp"
                 android:background="#078f4b"
-                android:padding="@dimen/_2dp"
+                android:padding="2dp"
+                android:layout_marginLeft="@dimen/_6dp"
                 android:text=""
                 android:textColor="#ffffff"
                 android:textSize="12sp" />
@@ -45,7 +40,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/headerCardview"
-        android:padding="@dimen/_7dp"
+        android:padding="7dp"
         android:text=""
         android:textColor="#000000"
         android:textSize="16sp"
@@ -74,18 +69,18 @@
 
 
         <android.support.v7.widget.CardView
+            android:id="@+id/CardbtnStartHome"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            app:cardElevation="@dimen/_8dp"
             android:foreground="?android:attr/selectableItemBackground"
             app:cardCornerRadius="@dimen/_5dp"
-            app:cardElevation="@dimen/_8dp"
             app:cardUseCompatPadding="true">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/tranist_Button_color">
+                android:layout_height="match_parent">
 
                 <TextView
                     android:id="@+id/btnStartHome"
@@ -108,26 +103,27 @@
                     android:layout_alignParentTop="true"
                     android:contentDescription="@string/app_name"
                     android:src="@drawable/ic_tick_inside_circle"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
 
             </RelativeLayout>
 
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
+            android:id="@+id/CardbtnReachedSite"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            app:cardElevation="@dimen/_8dp"
             android:foreground="?android:attr/selectableItemBackground"
             app:cardCornerRadius="@dimen/_5dp"
-            app:cardElevation="@dimen/_8dp"
             app:cardUseCompatPadding="true">
 
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/tranist_Button_color">
+                >
 
                 <TextView
                     android:id="@+id/btnReachedSite"
@@ -148,8 +144,6 @@
                     android:layout_height="@dimen/_30dp"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginRight="@dimen/_5dp"
-                    android:layout_marginTop="@dimen/_15dp"
                     android:contentDescription="@string/app_name"
                     android:src="@drawable/ic_tick_inside_circle"
                     android:visibility="gone" />
@@ -169,19 +163,20 @@
         android:weightSum="2">
 
         <android.support.v7.widget.CardView
+            android:id="@+id/CardbtnLeftSite"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            app:cardElevation="@dimen/_8dp"
             android:foreground="?android:attr/selectableItemBackground"
             app:cardCornerRadius="@dimen/_5dp"
-            app:cardElevation="@dimen/_8dp"
             app:cardUseCompatPadding="true">
 
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/tranist_Button_color">
+                >
 
                 <TextView
                     android:id="@+id/btnLeftSite"
@@ -212,19 +207,20 @@
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
+            android:id="@+id/CardbtnReachedHome"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            app:cardElevation="@dimen/_8dp"
             android:foreground="?android:attr/selectableItemBackground"
             app:cardCornerRadius="@dimen/_5dp"
-            app:cardElevation="@dimen/_8dp"
             app:cardUseCompatPadding="true">
 
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/tranist_Button_color">
+                >
 
                 <TextView
                     android:id="@+id/btnReachedHome"
@@ -259,7 +255,7 @@
 
     <Button
         android:id="@+id/btnAddSiteData"
-        android:layout_width="@dimen/_200dp"
+        android:layout_width="@dimen/_220dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/llRow2"
         android:layout_centerHorizontal="true"
@@ -270,7 +266,6 @@
         android:text="Add Site Address"
         android:textColor="#ffffff"
         android:textSize="16sp" />
-
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btnSyncData"

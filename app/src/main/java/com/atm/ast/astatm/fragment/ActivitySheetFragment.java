@@ -208,7 +208,7 @@ public class ActivitySheetFragment extends MainFragment {
 
     @Override
     protected void dataToView() {
-        if (activityId.equals("711") || activityId.equals("714") || activityId.equals("878") || activityId.equals("885") || activityId.equals("890") || activityId.equals("1168")  || activityId.equals("1282") || activityId.equals("1380")  || activityId.equals("749") || activityId.equals("750") || activityId.equals("1180")) {//PM check list mandatory for all these activitys
+        if (activityId.equals("711") || activityId.equals("714") || activityId.equals("878") || activityId.equals("885") || activityId.equals("890") || activityId.equals("1168") || activityId.equals("1282") || activityId.equals("1380") || activityId.equals("749") || activityId.equals("750") || activityId.equals("1180")) {//PM check list mandatory for all these activitys
             btnsave.setText("Next");
             pmChecklistFlag = true;
         } else {
