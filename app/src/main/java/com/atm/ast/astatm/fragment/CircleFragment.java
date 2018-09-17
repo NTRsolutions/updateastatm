@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,30 +24,35 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atm.ast.astatm.ASTGson;
 import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.R;
-import com.atm.ast.astatm.SyncSiteAddressDataWithServer;
+import com.atm.ast.astatm.activity.SplashScreen;
 import com.atm.ast.astatm.adapter.CircleGridAdapter;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
-import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.firebase.FirebaseInstanceIDService;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
 import com.atm.ast.astatm.model.CircleDisplayDataModel;
-import com.atm.ast.astatm.model.CustomerListDataModel;
+import com.atm.ast.astatm.model.ComplaintDataModel;
+import com.atm.ast.astatm.model.ContentData;
+import com.atm.ast.astatm.model.FillSiteActivityModel;
+import com.atm.ast.astatm.model.newmodel.ActivitySheetModel;
+import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.Header;
 import com.atm.ast.astatm.model.newmodel.ServiceContentData;
 import com.atm.ast.astatm.reciver.SendLocationToServerSideReciver;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.atm.ast.astatm.utils.ASTUtil;
-import com.atm.ast.astatm.utils.FilterPopupCircle;
 import com.atm.ast.astatm.utils.LogAnalyticsHelper;
 import com.atm.ast.astatm.utils.TooltipWindow;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,10 +75,6 @@ public class CircleFragment extends MainFragment {
     int batteryLowFilterstatus = 0, noCommLowFilterstatus = 0, INVFilterstatus = 0;
     int refresh = 0;
     public static String filterString = "NA";
-    AtmDatabase atmDatabase;
-    // String customerList;
-    //String[][] arrCustomerList;
-    // CharSequence[] items = null;
     AlertDialog alert;
     public static Boolean[] arrSelectedFilterOne;
     public static Boolean[] arrSelectedFilterTwo;
@@ -148,8 +150,6 @@ public class CircleFragment extends MainFragment {
 
     @Override
     protected void dataToView() {
-        Intent intentSiteAddressService = new Intent(getContext(), SyncSiteAddressDataWithServer.class);
-        getContext().startService(intentSiteAddressService);
         getSharePrefData();
         populateCircleDataToShowCircle();
         atmdbHelper = new ATMDBHelper(getContext());
@@ -256,6 +256,7 @@ public class CircleFragment extends MainFragment {
         editor.commit();
         logAnalytics();
         startLocationAlarmService();
+        syncOfflinData();
     }
 
     //openClusterScreen Cluster screen
@@ -1324,5 +1325,245 @@ public class CircleFragment extends MainFragment {
                 }
             }
         });
+    }
+
+    //sync all offline data
+    private void syncOfflinData() {
+        if (ASTUIUtil.isOnline(getContext())) {
+            ArrayList<ComplaintDataModel> complaintArrayList = atmdbHelper.getComplaintData();
+            if (complaintArrayList != null && complaintArrayList.size() > 0) {
+                for (ComplaintDataModel dataModel : complaintArrayList) {
+                    saveComplainData(dataModel);
+                }
+            }
+            ArrayList<ContentLocalData> contentLocalData = atmdbHelper.getAllActivtyFormData();
+            if (contentLocalData != null && contentLocalData.size() > 0) {
+                for (int i = 0; i < contentLocalData.size(); i++) {
+                    String activityFormStr = contentLocalData.get(i).getActivityFormData();
+                    if (activityFormStr != null) {
+                        ActivitySheetModel activityData = new Gson().fromJson(activityFormStr, new TypeToken<ActivitySheetModel>() {
+                        }.getType());
+                        activityFormDataServiceCall(activityData);
+                    }
+                }
+            }
+            ArrayList<FillSiteActivityModel> siteList = atmdbHelper.getAllAddSiteAddress();
+            for (FillSiteActivityModel siteActivityModel : siteList) {
+                saveFillSiteAddress(siteActivityModel);
+            }
+        }
+    }
+
+    //send offline save complain data to server
+    private void saveComplainData(ComplaintDataModel dataModel) {
+        ServiceCaller serviceCaller = new ServiceCaller(getContext());
+        JSONObject mainObj = new JSONObject();
+        try {
+            mainObj.put("CustomerCode", dataModel.getClientName());
+            mainObj.put("SiteID", dataModel.getSiteID());
+            mainObj.put("Name", dataModel.getName());
+            mainObj.put("Mobile", dataModel.getMobile());
+            mainObj.put("Email", dataModel.getEmailId());
+            mainObj.put("ComplaintType", dataModel.getType());
+            mainObj.put("Priority", dataModel.getPriority());
+            mainObj.put("Remarks", dataModel.getDescription());
+            mainObj.put("IsProposedPlan", dataModel.getProposePlan());
+            mainObj.put("UserId", dataModel.getUserId());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String serviceURL = "";
+        serviceURL = Contants.BASE_URL_API + Contants.SAVE_COMPLAINT_URL;
+        serviceCaller.CallCommanServiceMethod(serviceURL, mainObj, "ComplaintDescriptionData", new IAsyncWorkCompletedCallback() {
+            @Override
+            public void onDone(String result, boolean isComplete) {
+                if (isComplete) {
+                    parseandsaveComlaintData(result, dataModel.getId());
+                } else {
+                    ASTUIUtil.showToast("Your ticket not submitted successfully!");
+                }
+            }
+        });
+    }
+
+    /*
+     *
+     * Parse and save Comlaint Data
+     */
+    public void parseandsaveComlaintData(String result, String id) {
+        if (result != null) {
+            try {
+                ContentData data = new Gson().fromJson(result, ContentData.class);
+                if (data.getStatus() == 2) {
+                    ASTUIUtil.showToast("Your ticket has been submitted successfully");
+                    atmdbHelper.deleteComplaintData(Integer.valueOf(id));
+                } else {
+                    ASTUIUtil.showToast(data.getMessage());
+                }
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    //---------------------Calling Web Service to save activity form data into server--------------------------
+    public void activityFormDataServiceCall(ActivitySheetModel sheetModel) {
+
+        String serviceURL = "";
+        serviceURL = Contants.BASE_URL + Contants.ADD_NEW_ACTIVITY_NEW_URL;
+        serviceURL += "&uid=" + sheetModel.getUserId() + "&sid=" + sheetModel.getSiteId() + "&tid=" + sheetModel.getTaskId() + "&aid=" + sheetModel.getActivityId()
+                + "&neid=" + sheetModel.getNocEnggId() + "&st=" + sheetModel.getStatusId() + "&reason=" + sheetModel.getReasonId() + "&ztype=" + sheetModel.getZoneId()
+                + "&mid=" + sheetModel.getMaterialStatus() + "&remarks=" + sheetModel.getRemarks() + "&isplanned=" + sheetModel.getIsPlanned() + "&ispm=" + sheetModel.getIsPm() + "&earthingvoltage=" + sheetModel.getEarthVolt() +
+                "&batterytopup=" + sheetModel.getBattTopup() + "&batterycells=" + sheetModel.getBattCells() + "&charger=" + sheetModel.getCharger() + "&inverter=" + sheetModel.getInverter() +
+                "&ebconnection=" + sheetModel.getEbConn() + "&connection=" + sheetModel.getConn() + "&solar=" + sheetModel.getSolar() + "&signoff=" + sheetModel.getSignOff() +
+                "&sgc1=" + sheetModel.getCell1() + "&sgc2=" + sheetModel.getCell2() + "&sgc3=" + sheetModel.getCell3() + "&sgc4=" + sheetModel.getCell4() + "&sgc5=" + sheetModel.getCell5() +
+                "&sgc6=" + sheetModel.getCell6() + "&sgc7=" + sheetModel.getCell7() + "&sgc8=" + sheetModel.getCell8() +
+                "&SolarStructure=" + sheetModel.getSolarStructureAndPanelTightness() + "&BattTermnialGreas=" + sheetModel.getBatteryTerminalGreasing() + "&Photo=" + sheetModel.getPhotos() + "&ModemConnection=" + sheetModel.getModemConn() + "&CommStatu=" + "0" + "&SpareReq=" + sheetModel.getSpareRequirement() +
+                "&plandate=" + sheetModel.getPlannedDate() +
+                "&planid=" + sheetModel.getPlanId() + "&da=" + sheetModel.getOtherExpenses() + "&androidtime=" + sheetModel.getSubmitDateTime() + "&numberOfDays=" + sheetModel.getDaysTaken() + "&lat=" + sheetModel.getLatitude() + "&lon=" + sheetModel.getLongitude();
+        serviceURL = serviceURL.replace(" ", "^^");
+
+        Log.d(Contants.LOG_TAG, "activityFormDataServiceCall serviceURL***************" + serviceURL);
+        ServiceCaller serviceCaller = new ServiceCaller(getContext());
+        serviceCaller.CallCommanServiceMethod(serviceURL, "activityFormDataServiceCall", new IAsyncWorkCompletedCallback() {
+            @Override
+            public void onDone(String result, boolean isComplete) {
+                if (isComplete) {
+                    parseActivityFormData(result, sheetModel.getPlanId());
+                } else {
+                    ASTUIUtil.showToast("Server Side error");
+                }
+            }
+        });
+    }
+
+    //parse activity form data response
+    private void parseActivityFormData(String response, String savePlanId) {
+        if (response != null) {
+            try {
+                JSONObject jsonRootObject = new JSONObject(response);
+                String jsonStatus = jsonRootObject.optString("status").toString();
+
+                if (jsonStatus.equals("2")) {
+                    JSONArray jsonArray = jsonRootObject.optJSONArray("data");
+                    atmdbHelper.deleteActivtyFormDataByPlanId(savePlanId);
+                    //ASTUIUtil.showToast("Activity Form Data Saved on Server");
+                } else if (jsonStatus.equals("0")) {
+
+                }
+                //connectingToServer = 0;
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                // connectingToServer = 0;
+            }
+        }
+    }
+
+    private void saveFillSiteAddress(FillSiteActivityModel fillSiteActivityModel) {
+
+        String siteId = fillSiteActivityModel.getSiteId();
+        //String customerSiteId = fillSiteActivityModel.getCustomerSiteId();
+        //String siteName = fillSiteActivityModel.getSiteName();
+        String branchName = fillSiteActivityModel.getBranchName();
+        String branchCode = fillSiteActivityModel.getBranchCode();
+        String onOffSite = fillSiteActivityModel.getOnOffSite();
+        String address1 = fillSiteActivityModel.getAddress();
+        String city = fillSiteActivityModel.getCity();
+        String circleId = fillSiteActivityModel.getCircleId();
+        String districtId = fillSiteActivityModel.getDistrictId();
+        String tehsilId = fillSiteActivityModel.getTehsilId();
+        String pincode = fillSiteActivityModel.getPincode();
+        String lat = fillSiteActivityModel.getLat();
+        String lon = fillSiteActivityModel.getLon();
+        String startTime = fillSiteActivityModel.getFunctionalFromTime();
+        String endTime = fillSiteActivityModel.getFunctionalToTime();
+        String siteAddressId = fillSiteActivityModel.getSiteAddressId();
+
+        if (lat == null) {
+            lat = "0.000000";
+        } else if (lon == null) {
+            lon = "0.000000";
+        }
+
+        if (siteId.equals("") || siteId.equals(null)) {
+            siteId = "000000";
+        }
+       /* if (customerSiteId.equals("") || customerSiteId.equals(null)) {
+            customerSiteId = "000000";
+        }
+        if (siteName.equals("") || siteName.equals(null)) {
+            siteName = "NA";
+        }*/
+        if (branchName.equals("") || branchName.equals(null)) {
+            branchName = "NA";
+        }
+        if (branchCode.equals("") || branchCode.equals(null)) {
+            branchCode = "000000";
+        }
+        if (onOffSite.equals("") || onOffSite.equals(null)) {
+            onOffSite = "NA";
+        }
+        if (address1.equals("") || address1.equals(null)) {
+            address1 = "NA";
+        }
+        if (city.equals("") || city.equals(null)) {
+            city = "NA";
+        }
+        if (circleId.equals("0") || circleId.equals(null)) {
+            circleId = "000000";
+        }
+        if (districtId.equals("0") || districtId.equals(null)) {
+            districtId = "000000";
+        }
+        if (tehsilId.equals("0") || tehsilId.equals(null)) {
+            tehsilId = "000000";
+        }
+        if (pincode.equals("") || pincode.equals(null)) {
+            pincode = "000000";
+        }
+        if (lat.equals("") || lat.equals(null)) {
+            lat = "0";
+        }
+        if (lon.equals("") || lon.equals(null)) {
+            lon = "0";
+        }
+
+        address1.replace("", "^^");
+
+        String serviceURL = Contants.BASE_URL + Contants.ADD_SITE_ADDRESS;
+
+        serviceURL += "&sid=" + siteId + "&branchname=" + branchName + "&branchcode=" + branchCode + "&city=" + city +
+                "&pincode=" + pincode + "&onoffsite=" + onOffSite + "&address=" + address1 + "&circleid=" + circleId +
+                "&districtid=" + districtId + "&tehsilid=" + tehsilId + "&lat=" + lat + "&lon=" + lon +
+                "&fnhrfromtime=" + startTime + "&fnhrtotime=" + endTime;
+        serviceURL = serviceURL.replace(" ", "^^");
+
+
+        ServiceCaller serviceCaller = new ServiceCaller(getContext());
+        serviceCaller.CallCommanServiceMethod(serviceURL, "saveFillSiteAddress", new IAsyncWorkCompletedCallback() {
+            @Override
+            public void onDone(String result, boolean isComplete) {
+                if (isComplete) {
+                    parseAndSaveFillSiteAddress(result);
+                }
+            }
+        });
+    }
+
+    private void parseAndSaveFillSiteAddress(String result) {
+        if (result != null) {
+            try {
+                JSONObject jsonRootObject = new JSONObject(result);
+                String jsonStatus = jsonRootObject.optString("status").toString();
+
+                if (jsonStatus.equals("2")) {
+                    Toast.makeText(getContext(), "Site Address Data Saved on Server.", Toast.LENGTH_SHORT).show();
+                }
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 }

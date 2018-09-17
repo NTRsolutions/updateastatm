@@ -10,7 +10,6 @@ import android.widget.Toast;
 import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.activity.MainActivity;
 import com.atm.ast.astatm.database.ATMDBHelper;
-import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.model.ContentData;
 import com.atm.ast.astatm.model.EquipListDataModel;
 import com.google.gson.Gson;

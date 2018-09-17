@@ -2,12 +2,10 @@ package com.atm.ast.astatm.fragment;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.Intent;
 import android.location.Location;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -16,23 +14,18 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.atm.ast.astatm.R;
-import com.atm.ast.astatm.SyncSiteAddressDataWithServer;
-import com.atm.ast.astatm.adapter.FillSiteAddressAdapter;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
-import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
 import com.atm.ast.astatm.model.DistrictModel;
 import com.atm.ast.astatm.model.FillSiteActivityModel;
-import com.atm.ast.astatm.model.SiteDisplayDataModel;
 import com.atm.ast.astatm.model.StateModel;
 import com.atm.ast.astatm.model.TehsilModel;
 import com.atm.ast.astatm.model.newmodel.Data;
@@ -71,6 +64,7 @@ public class FillSiteAddressFragment extends MainFragment {
     ATMDBHelper atmdbHelper;
     District[] districtsList;
     Tehsil[] tehsilList;
+    ArrayList<Data> arrState;
 
     @Override
     protected int fragmentLayout() {
@@ -105,6 +99,7 @@ public class FillSiteAddressFragment extends MainFragment {
         this.btnSyncData.setOnClickListener(this);
         this.imgRefresh.setOnClickListener(this);
         this.imgGpsAddress.setOnClickListener(this);
+        this.btnSubmit.setOnClickListener(this);
     }
 
     @Override
@@ -170,7 +165,7 @@ public class FillSiteAddressFragment extends MainFragment {
                 }
             }
         });
-        final ArrayList<Data> arrState = atmdbHelper.getAllStateDetailListData();
+        arrState = atmdbHelper.getAllStateDetailListData();
         if (arrState.size() > 0) {
             ArrayList<String> arrStateName = new ArrayList<>();
             arrStateName.add("-- Select State --");
@@ -420,7 +415,7 @@ public class FillSiteAddressFragment extends MainFragment {
                                 if (districtsList.length > 0) {
                                     ArrayList<String> arrDistrictName = new ArrayList<>();
                                     arrDistrictName.add("-- Select District --");
-                                    for (District district:districtsList) {
+                                    for (District district : districtsList) {
                                         arrDistrictName.add(district.getDistrict());
                                     }
                                     ArrayAdapter<String> DistrictArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, arrDistrictName); //selected item will look like a spinner set from XML
@@ -667,7 +662,199 @@ public class FillSiteAddressFragment extends MainFragment {
                     e.printStackTrace();
                 }
             }
+        } else if (view.getId() == R.id.btnSubmit) {
+            saveData();
         }
     }
 
+    private void saveData() {
+        Location location = commonFunctions.getLocation(getContext());
+
+        int validated = 0;
+
+        if (cb24Hr.isChecked()) {
+            startTime = "00:01";
+            endTime = "23:59";
+            validated = 1;
+        } else {
+            if (etStartTime.equals("")) {
+                Toast.makeText(getContext(), "Please Select Site's Functional Time", Toast.LENGTH_SHORT).show();
+            } else {
+                startTime = etStartTime.getText().toString();
+                endTime = etEndTime.getText().toString();
+                validated = 1;
+            }
+        }
+
+        if (etSiteName.getText().toString().equals("") || etSiteName.getText().toString().equals(null)) {
+            Toast.makeText(getContext(), "Please select site", Toast.LENGTH_SHORT).show();
+        } else if (etSiteId.getText().toString().equals("") || etSiteId.getText().toString().equals("")) {
+            Toast.makeText(getContext(), "Please select site", Toast.LENGTH_SHORT).show();
+        } else if (etNameOfBranch.getText().toString().equals("") || etNameOfBranch.getText().toString().equals(null)) {
+            Toast.makeText(getContext(), "Please select Branch Name", Toast.LENGTH_SHORT).show();
+        } else if (etBranchCode.getText().toString().equals("") || etBranchCode.getText().toString().equals(null)) {
+            Toast.makeText(getContext(), "Please select Branch Code", Toast.LENGTH_SHORT).show();
+        } else if (spOffsiteOnsite.getSelectedItemPosition() == 0) {
+            Toast.makeText(getContext(), "Please select ON/Off Site", Toast.LENGTH_SHORT).show();
+        } else if (etAddressLine.getText().toString().equals("") || etAddressLine.getText().toString().equals(null)) {
+            Toast.makeText(getContext(), "Please select Address", Toast.LENGTH_SHORT).show();
+        } else if (etCity.getText().toString().equals("") || etCity.getText().toString().equals(null)) {
+            Toast.makeText(getContext(), "Please select city", Toast.LENGTH_SHORT).show();
+        } else if (spState.getSelectedItemPosition() == 0) {
+            Toast.makeText(getContext(), "Please select state", Toast.LENGTH_SHORT).show();
+        } else if (spDistrict.getSelectedItemPosition() == 0) {
+            Toast.makeText(getContext(), "Please select district", Toast.LENGTH_SHORT).show();
+        } else if (spTehsil.getSelectedItemPosition() == 0) {
+            Toast.makeText(getContext(), "Please select tehsil", Toast.LENGTH_SHORT).show();
+        } else if (etPinCode.getText().toString().equals("") || etPinCode.getText().toString().equals(null)) {
+            Toast.makeText(getContext(), "Please select pincode", Toast.LENGTH_SHORT).show();
+        } else {
+            if (validated == 1) {
+                FillSiteActivityModel fillSiteActivityModel = new FillSiteActivityModel();
+                fillSiteActivityModel.setSiteName(etSiteName.getText().toString());
+                fillSiteActivityModel.setSiteId(String.valueOf(siteId));
+                fillSiteActivityModel.setCustomerSiteId(etSiteId.getText().toString());
+                fillSiteActivityModel.setBranchName(etNameOfBranch.getText().toString());
+                fillSiteActivityModel.setBranchCode(etBranchCode.getText().toString());
+                fillSiteActivityModel.setOnOffSite(spOffsiteOnsite.getSelectedItem().toString());
+                fillSiteActivityModel.setAddress(etAddressLine.getText().toString());
+                fillSiteActivityModel.setCity(etCity.getText().toString());
+                fillSiteActivityModel.setCircleId(String.valueOf(arrState.get(spState.getSelectedItemPosition() - 1).getCircleId()));
+                fillSiteActivityModel.setDistrictId(String.valueOf(arrDistrict.get(spDistrict.getSelectedItemPosition() - 1).getDistrictId()));
+                fillSiteActivityModel.setTehsilId(arrTehsil.get(spTehsil.getSelectedItemPosition() - 1).getTehsilId());
+                fillSiteActivityModel.setPincode(etPinCode.getText().toString());
+                if (location == null) {
+                    fillSiteActivityModel.setLat(String.valueOf("0.00000"));
+                    fillSiteActivityModel.setLon(String.valueOf("0.00000"));
+                } else {
+                    fillSiteActivityModel.setLat(String.valueOf(location.getLatitude()));
+                    fillSiteActivityModel.setLon(String.valueOf(location.getLongitude()));
+                }
+
+                fillSiteActivityModel.setFunctionalFromTime(startTime);
+                fillSiteActivityModel.setFunctionalToTime(endTime);
+                if (ASTUIUtil.isOnline(getContext())) {
+                    saveFillSiteAddress(fillSiteActivityModel);
+                } else {
+                    setoffLineData(fillSiteActivityModel);
+                }
+            }
+        }
+    }
+
+    private void saveFillSiteAddress(FillSiteActivityModel fillSiteActivityModel) {
+        ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
+        _progrssBar.show();
+
+        String siteId = fillSiteActivityModel.getSiteId();
+        //String customerSiteId = fillSiteActivityModel.getCustomerSiteId();
+        //String siteName = fillSiteActivityModel.getSiteName();
+        String branchName = fillSiteActivityModel.getBranchName();
+        String branchCode = fillSiteActivityModel.getBranchCode();
+        String onOffSite = fillSiteActivityModel.getOnOffSite();
+        String address1 = fillSiteActivityModel.getAddress();
+        String city = fillSiteActivityModel.getCity();
+        String circleId = fillSiteActivityModel.getCircleId();
+        String districtId = fillSiteActivityModel.getDistrictId();
+        String tehsilId = fillSiteActivityModel.getTehsilId();
+        String pincode = fillSiteActivityModel.getPincode();
+        String lat = fillSiteActivityModel.getLat();
+        String lon = fillSiteActivityModel.getLon();
+        String startTime = fillSiteActivityModel.getFunctionalFromTime();
+        String endTime = fillSiteActivityModel.getFunctionalToTime();
+        String siteAddressId = fillSiteActivityModel.getSiteAddressId();
+
+        if (lat == null) {
+            lat = "0.000000";
+        } else if (lon == null) {
+            lon = "0.000000";
+        }
+
+        if (siteId.equals("") || siteId.equals(null)) {
+            siteId = "000000";
+        }
+       /* if (customerSiteId.equals("") || customerSiteId.equals(null)) {
+            customerSiteId = "000000";
+        }
+        if (siteName.equals("") || siteName.equals(null)) {
+            siteName = "NA";
+        }*/
+        if (branchName.equals("") || branchName.equals(null)) {
+            branchName = "NA";
+        }
+        if (branchCode.equals("") || branchCode.equals(null)) {
+            branchCode = "000000";
+        }
+        if (onOffSite.equals("") || onOffSite.equals(null)) {
+            onOffSite = "NA";
+        }
+        if (address1.equals("") || address1.equals(null)) {
+            address1 = "NA";
+        }
+        if (city.equals("") || city.equals(null)) {
+            city = "NA";
+        }
+        if (circleId.equals("0") || circleId.equals(null)) {
+            circleId = "000000";
+        }
+        if (districtId.equals("0") || districtId.equals(null)) {
+            districtId = "000000";
+        }
+        if (tehsilId.equals("0") || tehsilId.equals(null)) {
+            tehsilId = "000000";
+        }
+        if (pincode.equals("") || pincode.equals(null)) {
+            pincode = "000000";
+        }
+        if (lat.equals("") || lat.equals(null)) {
+            lat = "0";
+        }
+        if (lon.equals("") || lon.equals(null)) {
+            lon = "0";
+        }
+
+        address1.replace("", "^^");
+
+        String serviceURL = Contants.BASE_URL + Contants.ADD_SITE_ADDRESS;
+
+        serviceURL += "&sid=" + siteId + "&branchname=" + branchName + "&branchcode=" + branchCode + "&city=" + city +
+                "&pincode=" + pincode + "&onoffsite=" + onOffSite + "&address=" + address1 + "&circleid=" + circleId +
+                "&districtid=" + districtId + "&tehsilid=" + tehsilId + "&lat=" + lat + "&lon=" + lon +
+                "&fnhrfromtime=" + startTime + "&fnhrtotime=" + endTime;
+        serviceURL = serviceURL.replace(" ", "^^");
+
+
+        ServiceCaller serviceCaller = new ServiceCaller(getContext());
+        serviceCaller.CallCommanServiceMethod(serviceURL, "saveFillSiteAddress", new IAsyncWorkCompletedCallback() {
+            @Override
+            public void onDone(String result, boolean isComplete) {
+                if (isComplete) {
+                    parseAndSaveFillSiteAddress(result);
+                }
+                _progrssBar.dismiss();
+            }
+        });
+    }
+
+    private void parseAndSaveFillSiteAddress(String result) {
+        if (result != null) {
+            try {
+                JSONObject jsonRootObject = new JSONObject(result);
+                String jsonStatus = jsonRootObject.optString("status").toString();
+
+                if (jsonStatus.equals("2")) {
+                    Toast.makeText(getContext(), "Site Address Data Saved on Server.", Toast.LENGTH_SHORT).show();
+                }
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
+    //save offline data into db
+    private void setoffLineData(FillSiteActivityModel fillSiteActivityModel) {
+        atmdbHelper.insertAddSiteAddress(fillSiteActivityModel);
+        Toast.makeText(getContext(), "Site Address Data Saved into local data base.", Toast.LENGTH_SHORT).show();
+    }
 }

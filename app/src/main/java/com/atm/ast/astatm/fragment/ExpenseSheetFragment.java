@@ -10,14 +10,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.adapter.ExpenseScreenAdapter;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
-import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
 import com.atm.ast.astatm.model.ExpenseScreenDataModel;

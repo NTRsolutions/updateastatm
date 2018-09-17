@@ -12,13 +12,10 @@ import android.widget.TextView;
 
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.database.ATMDBHelper;
-import com.atm.ast.astatm.database.AtmDatabase;
-import com.atm.ast.astatm.model.SiteDisplayDataModel;
 import com.atm.ast.astatm.model.TransitDataModel;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

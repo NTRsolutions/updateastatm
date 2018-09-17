@@ -14,6 +14,8 @@ import com.atm.ast.astatm.model.ComplaintDescriptionDataModel;
 import com.atm.ast.astatm.model.EquipListDataModel;
 import com.atm.ast.astatm.model.ExpenseScreenDataModel;
 import com.atm.ast.astatm.model.FeTrackerEmployeeModel;
+import com.atm.ast.astatm.model.FillSiteActivityModel;
+import com.atm.ast.astatm.model.LocationTrackingDataModel;
 import com.atm.ast.astatm.model.TransitDataModel;
 import com.atm.ast.astatm.model.newmodel.Activity;
 import com.atm.ast.astatm.model.newmodel.ContentLocalData;
@@ -252,6 +254,12 @@ public class ATMDBHelper extends SQLiteOpenHelper {
 
         String CREATE_SITEQUIPMENT_TABLE = "CREATE TABLE SiteEquipment(id INTEGER PRIMARY KEY autoincrement,equpimentData TEXT)";
         db.execSQL(CREATE_SITEQUIPMENT_TABLE);
+
+        String CREATE_LocationTracker_TABLE = "CREATE TABLE LocationTracker(id INTEGER PRIMARY KEY autoincrement,user_id TEXT,lat TEXT,lon TEXT,address TEXT,tracked_time TEXT,tracked_distance TEXT)";
+        db.execSQL(CREATE_LocationTracker_TABLE);
+
+        String CREATE_AddSiteAddress_TABLE = "CREATE TABLE AddSiteAddress(id INTEGER PRIMARY KEY autoincrement,site_id TEXT,site_customer_id TEXT,site_name TEXT,branch_name TEXT,branch_code TEXT,city TEXT,pincode TEXT,on_of_site TEXT,address TEXT,circle_id TEXT,district_id TEXT,tehsil_id TEXT,start_time TEXT,end_time TEXT,lat TEXT,lon TEXT,last_updated_date TEXT)";
+        db.execSQL(CREATE_AddSiteAddress_TABLE);
     }
 
     @Override
@@ -279,6 +287,8 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMPLAINTS);
         db.execSQL("DROP TABLE IF EXISTS SiteEquipment");
         db.execSQL("DROP TABLE IF EXISTS EquipmentList");
+        db.execSQL("DROP TABLE IF EXISTS LocationTracker");
+        db.execSQL("DROP TABLE IF EXISTS AddSiteAddress");
         onCreate(db);
     }
 
@@ -676,7 +686,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
                 cursor.moveToNext();
             }
         }
-        db.close();
+        //db.close();
         return list;
     }
 
@@ -2059,4 +2069,120 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         return list;
     }
 
+    //----------LocationTracker---------
+    private void populateLocationTracker(Cursor cursor, LocationTrackingDataModel ob) {
+        ob.setId(String.valueOf(cursor.getInt(0)));
+        ob.setUserId(cursor.getString(1));
+        ob.setLat(cursor.getString(2));
+        ob.setLon(cursor.getString(3));
+        ob.setAddress(cursor.getString(4));
+        ob.setTime(cursor.getString(5));
+        ob.setDistance(cursor.getString(6));
+
+    }
+
+    public boolean insertLocationTracker(LocationTrackingDataModel ob) {
+        ContentValues values = new ContentValues();
+        populateLocationTrackerValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = db.insert("LocationTracker", null, values);
+        db.close();
+        return i > 0;
+    }
+
+    public void populateLocationTrackerValueData(ContentValues values, LocationTrackingDataModel ob) {
+        values.put("user_id", ob.getUserId());
+        values.put("lat", ob.getLat());
+        values.put("lon", ob.getLon());
+        values.put("address", ob.getAddress());
+        values.put("tracked_time", ob.getTime());
+        values.put("tracked_distance", ob.getDistance());
+    }
+
+    public ArrayList<LocationTrackingDataModel> getAllLocationTrackerData() {
+        String query = "Select *  FROM LocationTracker ";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<LocationTrackingDataModel> list = new ArrayList<LocationTrackingDataModel>();
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+                LocationTrackingDataModel ob = new LocationTrackingDataModel();
+                populateLocationTracker(cursor, ob);
+                list.add(ob);
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        return list;
+    }
+
+    //----------AddSiteAddress---------
+    private void populateAddSiteAddress(Cursor cursor, FillSiteActivityModel ob) {
+        //ob.setId(String.valueOf(cursor.getInt(0)));
+        ob.setSiteId(cursor.getString(1));
+        ob.setCustomerSiteId(cursor.getString(2));
+        ob.setSiteName(cursor.getString(3));
+        ob.setBranchName(cursor.getString(4));
+        ob.setBranchCode(cursor.getString(5));
+        ob.setCity(cursor.getString(6));
+        ob.setPincode(cursor.getString(7));
+        ob.setOnOffSite(cursor.getString(8));
+        ob.setAddress(cursor.getString(9));
+        ob.setCircleId(cursor.getString(10));
+        ob.setDistrictId(cursor.getString(11));
+        ob.setTehsilId(cursor.getString(12));
+        ob.setFunctionalFromTime(cursor.getString(13));
+        ob.setFunctionalToTime(cursor.getString(14));
+        ob.setLat(cursor.getString(15));
+        ob.setLon(cursor.getString(16));
+
+    }
+
+    public boolean insertAddSiteAddress(FillSiteActivityModel ob) {
+        ContentValues values = new ContentValues();
+        populateAddSiteAddressValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = db.insert("AddSiteAddress", null, values);
+        db.close();
+        return i > 0;
+    }
+
+    public void populateAddSiteAddressValueData(ContentValues values, FillSiteActivityModel ob) {
+        values.put("site_id", ob.getSiteId());
+        values.put("site_customer_id", ob.getCustomerSiteId());
+        values.put("site_name", ob.getSiteName());
+        values.put("branch_name", ob.getBranchName());
+        values.put("branch_code", ob.getBranchCode());
+        values.put("city", ob.getCity());
+        values.put("pincode", ob.getPincode());
+        values.put("on_of_site", ob.getOnOffSite());
+        values.put("address", ob.getAddress());
+        values.put("circle_id", ob.getCircleId());
+        values.put("district_id", ob.getDistrictId());
+        values.put("tehsil_id", ob.getTehsilId());
+        values.put("start_time", ob.getFunctionalFromTime());
+        values.put("end_time", ob.getFunctionalToTime());
+        values.put("lat", ob.getLat());
+        values.put("lon", ob.getLon());
+        values.put("last_updated_date", "");
+    }
+
+    public ArrayList<FillSiteActivityModel> getAllAddSiteAddress() {
+        String query = "Select *  FROM AddSiteAddress ";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<FillSiteActivityModel> list = new ArrayList<FillSiteActivityModel>();
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+                FillSiteActivityModel ob = new FillSiteActivityModel();
+                populateAddSiteAddress(cursor, ob);
+                list.add(ob);
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        return list;
+    }
 }

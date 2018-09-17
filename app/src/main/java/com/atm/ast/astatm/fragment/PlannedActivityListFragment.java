@@ -1,60 +1,32 @@
 package com.atm.ast.astatm.fragment;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.atm.ast.astatm.ASTGson;
 import com.atm.ast.astatm.R;
-import com.atm.ast.astatm.SyncFormDataWithServerIntentService;
-import com.atm.ast.astatm.adapter.CircleParentFilterAdapter;
 import com.atm.ast.astatm.adapter.PlannedActivityListAdapter;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
-import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
-import com.atm.ast.astatm.model.ActivityListDataModel;
-import com.atm.ast.astatm.model.ActivityListSheetDataModel;
-import com.atm.ast.astatm.model.CircleDisplayDataModel;
-import com.atm.ast.astatm.model.PlannedActivityListModel;
-import com.atm.ast.astatm.model.ReasonListDataModel;
-import com.atm.ast.astatm.model.TaskListDataModel;
-import com.atm.ast.astatm.model.newmodel.Activity;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.Header;
 import com.atm.ast.astatm.model.newmodel.ServiceContentData;
 import com.atm.ast.astatm.utils.ASTUIUtil;
-import com.atm.ast.astatm.utils.FilterPopupActivity;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 

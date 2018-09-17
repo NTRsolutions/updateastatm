@@ -4,41 +4,28 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.atm.ast.astatm.ASTGson;
 import com.atm.ast.astatm.R;
-import com.atm.ast.astatm.adapter.ClusterGridAdapter;
 import com.atm.ast.astatm.adapter.SiteGridAdapter;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
-import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
-import com.atm.ast.astatm.model.CircleDisplayDataModel;
-import com.atm.ast.astatm.model.CustomerListDataModel;
-import com.atm.ast.astatm.model.SiteDisplayDataModel;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.Header;
 import com.atm.ast.astatm.model.newmodel.ServiceContentData;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.atm.ast.astatm.utils.ASTUtil;
-import com.atm.ast.astatm.utils.FilterPopupCircle;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,15 +35,11 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class SiteFragment extends MainFragment {
     GridView siteViewGrid;
-    AtmDatabase atmDatabase;
     SiteGridAdapter siteGridAdapter;
-    boolean[] selectedCustomerFilter = null;
     public ArrayList<Data> siteViewResDataList;
     PopupWindow popup = null;
     SharedPreferences pref;
-    String userId, userRole, userAccess, r1;
-    //String[] arrSiteName, arrSiteId;
-    ArrayList<SiteDisplayDataModel> siteDetailArrayList;
+    String userId;
     AutoCompleteTextView etSearch;
     TextView tvSort, tvLastUpdated, tvClearFilter;
     TextView tvTotalSites, tvTotalAlarmSites, tvTotalNonComm, tvTotalInvAlarm, tvTotalLowBattery, tvNsmSites;
@@ -122,7 +105,6 @@ public class SiteFragment extends MainFragment {
     protected void dataToView() {
         atmdbHelper = new ATMDBHelper(getContext());
         popup = new PopupWindow(getContext());
-        atmDatabase = new AtmDatabase(getContext());
         getSharedprefSData();
         siteViewGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

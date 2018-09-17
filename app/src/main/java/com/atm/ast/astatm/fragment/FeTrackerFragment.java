@@ -9,7 +9,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ExpandableListView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.atm.ast.astatm.R;
@@ -17,25 +16,19 @@ import com.atm.ast.astatm.adapter.FeTrackerAdapter;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
-import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
-import com.atm.ast.astatm.model.ActivityListSheetDataModel;
-import com.atm.ast.astatm.model.CircleDisplayDataModel;
 import com.atm.ast.astatm.model.FeTrackerChildItemModel;
 import com.atm.ast.astatm.model.FeTrackerEmployeeModel;
-import com.atm.ast.astatm.model.PlannedActivityListModel;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.Header;
 import com.atm.ast.astatm.utils.ASTUIUtil;
-import com.atm.ast.astatm.utils.FilterPopupActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
