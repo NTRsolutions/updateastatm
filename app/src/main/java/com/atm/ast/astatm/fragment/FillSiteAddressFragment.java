@@ -45,9 +45,8 @@ import java.util.List;
 public class FillSiteAddressFragment extends MainFragment {
     AutoCompleteTextView etSiteName, etSiteId;
     EditText etNameOfBranch, etBranchCode, etAddressLine, etCity, etPinCode, etStartTime, etEndTime;
-    Spinner spBranchCode, spState, spDistrict, spTehsil, spOffsiteOnsite;
+    Spinner  spState, spDistrict, spTehsil, spOffsiteOnsite;
     Button btnSubmit;
-    //private TimePicker timePicker1;
     CheckBox cb24Hr;
     ImageView imgGpsAddress, imgRefresh;
     Dialog unsyncedDialog = null;
@@ -509,36 +508,6 @@ public class FillSiteAddressFragment extends MainFragment {
     }
 
     public void genrateUnsyncedList() {
-       /* unsyncedDialog.setContentView(R.layout.offline_sync_site_address_screen);
-        unsyncedDialog.setTitle("Unsynced Entries");
-        unsyncedDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        unsyncedDialog.setCanceledOnTouchOutside(false);
-        ListView lvSiteAddress;
-        Button btnSyncData;
-        List<FillSiteActivityModel> siteAddressDataArrayList = atmdbHelper.getSiteAddress();
-        lvSiteAddress = (ListView) unsyncedDialog.findViewById(R.id.lvSiteAddress);
-        btnSyncData = (Button) unsyncedDialog.findViewById(R.id.btnSyncData);
-
-        if (siteAddressDataArrayList.size() > 0) {
-            lvSiteAddress.setAdapter(new FillSiteAddressAdapter(getContext(),
-                    siteAddressDataArrayList));
-        } else {
-            btnSyncData.setVisibility(View.GONE);
-            ASTUIUtil.showToast("No Pending Entries");
-        }
-
-        btnSyncData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intentService = new Intent(getContext(), SyncSiteAddressDataWithServer.class);
-                getContext().startService(intentService);
-                unsyncedDialog.dismiss();
-                ASTUIUtil.showToast("Syncing with server.");
-            }
-        });
-        if (siteAddressDataArrayList.size() > 0) {
-            unsyncedDialog.show();
-        }*/
     }
 
 
@@ -551,7 +520,6 @@ public class FillSiteAddressFragment extends MainFragment {
         _progrssBar.show();
         ServiceCaller serviceCaller = new ServiceCaller(getContext());
         String serviceURL = "";
-        //serviceURL = Contants.BASE_URL + Contants.GET_SITE_MASTER;
         serviceURL = Contants.BASE_URL + Contants.GET_STATE_MASTER;
         serviceCaller.CallCommanServiceMethod(serviceURL, "getStateData", new IAsyncWorkCompletedCallback() {
             @Override
@@ -633,8 +601,6 @@ public class FillSiteAddressFragment extends MainFragment {
                     }
                     Log.v("State List", "State List");
 
-                } else {
-                    //Toast.makeText(CircleActivity.this, "Data not available.", Toast.LENGTH_SHORT).show();
                 }
 
             } catch (JSONException e) {
@@ -773,12 +739,6 @@ public class FillSiteAddressFragment extends MainFragment {
         if (siteId.equals("") || siteId.equals(null)) {
             siteId = "000000";
         }
-       /* if (customerSiteId.equals("") || customerSiteId.equals(null)) {
-            customerSiteId = "000000";
-        }
-        if (siteName.equals("") || siteName.equals(null)) {
-            siteName = "NA";
-        }*/
         if (branchName.equals("") || branchName.equals(null)) {
             branchName = "NA";
         }

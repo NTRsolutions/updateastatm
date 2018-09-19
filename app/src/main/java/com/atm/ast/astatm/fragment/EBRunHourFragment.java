@@ -96,35 +96,6 @@ public class EBRunHourFragment extends MainFragment {
                     }
                 }
             }
-/*
-            try {
-                JSONObject jsonRootObject = new JSONObject(result);
-                EBRunHourModel ebRunHourModel;
-                ArrayList<EBRunHourModel> arrErRunHourData = new ArrayList<>();
-                String jsonStatus = jsonRootObject.optString("status").toString();
-                String date = "";
-                String EBRH = "";
-                String DGRH = "";
-                if (jsonStatus.equals("2")) {
-                    JSONArray jsonArray = jsonRootObject.optJSONArray("data");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        date = jsonObject.optString("Date").toString();
-                        EBRH = jsonObject.optString("EBRH").toString();
-                        DGRH = jsonObject.optString("DGRH").toString();
-                        ebRunHourModel = new EBRunHourModel();
-                        ebRunHourModel.setDate(date);
-                        ebRunHourModel.setDGRH(DGRH);
-                        ebRunHourModel.setEBRH(EBRH);
-                        arrErRunHourData.add(ebRunHourModel);
-                    }
-                    lvEBRHDetails.setAdapter(new EBRunHourAdapter(getContext(), arrErRunHourData));
-                } else {
-                }
-            } catch (JSONException e) {
-                // TODO Auto-generated catch block
-                //   e.printStackTrace();
-            }*/
         }
 
     }

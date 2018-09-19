@@ -41,18 +41,14 @@ import static android.content.Context.MODE_PRIVATE;
 public class ClusterFragment extends MainFragment {
     GridView clusterViewGrid;
     TooltipWindow tooltipWindow;
-    //ClusterDisplayDataModel clusterDisplayDataModel;
     PopupWindow popup = null;
     public List<Data> clusterViewResDataList;
     ClusterGridAdapter clusterGridAdapter;
     AutoCompleteTextView etSearch;
-    TextView tvSort, tvLastUpdated, tvUserName, tvClearFilter;
+    TextView tvSort, tvLastUpdated, tvClearFilter;
     ImageView imgRefresh;
     TextView tvTotalSites, tvTotalAlarmSites, tvTotalNonComm, tvTotalInvAlarm, tvTotalLowBattery, tvNSMSites, tvFilter;
     SharedPreferences pref;
-    boolean[] selectedCustomerFilter = null;
-    ArrayList<SiteDisplayDataModel> siteDetailArrayList;
-    // String[] arrSiteName, arrSiteId;
     String userName = "";
     String uid = "";
     String circleID = "0";
@@ -61,7 +57,6 @@ public class ClusterFragment extends MainFragment {
     String lon = "23.33";
     String circleName = "";
     int refresh = 0;
-    // AtmDatabase atmDB;
     LinearLayout filterLayout;
     ATMDBHelper atmdbHelper;
 
@@ -318,51 +313,7 @@ public class ClusterFragment extends MainFragment {
      * populate Cluster Grid data
      */
     public void populateClusterGrid() {
-
-       /* Boolean connected = commonFunction.checkNetwork(getContext());
-        String lastUpdatedDate = String.valueOf(System.currentTimeMillis());
-        int rowCount = atmDB.getCircleCount("cluster", "circle_id", circleID);
-        long lastUpdatedTimeDiff = 0;
-        if (rowCount > 1) {
-            lastUpdatedDate = atmDB.getLastUpdatedDate("cluster", "last_updated", "circle_id", circleID);
-            lastUpdatedTimeDiff = System.currentTimeMillis() - Long.parseLong(lastUpdatedDate);
-        }
-        if ((connected == true && rowCount == 0) || refresh == 1) {
-            refresh = 0;
-            getClusterData("NA");
-            long time = System.currentTimeMillis();
-        } else if (connected == true && lastUpdatedTimeDiff >= (100 * 60 * 1000) &&
-                !CircleFragment.ctid.equals("NA") && !CircleFragment.filterString.equals("NA")) {
-            getClusterData("NA");
-            long time = System.currentTimeMillis();
-            lastUpdatedDate = String.valueOf(time);
-        } else {
-            getDataFromDB(lastUpdatedDate);
-            lastUpdatedDate = atmDB.getLastUpdatedDate("cluster", "last_updated", "circle_id", circleID);
-            if (!lastUpdatedDate.equals("")) {
-                lastUpdatedDate = commonFunction.formatDate(String.valueOf(lastUpdatedDate));
-            }
-        }
-        tvSort.setOnClickListener(v -> genrateSortList());
-        tvLastUpdated.setText("Last Updated: " + lastUpdatedDate);
-        int siteSearchCount = atmDB.getCircleCount("site_search_details", "", "Survey");
-        if (siteSearchCount > 0) {
-
-            siteDetailArrayList = atmDB.getFilteredData("site_search_name", "", "Survey");
-            arrSiteName = new String[siteDetailArrayList.size()];
-            arrSiteId = new String[siteDetailArrayList.size()];
-            for (int i = 0; i < siteDetailArrayList.size(); i++) {
-                arrSiteName[i] = siteDetailArrayList.get(i).getSiteName();
-                arrSiteId[i] = siteDetailArrayList.get(i).getSiteId();
-            }
-            setSiteNameAdapter();
-        } else {
-            //getSiteSearchData();
-        }*/
         setSiteNameListIntoSearch();
-        /*String lastUpdatedDate = String.valueOf(System.currentTimeMillis());
-        lastUpdatedDate = ASTUIUtil.formatDate(lastUpdatedDate);
-        tvLastUpdated.setText("Last Updated: " + lastUpdatedDate);*/
         if (ASTUIUtil.isOnline(getContext())) {
             getClusterData("NA");
         } else {
@@ -375,18 +326,6 @@ public class ClusterFragment extends MainFragment {
      */
 
     public void setAdapter() {
-       /* if (paramClusterViewResDataList.size() == 0) {
-            clusterViewGrid.setEmptyView(clusterViewGrid);
-        } else {
-            tvTotalSites.setText("Total Sites: " + paramClusterViewResDataList.get(paramClusterViewResDataList.size() - 1).getTotalSites());
-            tvTotalAlarmSites.setText("Total Alarm Sites: " + paramClusterViewResDataList.get(paramClusterViewResDataList.size() - 1).getTotalAlarmSites());
-            tvTotalNonComm.setText("Total Non Comm: " + paramClusterViewResDataList.get(paramClusterViewResDataList.size() - 1).getTotalNonCom());
-            tvTotalInvAlarm.setText("Total INV Alarm: " + paramClusterViewResDataList.get(paramClusterViewResDataList.size() - 1).getTotalInvAlarm());
-            tvTotalLowBattery.setText("Total Low Battery: " + paramClusterViewResDataList.get(paramClusterViewResDataList.size() - 1).getTotalLowBattery());
-            tvNSMSites.setText("NMS Sites: " + paramClusterViewResDataList.get(paramClusterViewResDataList.size() - 1).getNsmSites());
-            clusterViewGrid.setEmptyView(clusterViewGrid);
-            clusterViewGrid.setAdapter(new ClusterGridAdapter(getContext(), paramClusterViewResDataList));
-        }*/
         tvLastUpdated.setText("Last Updated: " + ASTUIUtil.formatDate(String.valueOf(System.currentTimeMillis())));
 
         ATMDBHelper atmdbHelper = new ATMDBHelper(getContext());
@@ -435,9 +374,6 @@ public class ClusterFragment extends MainFragment {
     private void getClusterData(String alarmTypes) {
         ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
         _progrssBar.show();
-       /* if (CircleFragment.ctid.equals("")) {
-            CircleFragment.ctid = "NA";
-        }*/
         if (alarmTypes.equals("")) {
             alarmTypes = "NA";
         }
@@ -478,97 +414,9 @@ public class ClusterFragment extends MainFragment {
             if (msgFlag) {
                 ASTUIUtil.showToast("Cluster Data not available.");
             }
-          /*  try {
-                clusterViewResDataList.clear();
-                JSONObject jsonRootObject = new JSONObject(result);
-                String jsonStatus = jsonRootObject.optString("status").toString();
-                String totalSites = "";
-                String alarmSites = "";
-                String nonComSites = "";
-                String invSites = "";
-                String lowBattertSites = "";
-                String nmsSites = "";
-                if (jsonStatus.equals("2")) {
-                    atmDB.deleteAllRows("cluster");
-                    JSONArray jsonArrayHeader = jsonRootObject.optJSONArray("header");
-                    for (int i = 0; i < jsonArrayHeader.length(); i++) {
-                        JSONObject jsonObject = jsonArrayHeader.getJSONObject(i);
-                        totalSites = jsonObject.optString("TotalSites").toString();
-                        alarmSites = jsonObject.optString("AlarmSites").toString();
-                        nonComSites = jsonObject.optString("NoncomSites").toString();
-                        invSites = jsonObject.optString("INVSites").toString();
-                        lowBattertSites = jsonObject.optString("LowBatterySies").toString();
-                        nmsSites = jsonObject.optString("NSMSies").toString();
-                        tvTotalSites.setText("Total Sites: " + totalSites);
-                        tvTotalAlarmSites.setText("Total Alarm Sites: " + alarmSites);
-                        tvTotalNonComm.setText("Total Non Comm: " + nonComSites);
-                        tvTotalInvAlarm.setText("Total INV Alarm: " + invSites);
-                        tvTotalLowBattery.setText("Total Low Battery: " + lowBattertSites);
-                        tvNSMSites.setText("NMS Sites: " + nmsSites);
-                    }
-                    JSONArray jsonArray = jsonRootObject.optJSONArray("data");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        String clusterName = jsonObject.optString("dn").toString();
-                        String clusterAllSites = jsonObject.optString("dd").toString();
-                        String clusterAlarmSites = jsonObject.optString("dv").toString();
-                        String clusterColorCode = jsonObject.optString("co").toString();
-                        String clusterId = jsonObject.optString("did").toString();
-                        String clusterHeadContact = jsonObject.optString("dmp").toString();
-                        clusterDisplayDataModel = new ClusterDisplayDataModel();
-                        clusterDisplayDataModel.setClusterName(clusterName);
-                        clusterDisplayDataModel.setClusterTotalSites(clusterAllSites);
-                        clusterDisplayDataModel.setClusterTotalAlarmSites(clusterAlarmSites);
-                        clusterDisplayDataModel.setClusterColorCode(clusterColorCode);
-                        clusterDisplayDataModel.setClusterId(clusterId);
-                        clusterDisplayDataModel.setClusterHeadContact(clusterHeadContact);
-                        clusterDisplayDataModel.setTotalSites(totalSites);
-                        clusterDisplayDataModel.setTotalAlarmSites(alarmSites);
-                        clusterDisplayDataModel.setTotalNonCom(nonComSites);
-                        clusterDisplayDataModel.setTotalInvAlarm(invSites);
-                        clusterDisplayDataModel.setTotalLowBattery(lowBattertSites);
-                        clusterDisplayDataModel.setNsmSites(nmsSites);
-                        clusterViewResDataList.add(clusterDisplayDataModel);
-                    }
-                    //atmDB.deleteAllRows("cluster");
-                    atmDB.addClusterData(clusterViewResDataList, circleID);
-                    clusterGridAdapter = new ClusterGridAdapter(getContext(), clusterViewResDataList);
-                    setAdapter(clusterViewResDataList);
-                    tvLastUpdated.setText("Last Updated: " + commonFunction.formatDate(String.valueOf(System.currentTimeMillis())));
-                } else {
-                    ASTUIUtil.showToast("Data not available.");
-                }
-            } catch (JSONException e) {
-                // TODO Auto-generated catch block
-                //   e.printStackTrace();
-            }*/
         }
 
     }
-
-    /**
-     * get Data from DB
-     *
-     * @param lastUpdatedDate
-     *//*
-
-    public void getDataFromDB(String lastUpdatedDate) {
-        if (atmDB.getCircleCount("cluster", "circle_id", circleID) > 0) {
-            clusterViewResDataList = atmDB.getAllClusterData(circleID, "NAME");
-            clusterGridAdapter = new ClusterGridAdapter(getContext(), clusterViewResDataList);
-            setAdapter(clusterViewResDataList);
-            dfdfd
-            Log.v("Local Data", "Local Data");
-            String time = String.valueOf(System.currentTimeMillis());
-            lastUpdatedDate = commonFunction.formatDate(String.valueOf(time));
-        }
-        //-------------Display Last Updated Date-----------------------------------------------
-        lastUpdatedDate = atmDB.getLastUpdatedDate("cluster", "last_updated", "circle_id", circleID);
-        if (!lastUpdatedDate.equals("")) {
-            lastUpdatedDate = commonFunction.formatDate(String.valueOf(lastUpdatedDate));
-        }
-    }*/
-
 
     /**
      * genertae Sort List
@@ -602,40 +450,6 @@ public class ClusterFragment extends MainFragment {
         AlertDialog sortAlert = builder.create();
         sortAlert.show();
     }
-
-    /* *//**
-     * set Site Name Adapter
-     *//*
-    private void setSiteNameAdapter() {
-        String[] arrSearchData = commonFunction.concatinateStringArray(arrSiteId, arrSiteName);
-        ArrayAdapter<String> adapterSiteName = new ArrayAdapter<String>(getContext(), android.R.layout.select_dialog_item, arrSearchData);
-        etSearch.setAdapter(adapterSiteName);
-        etSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String searchString = etSearch.getText().toString();
-                int arraylistPosition = 0;
-                for (int i = 0; i < arrSiteId.length; i++) {
-                    if (arrSiteId[i].equals(searchString)) {
-                        arraylistPosition = i;
-                    }
-                    if (arrSiteName[i].equals(searchString)) {
-                        arraylistPosition = i;
-                    }
-                }
-                SiteDetailFragment siteDetailFragment = new SiteDetailFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("headerTxt", "Site Details");
-                bundle.putBoolean("showMenuButton", false);
-                bundle.putString("SITE_ID_NUM", siteDetailArrayList.get(arraylistPosition).getSiteNumId());
-                bundle.putString("SITE_NAME", siteDetailArrayList.get(arraylistPosition).getSiteName());
-                bundle.putString("SITE_ID", siteDetailArrayList.get(arraylistPosition).getSiteId());
-                getHostActivity().updateFragment(siteDetailFragment, bundle);
-            }
-        });
-
-    }*/
 
     /**
      * set Site Search Name Adapter and openClusterScreen SiteDetail Fragment with search Data
@@ -682,12 +496,6 @@ public class ClusterFragment extends MainFragment {
      * @param sortType
      */
     public void doSortingClusterList(String sortType, boolean isAsc) {
-      /*  if (atmDB.getCircleCount("circle", "", "") > 1) {
-            clusterViewResDataList = atmDB.getAllClusterData(circleID, String.valueOf(sortType));
-            clusterGridAdapter = new ClusterGridAdapter(getContext(), clusterViewResDataList);
-            setAdapter(clusterViewResDataList);
-        }*/
-
         if (clusterViewResDataList != null && clusterViewResDataList.size() > 0) {
             ASTUtil.sortArray(clusterViewResDataList, sortType, isAsc);
             clusterGridAdapter.notifyDataSetChanged();

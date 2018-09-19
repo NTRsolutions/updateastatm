@@ -107,36 +107,6 @@ public class SiteVisitFragment extends MainFragment {
                     }
                 }
             }
-           /* try {
-                JSONObject jsonRootObject = new JSONObject(result);
-                SiteVisitDataModel siteVisitDataModel;
-                ArrayList<SiteVisitDataModel> arrVisitData = new ArrayList<>();
-                String jsonStatus = jsonRootObject.optString("status").toString();
-                String visitDate = "";
-                String faultEquipmentMake = "";
-                String newEquipmentInstalledMake = "";
-                String feName = "";
-                if (jsonStatus.equals("2")) {
-                    JSONArray jsonArray = jsonRootObject.optJSONArray("data");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        visitDate = jsonObject.optString("VisitDate").toString();
-                        faultEquipmentMake = jsonObject.optString("FaultEquipmentMake").toString();
-                        newEquipmentInstalledMake = jsonObject.optString("NewEquipmentInstalledMake").toString();
-                        feName = jsonObject.optString("FEName").toString();
-                        siteVisitDataModel = new SiteVisitDataModel();
-                        siteVisitDataModel.setVisitDate(visitDate);
-                        siteVisitDataModel.setFaultEquipmentMake(faultEquipmentMake);
-                        siteVisitDataModel.setFeName(feName);
-                        siteVisitDataModel.setNewEquipmentInstalledMake(newEquipmentInstalledMake);
-                        arrVisitData.add(siteVisitDataModel);
-                    }
-                    lvSiteVisits.setAdapter(new SiteVisitAdapter(getContext(), arrVisitData));
-                }
-            } catch (JSONException e) {
-                // TODO Auto-generated catch block
-                //   e.printStackTrace();
-            }*/
         }
 
     }

@@ -72,7 +72,6 @@ public class CircleFragment extends MainFragment {
     PopupWindow popup = null;
     String apkName;
     String apkVersionNo = "";
-    int batteryLowFilterstatus = 0, noCommLowFilterstatus = 0, INVFilterstatus = 0;
     int refresh = 0;
     public static String filterString = "NA";
     AlertDialog alert;
@@ -80,7 +79,6 @@ public class CircleFragment extends MainFragment {
     public static Boolean[] arrSelectedFilterTwo;
     public List<Data> circleViewResDataList;
     CircleGridAdapter circleGridAdapter;
-    CircleDisplayDataModel circleDataModel;
     SharedPreferences pref;
     String userName = "";
     String applicationName = "";
@@ -104,8 +102,6 @@ public class CircleFragment extends MainFragment {
     String lat = "25.23";
     String lon = "25.23";
     String sid = "";
-    // ArrayList<SiteDisplayDataModel> siteDetailArrayList;
-    boolean[] selectedCustomerFilter = null;
     LogAnalyticsHelper analyticsHelper = null;
     ATMDBHelper atmdbHelper;
 
@@ -200,57 +196,16 @@ public class CircleFragment extends MainFragment {
                 return false;
             }
         });
-       /* if (atmDatabase.getCircleCount("customer_data", "", "") > 0) {
-            ArrayList<CustomerListDataModel> arrCustomerDBList = new ArrayList<>();
-            arrCustomerDBList = atmDatabase.getCustomerData();
-            //  items = new CharSequence[arrCustomerDBList.size() + 1];
-            // arrCustomerList = new String[2][arrCustomerDBList.size() + 1];
-            // arrCustomerList[0][0] = "All";
-            // arrCustomerList[1][0] = "0";
-            //  items[0] = "All";
-              *//*  for (int i = 0; i < arrCustomerDBList.size(); i++) {
-                    if (i == 0) {
-                        customerList += arrCustomerDBList.get(i).getCustomerName();
-                    } else {
-                        customerList += "," + arrCustomerDBList.get(i).getCustomerName();
-                    }
-                    //arrCustomerList[0][i + 1] = arrCustomerDBList.get(i).getCustomerName();
-                  //  arrCustomerList[1][i + 1] = arrCustomerDBList.get(i).getCustomerId();
-                   // items[i + 1] = arrCustomerDBList.get(i).getCustomerName();
-                }*//*
-        } else {
-            getCustomerData();
-        }*/
         //geting customer list
         if (ASTUIUtil.isOnline(getContext())) {
             getCustomerData();
         }
-       /* int siteSearchCount = atmDatabase.getCircleCount("site_search_details", "", "Survey");
-        if (siteSearchCount > 0) {
-            siteDetailArrayList = atmDatabase.getFilteredData("site_search_name", "", "Survey");
-            arrSiteName = new String[siteDetailArrayList.size()];
-            arrSiteId = new String[siteDetailArrayList.size()];
-            for (int i = 0; i < siteDetailArrayList.size(); i++) {
-                arrSiteName[i] = siteDetailArrayList.get(i).getSiteName();
-                arrSiteId[i] = siteDetailArrayList.get(i).getSiteId();
-            }
-            setSiteNameListIntoSearch();
-        } else {
-            getSiteSearchData();
-        }*/
         //geting all site list
         if (ASTUIUtil.isOnline(getContext())) {
             getSiteSearchData();
         } else {
             setSiteNameListIntoSearch();
         }
-
-     /*   ArrayList<EquipListDataModel> arrayEquipListEnggData = new ArrayList<>();
-        // need to refactor in new db
-        arrayEquipListEnggData = atmDatabase.getEquipDataData("1381");
-        if (arrayEquipListEnggData.size() <=0) {
-            getEquipListData(getContext());
-        }*/
         SharedPreferences.Editor editor = pref.edit();
         editor.putString("firstTimeLoad", "1");
         editor.commit();
@@ -561,62 +516,6 @@ public class CircleFragment extends MainFragment {
                     setAdaptor();
                 }
             }
-              /*  // JSONObject jsonRootObject = new JSONObject(result);
-                String jsonStatus = jsonRootObject.optString("status").toString();
-                if (jsonStatus.equals("2")) {
-                    JSONArray jsonArrayHeader = jsonRootObject.optJSONArray("header");
-                    for (int i = 0; i < jsonArrayHeader.length(); i++) {
-                        JSONObject jsonObject = jsonArrayHeader.getJSONObject(i);
-                        totalAlarmSites = jsonObject.optString("TotalSites").toString();
-                        alarmSites = jsonObject.optString("AlarmSites").toString();
-                        nonComSites = jsonObject.optString("NoncomSites").toString();
-                        invSites = jsonObject.optString("INVSites").toString();
-                        lowBattertSites = jsonObject.optString("LowBatterySies").toString();
-                        nmsSites = jsonObject.optString("NSMSies").toString();
-                        tvTotalSites.setText("Total Sites: " + totalAlarmSites);
-                        tvTotalAlarmSites.setText("Total Alarm Sites: " + alarmSites);
-                        tvTotalNonComm.setText("Total Non Comm: " + nonComSites);
-                        tvTotalInvAlarm.setText("Total INV Alarm: " + invSites);
-                        tvTotalLowBattery.setText("Total Low Battery: " + lowBattertSites);
-                        tvNSMSites.setText("NMS Sites: " + nmsSites);
-                    }
-                } else {
-                    ASTUIUtil.showToast("Data not available.");
-                }
-                if (jsonStatus.equals("2")) {
-                    JSONArray jsonArray = jsonRootObject.optJSONArray("data");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        String cin = jsonObject.optString("cin").toString();
-                        String cd = jsonObject.optString("cd").toString();
-                        String civ = jsonObject.optString("civ").toString();
-                        String co = jsonObject.optString("co").toString();
-                        String ciid = jsonObject.optString("ciid").toString();
-                        String chp = jsonObject.optString("chp").toString();
-                        circleDataModel = new CircleDisplayDataModel();
-                        circleDataModel.setCircleName(cin);
-                        circleDataModel.setTotalSites(cd);
-                        circleDataModel.setTotalAlarmSites(civ.trim());
-                        circleDataModel.setColorCode(co);
-                        circleDataModel.setCircleId(ciid);
-                        circleDataModel.setCircleHeadContact(chp);
-                        circleDataModel.setHeaderAlarmSites(alarmSites);
-                        circleDataModel.setHeaderTotalSites(totalAlarmSites);
-                        circleDataModel.setHeaderInvAlarm(invSites);
-                        circleDataModel.setHeaderLowBattery(lowBattertSites);
-                        circleDataModel.setHeaderNmsSites(nmsSites);
-                        circleDataModel.setHeaderNonComm(nonComSites);
-                        circleViewResDataList.add(circleDataModel);
-                    }
-                    if (ctid.equalsIgnoreCase("NA")) {
-                        atmDatabase.deleteAllRows("circle");
-                        atmDatabase.addCircleData(circleViewResDataList);
-                    }
-                    SharedPreferences.Editor editor = pref.edit();
-                    editor.putString("LAST_CONNECTED", String.valueOf(System.currentTimeMillis()));
-                    editor.commit();
-                    setAdaptor(circleViewResDataList);
-                }*/
         }
     }
 
@@ -661,90 +560,8 @@ public class CircleFragment extends MainFragment {
                     editor.commit();
                 }
             }
-            /*try {
-                ArrayList<CustomerListDataModel> arrayListCustomerData = new ArrayList<>();
-                JSONObject jsonRootObject = new JSONObject(result);
-                String jsonStatus = jsonRootObject.optString("status").toString();
-                if (jsonStatus.equals("1")) {
-                    JSONArray jsonArray = jsonRootObject.optJSONArray("data");
-                    //  arrCustomerList = new String[2][jsonArray.length() + 1];
-                    //  items = new CharSequence[jsonArray.length() + 1];
-                    // arrCustomerList[0][0] = "All";
-                    // arrCustomerList[1][0] = "0";
-                    // items[0] = "All";
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        CustomerListDataModel customerListDataModel = new CustomerListDataModel();
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        String customerName = jsonObject.optString("ctn").toString();
-                        String customerId = jsonObject.optString("ct").toString();
-                        customerListDataModel.setCustomerName(customerName);
-                        customerListDataModel.setCustomerId(customerId);
-                        arrayListCustomerData.add(customerListDataModel);
-
-                       *//* if (i == 0) {
-                            customerList += customerName;
-                        } else {
-                            customerList += "," + customerName;
-                        }*//*
-
-                        // arrCustomerList[0][i + 1] = customerName;
-                        // arrCustomerList[1][i + 1] = customerId;
-
-                        // items[i + 1] = customerName;
-                    }
-
-                    atmDatabase.addCustomerData(arrayListCustomerData);
-
-                }
-                // progressbar.dismiss();
-
-            } catch (JSONException e) {
-                // TODO Auto-generated catch block
-                //   e.printStackTrace();
-            }*/
         }
     }
-  /*  //------------------Generate Customer List-------------------------------------------
-    public void genrateCustomerList() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Select Customer");
-        final ArrayList<CustomerListDataModel> arrCustomerDataFiltered = new ArrayList<CustomerListDataModel>();
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.select_dialog_multichoice);
-        ArrayList<CustomerListDataModel> arrCustomerData = new ArrayList<>();
-        if (atmDatabase.getCircleCount("customer_data", "", "") > 0) {
-            selectedCustomerFilter = new boolean[atmDatabase.getCircleCount("customer_data", "", "") + 1];
-            arrCustomerData = atmDatabase.getCustomerData();
-        } else {
-            selectedCustomerFilter = new boolean[0];
-        }
-        final String[] arrFilteredData = new String[arrCustomerData.size()];
-        builder.setPositiveButton("Filter", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                alert.cancel();
-            }
-        });
-
-        builder.setMultiChoiceItems(items, selectedCustomerFilter, new DialogInterface.OnMultiChoiceClickListener() {
-            public void onClick(DialogInterface dialogInterface, int item, boolean b) {
-                //Log.d("Myactivity", String.format("%s: %s", items[item], b));
-                selectedCustomerFilter[item] = true;
-                if (b == true) {
-                    arrFilteredData[item] = "true";
-                } else {
-                    arrFilteredData[item] = "false";
-                }
-            }
-        });
-
-        alert = builder.create();
-        alert.show();
-    }*/
 
     /*
      *
@@ -800,54 +617,6 @@ public class CircleFragment extends MainFragment {
                     }.execute();
                 }
             }
-          /*  try {
-                JSONObject jsonRootObject = new JSONObject(result);
-                String jsonStatus = jsonRootObject.optString("status").toString();
-                siteDetailArrayList = new ArrayList<>();
-                atmDatabase.deleteAllRows("site_search_details");
-                //ArrayList<SiteDisplayDataModel> siteDetailArrayList = new ArrayList<>(SiteDisplayDataModel);
-                //circleViewResDataList.clear();
-                if (jsonStatus.equals("2")) {
-                    //atmDatabase.deleteSiteSearchData();
-                    JSONArray jsonArray = jsonRootObject.optJSONArray("data");
-                    arrSiteName = new String[jsonArray.length()];
-                    arrSiteId = new String[jsonArray.length()];
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        String siteId = jsonObject.optString("SiteId").toString();
-                        String customerSiteId = jsonObject.optString("sid").toString();
-                        String siteName = jsonObject.optString("SiteName").toString();
-                        String siteLat = jsonObject.optString("Lat").toString();
-                        String siteLong = jsonObject.optString("Lon").toString();
-                        String distanceFromBaseLocation = jsonObject.optString("BaseDistance").toString();
-                        String clientName = jsonObject.optString("Client").toString();
-                        String clientId = jsonObject.optString("ClientId").toString();
-                        SiteDisplayDataModel siteDisplayDataModel = new SiteDisplayDataModel();
-                        siteDisplayDataModel.setSiteId(customerSiteId);
-                        siteDisplayDataModel.setSiteName(siteName);
-                        siteDisplayDataModel.setSiteNumId(siteId);
-                        siteDisplayDataModel.setSiteLat(siteLat);
-                        siteDisplayDataModel.setSiteLong(siteLong);
-                        siteDisplayDataModel.setBaseDistance(distanceFromBaseLocation);
-                        siteDisplayDataModel.setClientName(clientName);
-                        siteDisplayDataModel.setCircleId(clientId);
-                        siteDetailArrayList.add(siteDisplayDataModel);
-                        arrSiteName[i] = String.valueOf(siteName);
-                        arrSiteId[i] = String.valueOf(customerSiteId);
-                    }
-                  *//*  if (siteDetailArrayList != null && siteDetailArrayList.size() > 0) {
-                        SiteDetailAsyncTask siteDetailAsyncTask = new SiteDetailAsyncTask(siteDetailArrayList);
-                        siteDetailAsyncTask.execute();
-                    }*//*
-
-                } else if (jsonStatus.equals("0")) {
-                    ASTUIUtil.showToast("Site Data is not available!");
-                }
-
-            } catch (JSONException e) {
-                // TODO Auto-generated catch block
-                //   e.printStackTrace();
-            }*/
         }
     }
 
@@ -867,17 +636,6 @@ public class CircleFragment extends MainFragment {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     String searchString = etSearch.getText().toString();
-                   /* int arraylistPosition = 0;
-                    for (int i = 0; i < arrSiteId.length; i++) {
-                        if (arrSiteId[i].equals(searchString)) {
-                            arraylistPosition = i;
-                        }
-                        if (arrSiteName[i].equals(searchString)) {
-                            arraylistPosition = i;
-                        }
-                    }*/
-                    /*siteDisplayDataModel.setSiteId(customerSiteId);
-                    siteDisplayDataModel.setSiteNumId(siteId);*/
                     if (searchString != null && !searchString.equals("")) {
                         getSiteDetailAndOpenSiteDetailScreen(searchString);
                     }
@@ -939,99 +697,6 @@ public class CircleFragment extends MainFragment {
             circleGridAdapter.notifyDataSetChanged();
         }
     }
-
-   /* public void genrateFilterList() {
-        AlertDialog.Builder builderSingle = new AlertDialog.Builder(getContext());
-        builderSingle.setIcon(R.drawable.ic_launcher);
-        //builderSingle.setTitle("Select One Name:-");
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.select_dialog_singlechoice);
-        //arrayAdapter.add("Remove Filter");
-        arrayAdapter.add("Alarm Type");
-        arrayAdapter.add("Customer");
-        builderSingle.setAdapter(
-                arrayAdapter,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int position) {
-                        if (position == 0) {
-                            genrateAlarmFilterList();
-                            //filterAlert.dismiss();
-                        } else if (position == 1) {
-                            genrateCustomerList();
-                        }
-
-                    }
-                });
-        builderSingle.show();
-    }*/
-
-  /*  public void genrateAlarmFilterList() {
-        final AlertDialog.Builder builderSingle = new AlertDialog.Builder(getContext());
-        builderSingle.setIcon(R.drawable.ic_launcher);
-        //builderSingle.setTitle("Select One Name:-");
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.select_dialog_multichoice);
-        final CharSequence[] items = {"Battery Low", "No Comm", "INV"};
-        final boolean[] selected = {false, false, false};
-        filterString = "NA";
-        builderSingle.setPositiveButton("Filter", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                //siteDetailArrayList
-                ArrayList<SiteDisplayDataModel> siteDetailArrayListTemp = new ArrayList<SiteDisplayDataModel>();
-                if (batteryLowFilterstatus == 1) {
-                    if (filterString.equals("")) {
-                        filterString = "BL1";
-                    }
-                }
-                if (noCommLowFilterstatus == 1) {
-                    if (filterString.equals("")) {
-                        filterString = "NSM";
-                    } else {
-                        filterString = ",NSM";
-                    }
-                }
-                if (INVFilterstatus == 1) {
-                    if (filterString.equals("")) {
-                        filterString = "INV";
-                    } else {
-                        filterString = ",INV";
-                    }
-                }
-
-                getCircleData(filterString);
-            }
-        });
-
-        builderSingle.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-
-
-        builderSingle.setMultiChoiceItems(items, selected, new DialogInterface.OnMultiChoiceClickListener() {
-            public void onClick(DialogInterface dialogInterface, int item, boolean b) {
-                Log.d("Myactivity", String.format("%s: %s", items[item], b));
-                switch (item) {
-                    case 0:
-                        batteryLowFilterstatus = 1;
-                        break;
-                    case 1:
-                        noCommLowFilterstatus = 1;
-                        break;
-                    case 2:
-                        INVFilterstatus = 1;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-
-        builderSingle.show();
-    }*/
 
     public void startLocationAlarmService() {
         if (locationTracking.equals("1")) {
@@ -1164,58 +829,6 @@ public class CircleFragment extends MainFragment {
         protected void onProgressUpdate(String... text) {
         }
     }
-
-   /* class SiteDetailAsyncTask extends AsyncTask<Void, Void, Void> {
-        private final ArrayList<SiteDisplayDataModel> siteDetailArrayList;
-        private Exception exception;
-        private ProgressDialog progressDialog;
-
-        public SiteDetailAsyncTask(ArrayList<SiteDisplayDataModel> siteDetailArrayList) {
-            this.siteDetailArrayList = siteDetailArrayList;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = new ProgressDialog(getContext());
-            //  progressDialog.show();
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {site_search_details
-                 atmDatabase.addSearchSiteData(siteDetailArrayList);
-                //   setSiteNameListIntoSearch();
-            } catch (Exception e) {
-                exception = e;
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            if (progressDialog != null && progressDialog.isShowing()) {
-                progressDialog.dismiss();
-                progressDialog = null;
-            }
-            if (exception == null) {
-                onSuccessAddSearchSiteData();
-            } else {
-                onFailAddSearchSiteData(exception);
-            }
-        }
-    }
-
-    private void onSuccessAddSearchSiteData() {
-        ASTUIUtil.showToast("Success");
-    }
-
-    private void onFailAddSearchSiteData(Exception exception) {
-        ASTUIUtil.showToast("Fail");
-    }*/
-
-
     /*
      *
      * Calling Web Service to Get State, District and Tehsil
@@ -1255,9 +868,7 @@ public class CircleFragment extends MainFragment {
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.etSearch) {
-
-        } else if (view.getId() == R.id.tvSort) {
+        if (view.getId() == R.id.tvSort) {
             genrateSortList();
         } else if (view.getId() == R.id.tvFilter) {
             getFIlterData();
@@ -1280,34 +891,7 @@ public class CircleFragment extends MainFragment {
      * get Filter Search Data
      */
     public void getFIlterData() {
-      /*  ArrayList<CustomerListDataModel> arrCustomerData = new ArrayList<>();
-        if (atmDatabase.getCircleCount("customer_data", "", "") > 0) {
-            selectedCustomerFilter = new boolean[atmDatabase.getCircleCount("customer_data", "", "") + 1];
-            arrCustomerData = atmDatabase.getCustomerData();
-        } else {
-            selectedCustomerFilter = new boolean[0];
-        }
-        final String[] arrFilteredData = new String[arrCustomerData.size()];
-        final String[] arrFilteredIdData = new String[arrCustomerData.size()];
-        for (int i = 0; i < arrCustomerData.size(); i++) {
-            arrFilteredData[i] = arrCustomerData.get(i).getCustomerName();
-            arrFilteredIdData[i] = arrCustomerData.get(i).getCustomerId();
-        }
-        String[] arrParentData = new String[2];
-        String[] arrAlarmTypes = {"Battery Low", "No Comm", "INV", "NSM"};
-        arrParentData[0] = "Alarm Type";
-        arrParentData[1] = "Customer";
-        arrSelectedFilterOne = new Boolean[arrAlarmTypes.length];
-        for (int i = 0; i < arrAlarmTypes.length; i++) {
-            arrSelectedFilterOne[i] = false;
-        }
-        arrSelectedFilterTwo = new Boolean[arrFilteredData.length];
-        for (int i = 0; i < arrFilteredData.length; i++) {
-            arrSelectedFilterTwo[i] = false;
-        }
 
-        FilterPopupCircle filterPopup = new FilterPopupCircle();
-        filterPopup.getFilterPopup(popup, getContext(), arrParentData, arrAlarmTypes, arrFilteredData, arrFilteredIdData, "circle");*/
     }
 
     /*

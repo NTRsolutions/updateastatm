@@ -66,8 +66,6 @@ public class ActivitySheetFragment extends MainFragment {
     PopupWindow siteNotFoundPopupWindow;
     private GoogleApiClient client;
     Dialog daRateChartDialog = null;
-    // int dataRefreshed = 0;
-    //  int dataRefreshedForSms = 0;
     AutoCompleteTextView tvSiteName, tvSiteId;
     Button btnsave;
     Boolean isPlan = false;

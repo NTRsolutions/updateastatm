@@ -38,7 +38,7 @@ public class FeTrackerFragment extends MainFragment {
     ArrayList<FeTrackerEmployeeModel> arrFeTracker;
     ArrayList<FeTrackerChildItemModel> arrayListFeTrackerChild;
     SharedPreferences pref;
-    String userId, userRole, userAccess, r1;
+    String userId;
     String userName = "";
     TextView tvPlannedExecuted, tvOnTheWay, tvReachedSite, tvLeftSite, tvUnknown, tvCircleName, tvAttendance;
     TextView tvFilter;

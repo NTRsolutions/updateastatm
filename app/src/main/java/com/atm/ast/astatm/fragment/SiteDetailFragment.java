@@ -27,13 +27,11 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class SiteDetailFragment extends MainFragment implements AbsListView.OnScrollListener {
     LinearLayout llSiteDetailTable;
-    // ProgressDialog progressbar;
     ASTUIUtil commonFunction;
     int position;
     String uptime, visit, ebRunHour;
     ArrayList<Data> siteDetailViewResDataList;
     SiteDetailAdapter siteDetailAdapter;
-    //SiteDetailsDisplayModel siteDetailsDisplayModel;
     TextView tvSiteName;
     TextView tvUptime, tvVisit, tvEBRunHour;
     TextView tvLastUpdated;
@@ -46,12 +44,7 @@ public class SiteDetailFragment extends MainFragment implements AbsListView.OnSc
     String siteName, siteId;
     SharedPreferences pref;
     String userId;
-    // String userRole, userAccess, r1;
-    //private int visibleThreshold = 5;
     private int currentPage = 1;
-    // private int previousTotal = 0;
-    //private boolean loading = true;
-    //  private int selectedPosition = 1;
     boolean loadingMore = false;
 
     @Override
@@ -64,11 +57,6 @@ public class SiteDetailFragment extends MainFragment implements AbsListView.OnSc
         customerSiteId = this.getArguments().getString("SITE_ID_NUM");
         siteName = this.getArguments().getString("SITE_NAME");
         siteId = this.getArguments().getString("SITE_ID");
- /*siteDisplayDataModel.setSiteId(customerSiteId);
-                    siteDisplayDataModel.setSiteNumId(siteId);
-
-                    need to change this */
-
     }
 
     @Override
@@ -123,36 +111,6 @@ public class SiteDetailFragment extends MainFragment implements AbsListView.OnSc
     }
 
     public void populateSiteData() {
-      /*  Boolean connected = ASTUtil.isNetworkAvailable(getContext());
-        try {
-            if (!siteId.equalsIgnoreCase("0") && siteId != null) {
-                String lastUpdatedDate = "";
-                if (atmDatabase.getCircleCount("site_details", "site_detail_num_id", siteId) > 1) {
-                    lastUpdatedDate = atmDatabase.getLastUpdatedDate("site_details", "site_detail_last_updated", "site_detail_id", customerSiteId);
-                }
-                if (lastUpdatedDate.equalsIgnoreCase("")) {
-                    lastUpdatedDate = String.valueOf(System.currentTimeMillis());
-                }
-                atmDatabase.deleteAllRows("site_details");
-                siteDetailViewResDataList = atmDatabase.getAllSiteDetailData(siteId);
-                siteDetailAdapter = new SiteDetailAdapter(getContext(), siteDetailViewResDataList);
-                lvSiteDetails.setAdapter(siteDetailAdapter);
-                int siteDetailCount = atmDatabase.getCircleCount("site_details", "site_detail_num_id", siteId);
-                if ((connected == true && siteDetailCount == 0) || lastUpdatedDate.equals("")) {
-                    getSiteDetailsData(1);
-                    long time = System.currentTimeMillis();
-                } else if (connected == true && Long.parseLong(lastUpdatedDate + (10 * 60 * 1000)) >= System.currentTimeMillis()) {
-                    getSiteDetailsData(1);
-                    lastUpdatedDate = String.valueOf(System.currentTimeMillis());
-                } else {
-                    siteDetailViewResDataList = atmDatabase.getAllSiteDetailData(siteId);
-                }
-                lastUpdatedDate = commonFunction.formatDate(lastUpdatedDate);
-                tvLastUpdated.setText("Last Updated: " + lastUpdatedDate);
-            }
-        } catch (Exception ex) {
-
-        }*/
         siteDetailAdapter = new SiteDetailAdapter(getContext(), siteDetailViewResDataList);
         lvSiteDetails.setAdapter(siteDetailAdapter);
         String lastUpdatedDate = commonFunction.formatDate(String.valueOf(System.currentTimeMillis()));
@@ -214,66 +172,7 @@ public class SiteDetailFragment extends MainFragment implements AbsListView.OnSc
                     }
                 }
             }
-
-            /*try {
-                JSONObject jsonRootObject = new JSONObject(result);
-                String jsonStatus = jsonRootObject.optString("status").toString();
-                String dataSummaryString = jsonRootObject.optString("datasummary").toString();
-                if (jsonStatus.equals("2")) {
-                    JSONArray jsonArrayDataSummary = jsonRootObject.optJSONArray("datasummary");
-                    if (!dataSummaryString.equals("null")) {
-                        for (int i = 0; i < jsonArrayDataSummary.length(); i++) {
-                            JSONObject jsonObject = jsonArrayDataSummary.getJSONObject(i);
-                            uptime = jsonObject.optString("ut").toString();
-                            visit = jsonObject.optString("vt").toString();
-                            ebRunHour = jsonObject.optString("eb").toString();
-                            tvUptime.setText("Uptime: " + uptime + "%");
-                            tvVisit.setText("Visit: " + visit);
-                            tvEBRunHour.setText("EB Run Hr: " + ebRunHour + " RH");
-                        }
-                    }
-                }
-                if (jsonStatus.equals("2")) {
-                    JSONArray jsonArray = jsonRootObject.optJSONArray("data");
-                    int length = jsonArray.length();
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        position = i;
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        String date = jsonObject.optString("dt").toString();
-                        String colorCode = jsonObject.optString("co").toString();
-                        String batteryVoltage = jsonObject.optString("btv").toString();
-                        String siteStatus = jsonObject.optString("sst").toString();
-                        String inputOutVoltage = jsonObject.optString("iov").toString();
-                        String solarCurrent = jsonObject.optString("soa").toString();
-                        String batteryChargeCurrent = jsonObject.optString("bta").toString();
-                        String batteryDischargeCurrent = jsonObject.optString("bda").toString();
-                        String currentAlarm = jsonObject.optString("ca").toString();
-                        String loadCurrent = jsonObject.optString("la").toString();
-                        siteDetailsDisplayModel = new SiteDetailsDisplayModel();
-                        siteDetailsDisplayModel.setDate(date);
-                        siteDetailsDisplayModel.setColorCode(colorCode);
-                        siteDetailsDisplayModel.setBatteryVoltage(batteryVoltage);
-                        siteDetailsDisplayModel.setSiteStatus(siteStatus);
-                        siteDetailsDisplayModel.setInputOutVoltage(inputOutVoltage);
-                        siteDetailsDisplayModel.setSolarCurrent(solarCurrent);
-                        siteDetailsDisplayModel.setBatteryChargeCurrent(batteryChargeCurrent);
-                        siteDetailsDisplayModel.setBatteryDischargeCurrent(batteryDischargeCurrent);
-                        siteDetailsDisplayModel.setCurrentAlarm(currentAlarm);
-                        siteDetailsDisplayModel.setLoadCurrent(loadCurrent);
-                        siteDetailViewResDataList.add(siteDetailsDisplayModel);
-                    }
-                    siteDetailAdapter.notifyDataSetChanged();
-                    loadingMore = false;
-                }
-            } catch (JSONException e) {
-                // TODO Auto-generated catch block
-                //   e.printStackTrace();
-            }*/
         }
-
-    }
-
-    private void setAdapter() {
 
     }
 
