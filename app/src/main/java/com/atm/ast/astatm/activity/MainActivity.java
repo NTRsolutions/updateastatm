@@ -386,30 +386,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return "PERMISSION_REQ_" + permissionCode;
     }
 
-  /*  protected void askUsertoChangePermission(@StringRes int message) {
-        AlertDialog deviceSettingsDialog = new AlertDialog.Builder(this)
-                .setPositiveButton(R.string.openSett, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                Uri.fromParts("package", getPackageName(), null));
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        MainActivity.this.finish();
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).create();
-        deviceSettingsDialog.setTitle(R.string.access_denied);
-        deviceSettingsDialog.setMessage(ASTStringUtil.getStringForID(message));
-        deviceSettingsDialog.show();
-    }*/
-
     protected String permissionForCode(int permissionCode) {
         switch (permissionCode) {
             case ASTReqResCode.PERMISSION_REQ_ACCESS_COARSE_LOCATION:

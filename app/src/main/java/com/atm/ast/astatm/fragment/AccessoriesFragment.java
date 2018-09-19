@@ -40,8 +40,6 @@ public class AccessoriesFragment extends MainFragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         StaggeredGridLayoutManager gaggeredGridLayoutManager = new StaggeredGridLayoutManager(1, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(gaggeredGridLayoutManager);
-        //  RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 2);
-        //    recyclerView.setLayoutManager(mLayoutManager);
 
     }
 

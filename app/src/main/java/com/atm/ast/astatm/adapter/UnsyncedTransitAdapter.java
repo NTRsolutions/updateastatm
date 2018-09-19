@@ -11,12 +11,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.atm.ast.astatm.R;
-import com.atm.ast.astatm.database.AtmDatabase;
-import com.atm.ast.astatm.model.SiteDisplayDataModel;
+import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.model.TransitDataModel;
+import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,20 +25,12 @@ public class UnsyncedTransitAdapter extends BaseAdapter {
     Context context;
     List<TransitDataModel> transitDataArrayList;
     ASTUIUtil commonFunctions;
-    ArrayList<SiteDisplayDataModel> siteDetailArrayList;
-    AtmDatabase atmDatabase;
-
-    public UnsyncedTransitAdapter(Context context, List<TransitDataModel> transitDataArrayList, ArrayList<SiteDisplayDataModel> siteDetailArrayList) {
-        this.context = context;
-        this.siteDetailArrayList = siteDetailArrayList;
-        this.transitDataArrayList = transitDataArrayList;
-        atmDatabase = new AtmDatabase(context);
-    }
+    ATMDBHelper atmdbHelper;
 
     public UnsyncedTransitAdapter(Context context, List<TransitDataModel> transitDataArrayList) {
         this.context = context;
         this.transitDataArrayList = transitDataArrayList;
-        atmDatabase = new AtmDatabase(context);
+        this.atmdbHelper = new ATMDBHelper(context);
     }
 
     /*private view holder class*/
@@ -68,9 +59,11 @@ public class UnsyncedTransitAdapter extends BaseAdapter {
         String siteName = "";
         String time = commonFunctions.formatDate(transitDataArrayList.get(position).getDateTime());
         String transitType = "";
-        SiteDisplayDataModel siteData = atmDatabase.getSiteSearchDataBySiteId(transitDataArrayList.get(position).getSiteId());
+
+
+        siteId = transitDataArrayList.get(position).getSiteId();
+        Data siteData = atmdbHelper.getPopulateSiteListDataBySiteID(Long.parseLong(siteId));
         if (siteData != null) {
-            siteId = transitDataArrayList.get(position).getSiteId();
             siteName = siteData.getSiteName();
         }
         switch (transitDataArrayList.get(position).getType()) {

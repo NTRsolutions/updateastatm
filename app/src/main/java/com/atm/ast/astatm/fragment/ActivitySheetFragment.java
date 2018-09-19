@@ -20,26 +20,17 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.atm.ast.astatm.ASTGson;
 import com.atm.ast.astatm.R;
-import com.atm.ast.astatm.SyncFormDataWithServerIntentService;
+import com.atm.ast.astatm.SyncFECallTrackerIntentService;
 import com.atm.ast.astatm.adapter.UnsyncedActivityFormAdapter;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
-import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
-import com.atm.ast.astatm.model.ActivityFormDataModel;
-import com.atm.ast.astatm.model.ActivityListSheetDataModel;
 import com.atm.ast.astatm.model.newmodel.ActivitySheetModel;
-import com.atm.ast.astatm.model.NocEnggListDataModel;
-import com.atm.ast.astatm.model.ReasonListDataModel;
-import com.atm.ast.astatm.model.SiteDisplayDataModel;
-import com.atm.ast.astatm.model.TaskListDataModel;
-import com.atm.ast.astatm.model.TransitDataModel;
 import com.atm.ast.astatm.model.newmodel.Activity;
 import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.model.newmodel.Data;
@@ -50,7 +41,6 @@ import com.atm.ast.astatm.model.newmodel.ServiceContentData;
 import com.atm.ast.astatm.utils.CustomDialog;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.atm.ast.astatm.utils.LogAnalyticsHelper;
-import com.atm.ast.astatm.utils.SiteNotFoundPopup;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -61,12 +51,9 @@ import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -79,8 +66,6 @@ public class ActivitySheetFragment extends MainFragment {
     PopupWindow siteNotFoundPopupWindow;
     private GoogleApiClient client;
     Dialog daRateChartDialog = null;
-    // int dataRefreshed = 0;
-    //  int dataRefreshedForSms = 0;
     AutoCompleteTextView tvSiteName, tvSiteId;
     Button btnsave;
     Boolean isPlan = false;
@@ -220,7 +205,7 @@ public class ActivitySheetFragment extends MainFragment {
         atmdbHelper = new ATMDBHelper(getContext());
         logScreen();
         //--------------Start Background Service--------------------------------
-        Intent intentService = new Intent(getContext(), SyncFormDataWithServerIntentService.class);
+        Intent intentService = new Intent(getContext(), SyncFECallTrackerIntentService.class);
         getContext().startService(intentService);
         getSharedPrefData();
         activityDetailArrayList = new ArrayList<>();

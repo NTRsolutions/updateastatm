@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 
 import com.atm.ast.astatm.R;
-import com.atm.ast.astatm.SyncFormDataWithServerIntentService;
+import com.atm.ast.astatm.SyncFECallTrackerIntentService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class PlannedActivityListTabFragment extends MainFragment {
         adapter.addFragment(new FeTrackerFragment(), "FE Tracker");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-        Intent intentService = new Intent(getHostActivity(), SyncFormDataWithServerIntentService.class);
+        Intent intentService = new Intent(getHostActivity(), SyncFECallTrackerIntentService.class);
         getContext().startService(intentService);
 
     }

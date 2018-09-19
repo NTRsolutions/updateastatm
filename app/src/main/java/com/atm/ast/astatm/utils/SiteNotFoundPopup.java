@@ -20,9 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.atm.ast.astatm.R;
-import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
-import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
 import com.atm.ast.astatm.model.SiteDisplayDataModel;
@@ -46,7 +44,7 @@ public class SiteNotFoundPopup {
     EditText etSiteId;
     String globalUserId;
     ArrayList siteDetailArrayList;
-    AtmDatabase atmDatabase;
+   // AtmDatabase atmDatabase;
     String[] arrSiteName;
     String[] arrSiteId;
     Context globalContext;
@@ -64,7 +62,6 @@ public class SiteNotFoundPopup {
         point.x = 100;
         point.y = 100;
 
-        atmDatabase = new AtmDatabase(context);
         globalUserId = userId;
         globalUserName = userName;
         globalContext = context;
@@ -182,7 +179,6 @@ public class SiteNotFoundPopup {
                 String jsonStatus = jsonRootObject.optString("status").toString();
                 siteDetailArrayList = new ArrayList<>();
                 if (jsonStatus.equals("2")) {
-                    atmDatabase.deleteSiteSearchData();
                     JSONArray jsonArray = jsonRootObject.optJSONArray("data");
                     arrSiteName = new String[jsonArray.length()];
                     arrSiteId = new String[jsonArray.length()];

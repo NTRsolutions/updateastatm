@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.activity.MainActivity;
-import com.atm.ast.astatm.database.AtmDatabase;
+import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.model.ContentData;
 import com.atm.ast.astatm.model.EquipListDataModel;
 import com.google.gson.Gson;
@@ -41,7 +41,7 @@ public class ServiceCaller {
             public void onDone(String doneWhatCode, String result, String error) {
                 if (result != null) {
                     workCompletedCallback.onDone(result, true);
-                    if(Contants.IS_DEBUG_LOG) {
+                    if (Contants.IS_DEBUG_LOG) {
                         Log.d(Contants.LOG_TAG, methodNmae + "********" + result);
                     }
                 } else {
@@ -96,8 +96,7 @@ public class ServiceCaller {
                     try {
                         JSONObject jsonRootObject = new JSONObject(result);
                         String jsonStatus = jsonRootObject.optString("Status").toString();
-                        AtmDatabase atmDatabase = new AtmDatabase(ApplicationHelper.application().getContext());
-                        ArrayList<EquipListDataModel> equipListArrayList = new ArrayList<>();
+                        ATMDBHelper atmDatabase = new ATMDBHelper(ApplicationHelper.application().getContext());
                         atmDatabase.deleteAllRows("equipment_list");
                         if (jsonStatus.equals("2")) {
                             JSONArray jsonArray = jsonRootObject.optJSONArray("Data");
@@ -110,10 +109,9 @@ public class ServiceCaller {
                                 equipListDataModel.setEquipId(equipId);
                                 equipListDataModel.setEquipName(equipName);
                                 equipListDataModel.setEquipParentId(parentId);
-                                equipListArrayList.add(equipListDataModel);
-                            }
 
-                            atmDatabase.addEquipListData(equipListArrayList);
+                                atmDatabase.insertEquipmentList(equipListDataModel);
+                            }
                             flag = true;
                         }
 

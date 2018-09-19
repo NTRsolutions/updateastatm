@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -74,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
                     serviceURL += "&username=" + userName + "&password=" + password + "&version=" + osVersion + "&rid="
                             + gcmClass.regid + "&AndroidAppVersionNo=" + versionName
                             + "&lat=" + lat + "&lon=" + lon;
-                    login(LoginActivity.this, serviceURL, userName);
+                    login(serviceURL, userName);
                 }
             }
         });
@@ -85,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
      *
      * call Login Services
      */
-    public void login(Context context1, String serviceUrl, String uID) {
+    public void login(String serviceUrl, String uID) {
         if (ASTUIUtil.isOnline(this)) {
             final ASTProgressBar dotDialog = new ASTProgressBar(LoginActivity.this);
             dotDialog.show();
@@ -94,8 +95,7 @@ public class LoginActivity extends AppCompatActivity {
                 gcmClass.getRegId(this.getApplicationContext());
             }
             ServiceCaller serviceCaller = new ServiceCaller(this);
-            String serviceURL = serviceUrl;
-            serviceCaller.CallCommanServiceMethod(serviceURL, "login", new IAsyncWorkCompletedCallback() {
+            serviceCaller.CallCommanServiceMethod(serviceUrl, "login", new IAsyncWorkCompletedCallback() {
                 @Override
                 public void onDone(String result, boolean isComplete) {
                     if (isComplete) {

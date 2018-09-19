@@ -12,34 +12,23 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.atm.ast.astatm.ASTGson;
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
-import com.atm.ast.astatm.database.AtmDatabase;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
-import com.atm.ast.astatm.model.ActivityListSheetDataModel;
 import com.atm.ast.astatm.model.ActivitySheetReportDataModel;
-import com.atm.ast.astatm.model.CircleDisplayDataModel;
-import com.atm.ast.astatm.model.ExecutedActivityListModel;
-import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.Header;
-import com.atm.ast.astatm.model.newmodel.ServiceContentData;
 import com.atm.ast.astatm.utils.ASTUIUtil;
-import com.atm.ast.astatm.utils.FilterPopupActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -52,7 +41,6 @@ public class ActivitySheetReportFragment extends MainFragment {
     ImageView imgRefresh;
     String lat = "25.30";
     String lon = "25.30";
-    //Shared Prefrences
     SharedPreferences pref;
     String userId = "";
     String[][] arrColorCode = new String[15][2];
@@ -157,46 +145,6 @@ public class ActivitySheetReportFragment extends MainFragment {
                 setFeNameAdapter(arrListFeName);
             }
         }
-
-           /* tvPlannedExecuted.setText("Planned/Executed: " + arrExecutedActivityData.get(0).getExecuted());
-            tvOnTheWay.setText("On The Way: " + arrExecutedActivityData.get(0).getOnTheWay());
-            tvReachedSite.setText("Reached Site: " + arrExecutedActivityData.get(0).getReachedSite());
-            tvLeftSite.setText("Left Site: " + arrExecutedActivityData.get(0).getLeftSite());
-            tvUnknown.setText("Unknown: " + arrExecutedActivityData.get(0).getUnknown());
-            //tvCircleName.setText("Circle Name: " + );
-            tvAttendance.setText("Attendance/Leave: " + arrExecutedActivityData.get(0).getAttendance() + "/" + arrExecutedActivityData.get(0).getLeave());
-            tvCircleName.setVisibility(View.GONE);
-            int dd = arrExecutedActivityData.size();
-            for (int i = 0; i < arrExecutedActivityData.size(); i++) {
-                activitySheetReportDataModel = new ActivitySheetReportDataModel();
-                activitySheetReportDataModel.setSiteName(arrExecutedActivityData.get(i).getSiteName());
-                activitySheetReportDataModel.setCustomer(arrExecutedActivityData.get(i).getCustomer());
-                activitySheetReportDataModel.setActivityDate(arrExecutedActivityData.get(i).getActivityDate());
-                activitySheetReportDataModel.setActivityTime(arrExecutedActivityData.get(i).getActivityTime());
-                activitySheetReportDataModel.setZoneType(arrExecutedActivityData.get(i).getZoneType());
-                activitySheetReportDataModel.setTotalAmount(arrExecutedActivityData.get(i).getTotalAmount());
-                activitySheetReportDataModel.setStatus(arrExecutedActivityData.get(i).getStatus());
-                activitySheetReportDataModel.setDays(arrExecutedActivityData.get(i).getDays());
-                activitySheetReportDataModel.setColor(arrExecutedActivityData.get(i).getColor());
-                activitySheetReportDataModel.setActivity(arrExecutedActivityData.get(i).getActivity());
-                activitySheetReportDataModel.setNocApprovel(arrExecutedActivityData.get(i).getNocApprovel());
-                activitySheetReportDataModel.setTaDaAmt(arrExecutedActivityData.get(i).getTaDaAmt());
-                activitySheetReportDataModel.setBonus(arrExecut edActivityData.get(i).getBonus());
-                activitySheetReportDataModel.setPenalty(arrExecutedActivityData.get(i).getPenalty());
-                activitySheetReportDataModel.setFeName(arrExecutedActivityData.get(i).getFeName());
-                activitySheetReportDataModel.setFeId(arrExecutedActivityData.get(i).getFeId());
-                activitySheetReportDataModel.setCircle(arrExecutedActivityData.get(i).getCircle());
-                activitySheetReportArrayList.add(activitySheetReportDataModel);
-            }
-            arrFeName = new String[activitySheetReportArrayList.size()];
-            ArrayList<String> arrListFeName = new ArrayList<>();
-            for (int i = 0; i < arrFeName.length; i++) {
-                arrListFeName.add(activitySheetReportArrayList.get(i).getFeName());
-            }
-            inflateTableRow(activitySheetReportArrayList);
-            setFeNameAdapter(arrListFeName);*/
-
-
     }
 
 
