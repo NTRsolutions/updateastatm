@@ -63,15 +63,16 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
     private View view;
     private Context context;
     int qty;
-    int  makeID;
+  int  makeID;
     String Equipmentdataa;
     int capacityId;
     EquipmnetContentData contentDataa;
     Equipment equipmentdata;
 
     @SuppressLint("ValidFragment")
-    public EquipMentBarcodeFragment(String Equipmentdata) {
-        Equipmentdataa = Equipmentdata;
+    public EquipMentBarcodeFragment(String Equipmentdata,int makeid) {
+        this.Equipmentdataa = Equipmentdata;
+        this.makeID=makeid;
     }
 
     @Override
@@ -126,13 +127,15 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
      */
 
     public void setcpacityData() {
-        makeID = equipmentdata.getMakeID();
+       // makeID = equipmentdata.getMakeID();
+
         ArrayList<String> capacityList = new ArrayList<>();
         ArrayList<Integer> capacityIdList = new ArrayList<>();
         for (Capacity capacity : contentDataa.getCapacity()) {
-            if (makeID == capacity.getMakeId())
+            if (makeID == capacity.getMakeId()) {
                 capacityList.add(capacity.getName());
-            capacityIdList.add(capacity.getId());
+                capacityIdList.add(capacity.getId());
+            }
         }
         ArrayAdapter<String> capacityAdtapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_row, capacityList);
         etCapacity.setAdapter(capacityAdtapter);
@@ -142,8 +145,8 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
             public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                 capacityId = capacityIdList.get(arg2);
                 Log.d(Contants.LOG_TAG, "capacityIdList.get(arg2)8888888888" + capacityIdList.get(arg2));
-                setScMCodeData(capacityId);
-                setscmcodeiscriptionData(capacityId);
+                setScMCodeData();
+                setscmcodeiscriptionData();
             }
 
             public void onNothingSelected(AdapterView<?> arg0) {
@@ -157,7 +160,7 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
     /**
      * set Data
      */
-    public void setScMCodeData(int capacityId) {
+    public void setScMCodeData() {
         ArrayList<String> scmcodeList = new ArrayList<>();
         for (SCMCode scmCode : contentDataa.getSCMCode()) {
             if (capacityId == scmCode.getCapcityId()) {
@@ -171,11 +174,12 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
     }
 
 
-    public void setscmcodeiscriptionData(int capacityId) {
+    public void setscmcodeiscriptionData() {
         ArrayList<String> scmcodeiscriptionList = new ArrayList<>();
         for (SCMDescription scmDescription : contentDataa.getSCMDescription()) {
-            if (capacityId == scmDescription.getCapcityId())
+            if (capacityId == scmDescription.getCapcityId()) {
                 scmcodeiscriptionList.add(scmDescription.getName());
+            }
         }
         ArrayAdapter<String> scmcodedesdapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_row, scmcodeiscriptionList);
         etSCMDiscription.setAdapter(scmcodedesdapter);

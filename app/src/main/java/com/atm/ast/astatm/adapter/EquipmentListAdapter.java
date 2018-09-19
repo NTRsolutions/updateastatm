@@ -127,9 +127,11 @@ public class EquipmentListAdapter extends RecyclerView.Adapter<EquipmentListAdap
             }
 
             for (Make make : contentDataa.getMake()) {
-                if (equipmentList.get(postion).getId() == make.getEqId())
+                if (equipmentList.get(postion).getId() == make.getEqId()) {
                     makeList.add(make.getName());
-                makeIdList.add(make.getId());
+                    makeIdList.add(make.getId());
+                }
+
             }
         }
         ArrayAdapter<String> homeadapter = new ArrayAdapter<String>(mCtx, R.layout.spinner_row, makeList);

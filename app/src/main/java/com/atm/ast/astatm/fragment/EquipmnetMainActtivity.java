@@ -73,7 +73,9 @@ public class EquipmnetMainActtivity extends AppCompatActivity implements View.On
     }
 
     protected void setAccessibility() {
-
+        int currentPagepre = mPager.getCurrentItem();
+            previous.setVisibility(currentPagepre == 1 ?View.GONE:View.VISIBLE);
+            next.setVisibility(currentPagepre == qty ?View.GONE:View.VISIBLE);
     }
 
     protected void dataToView() {
@@ -83,7 +85,7 @@ public class EquipmnetMainActtivity extends AppCompatActivity implements View.On
         equipment.setQty(qty);
         equipment.setMakeID(makeID);
         List<Equipment> equipmentist = new ArrayList<Equipment>();
-        EqupmentPagerAdapter mAdapter = new EqupmentPagerAdapter(getSupportFragmentManager(), "");
+        EqupmentPagerAdapter mAdapter = new EqupmentPagerAdapter(getSupportFragmentManager(), "", makeID);
         mPager.setAdapter(mAdapter);
         mPager.setOffscreenPageLimit(qty);
         for (int i = 0; i < qty; i++) {

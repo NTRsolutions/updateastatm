@@ -1,7 +1,12 @@
 package com.atm.ast.astatm.activity;
 
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -22,6 +27,8 @@ import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
 
@@ -31,15 +38,18 @@ import java.util.ArrayList;
  */
 
 public class SplashScreen extends AppCompatActivity {
-    String gcmRegId;
-    SharedPreferences pref;
-    GCM_Registration gcmClass;
-    ATMDBHelper atmdbHelper;
+    private String gcmRegId;
+    private SharedPreferences pref;
+    private GCM_Registration gcmClass;
+    private ATMDBHelper atmdbHelper;
+    private String currentVersion, latestVersion;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
+        // checkForceUpdateStatus();
+        getCurrentVersion();
         ApplicationHelper.application().initIcons();
         pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
         String userId = pref.getString("userId", "");
@@ -117,6 +127,98 @@ public class SplashScreen extends AppCompatActivity {
                 }
             } catch (Exception e) {
             }
+        }
+    }
+
+
+ /*   //check app need force update or not
+    @SuppressLint("StaticFieldLeak")
+    private void checkForceUpdateStatus() {
+        final String cureentVersion = ASTUIUtil.getAppVersionName(this);
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                String latestVersion = null;
+                try {
+                    String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.atm.ast.astatm";
+                    org.jsoup.nodes.Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
+                    latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                return latestVersion;
+            }
+
+            @Override
+            protected void onPostExecute(String latestVersion) {
+                super.onPostExecute(latestVersion);
+                if (latestVersion != null) {
+                    if (!cureentVersion.equals(latestVersion)) {
+                        AstAppUgradeDlgActivity fnAppUgradeDlgActivity = new AstAppUgradeDlgActivity(SplashScreen.this) {
+                            @Override
+                            public void onSkip() {
+                                ASTUIUtil.showToast("Please Update your App");
+                            }
+                        };
+                        fnAppUgradeDlgActivity.show();
+                    }
+                }
+
+            }
+        }.execute(null, null, null);
+    }
+*/
+
+
+    private void getCurrentVersion() {
+        PackageManager pm = this.getPackageManager();
+        PackageInfo pInfo = null;
+        try {
+            pInfo = pm.getPackageInfo(this.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e1) {
+            e1.printStackTrace();
+        }
+        currentVersion = pInfo.versionName;
+        new GetLatestVersion().execute();
+    }
+
+    private class GetLatestVersion extends AsyncTask<String, String, JSONObject> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected JSONObject doInBackground(String... params) {
+            try {
+                String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.atm.ast.astatm";
+                Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
+                latestVersion = doc.getElementsByClass("htlgb").get(6).text();
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+
+            return new JSONObject();
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject jsonObject) {
+            if (latestVersion != null) {
+                if (!currentVersion.equalsIgnoreCase(latestVersion)) {
+                    if (!isFinishing()) { //This would help to prevent Error : BinderProxy@45d459c0 is not valid; is your activity running? error
+                        AstAppUgradeDlgActivity fnAppUgradeDlgActivity = new AstAppUgradeDlgActivity(SplashScreen.this) {
+                            @Override
+                            public void onSkip() {
+                                ASTUIUtil.showToast("Please Update your App");
+                            }
+                        };
+                        fnAppUgradeDlgActivity.show();
+                    }
+                }
+            } else
+                super.onPostExecute(jsonObject);
         }
     }
 

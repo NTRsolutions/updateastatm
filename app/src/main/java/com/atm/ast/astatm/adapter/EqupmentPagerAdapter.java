@@ -13,12 +13,14 @@ import java.util.List;
 
 public class EqupmentPagerAdapter extends FragmentStatePagerAdapter {
 
-    List<Equipment> mKeyList = new ArrayList<Equipment>();
-    String ticketNo = "";
+    private List<Equipment> mKeyList = new ArrayList<Equipment>();
+    private String ticketNo = "";
+    private int makeID;
 
-    public EqupmentPagerAdapter(FragmentManager fm, String ticketNo) {
+    public EqupmentPagerAdapter(FragmentManager fm, String ticketNo, int makeID) {
         super(fm);
         this.ticketNo = ticketNo;
+        this.makeID = makeID;
     }
 
     @Override
@@ -29,7 +31,7 @@ public class EqupmentPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         String Equipmentdata = new Gson().toJson(mKeyList.get(position));
-        EquipMentBarcodeFragment tab1 = new EquipMentBarcodeFragment(Equipmentdata);
+        EquipMentBarcodeFragment tab1 = new EquipMentBarcodeFragment(Equipmentdata, makeID);
         return tab1;
     }
 
