@@ -317,8 +317,12 @@ public class ActivitySheetFragment extends MainFragment {
 
         );
         getAllActivity();
-        getNocEnggListData();
         setSiteNameAdapter();
+        if (ASTUIUtil.isOnline(getContext())) {
+            getNocEnggListData();
+        } else {
+            setNocEnggAdapter();
+        }
     }
 
     //set all spinner value
@@ -727,24 +731,30 @@ public class ActivitySheetFragment extends MainFragment {
         String[] arrEnggList = null;
         if (engineerFlage) { //FieldEngineer
             FieldEngineerList = atmdbHelper.getAllFieldEngineerData();
-            arrEnggList = new String[FieldEngineerList.size() + 2];
-            arrEnggList[0] = "--Select Engineer--";
-            arrEnggList[1] = "--No Engineer--";
-            for (int i = 2; i < FieldEngineerList.size() + 2; i++) {
-                arrEnggList[i] = FieldEngineerList.get(i - 2).getFieldEngName();
+            if (FieldEngineerList != null && FieldEngineerList.size() > 0) {
+                arrEnggList = new String[FieldEngineerList.size() + 2];
+                arrEnggList[0] = "--Select Engineer--";
+                arrEnggList[1] = "--No Engineer--";
+                for (int i = 2; i < FieldEngineerList.size() + 2; i++) {
+                    arrEnggList[i] = FieldEngineerList.get(i - 2).getFieldEngName();
+                }
             }
         } else {  //NOCEngineer
             nocEnggList = atmdbHelper.getAllNOCEngineerData();
-            arrEnggList = new String[nocEnggList.size() + 2];
-            arrEnggList[0] = "--Select Engineer--";
-            arrEnggList[1] = "--No Engineer--";
-            for (int i = 2; i < nocEnggList.size() + 2; i++) {
-                arrEnggList[i] = nocEnggList.get(i - 2).getNocEngName();
+            if (nocEnggList != null && nocEnggList.size() > 0) {
+                arrEnggList = new String[nocEnggList.size() + 2];
+                arrEnggList[0] = "--Select Engineer--";
+                arrEnggList[1] = "--No Engineer--";
+                for (int i = 2; i < nocEnggList.size() + 2; i++) {
+                    arrEnggList[i] = nocEnggList.get(i - 2).getNocEngName();
+                }
             }
         }
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, arrEnggList);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spNOC.setAdapter(dataAdapter);
+        if (arrEnggList != null && arrEnggList.length > 0) {
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, arrEnggList);
+            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spNOC.setAdapter(dataAdapter);
+        }
     }
 
     //set reason list data
@@ -912,7 +922,6 @@ public class ActivitySheetFragment extends MainFragment {
             if (ASTUIUtil.isOnline(getContext())) {
                 activityFormDataServiceCall(sheetModel);
             } else {
-                ASTUIUtil.showToast(Contants.OFFLINE_MESSAGE);
                 saveActivityFormDataIntoDb(sheetModel);
                 openPlannedActivityListTabScreen();
             }
@@ -968,8 +977,9 @@ public class ActivitySheetFragment extends MainFragment {
         Button btnSyncData;
         ArrayList<ActivitySheetModel> activityFormList = new ArrayList<>();
         ArrayList<ContentLocalData> contentLocalData = atmdbHelper.getAllActivtyFormData();
-        lvTransit = (ListView) unsyncedDialog.findViewById(R.id.lvTransit);
+        lvTransit =  unsyncedDialog.findViewById(R.id.lvTransit);
         btnSyncData = unsyncedDialog.findViewById(R.id.btnSyncData);
+        Button cancel = unsyncedDialog.findViewById(R.id.cancel);
         if (contentLocalData != null && contentLocalData.size() > 0) {
             for (int i = 0; i < contentLocalData.size(); i++) {
                 String activityFormStr = contentLocalData.get(i).getActivityFormData();
@@ -993,6 +1003,12 @@ public class ActivitySheetFragment extends MainFragment {
                 } else {
                     ASTUIUtil.showToast(Contants.OFFLINE_MESSAGE);
                 }
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                unsyncedDialog.dismiss();
             }
         });
         unsyncedDialog.show();
@@ -1025,6 +1041,7 @@ public class ActivitySheetFragment extends MainFragment {
                 getNocEnggListData();
                 getEquipListData();
             } else {
+                setNocEnggAdapter();
                 ASTUIUtil.showToast(Contants.OFFLINE_MESSAGE);
             }
         } else if (view.getId() == R.id.btnSyncData) {

@@ -339,7 +339,11 @@ public class PlannedActivityListFragment extends MainFragment {
             if (rbCircle.isChecked()) {
             }
         } else if (view.getId() == R.id.imgRefresh) {
-            getActivityList();
+            if (ASTUIUtil.isOnline(getContext())) {
+                getActivityList();
+            } else {
+                ASTUIUtil.showToast(Contants.OFFLINE_MESSAGE);
+            }
         }
     }
 

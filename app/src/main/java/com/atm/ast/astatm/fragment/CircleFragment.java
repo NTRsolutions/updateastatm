@@ -74,7 +74,6 @@ public class CircleFragment extends MainFragment {
     String apkVersionNo = "";
     int refresh = 0;
     public static String filterString = "NA";
-    AlertDialog alert;
     public static Boolean[] arrSelectedFilterOne;
     public static Boolean[] arrSelectedFilterTwo;
     public List<Data> circleViewResDataList;

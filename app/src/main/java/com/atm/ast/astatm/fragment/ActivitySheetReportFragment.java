@@ -415,7 +415,11 @@ public class ActivitySheetReportFragment extends MainFragment {
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.imgRefresh) {
-            getActivitySheetReportData();
+            if (ASTUIUtil.isOnline(getContext())) {
+                getActivitySheetReportData();
+            } else {
+                ASTUIUtil.showToast(Contants.OFFLINE_MESSAGE);
+            }
         }
 
     }
