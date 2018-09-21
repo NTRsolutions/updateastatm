@@ -1,5 +1,7 @@
 package com.atm.ast.astatm.model.newmodel;
 
+import java.util.ArrayList;
+
 public class EquipmnetContentData {
 
     private int id;
@@ -89,4 +91,13 @@ public class EquipmnetContentData {
         return "ClassPojo [Status = " + Status + ", SCMCode = " + SCMCode + ", Equipment = " + Equipment + ", Accessories = " + Accessories + ", Message = " + Message + ", SCMDescription = " + SCMDescription + ", Capacity = " + Capacity + ", Make = " + Make + "]";
     }
 
+    private ArrayList<AccFeedBack> AccFeedBack;
+
+    public ArrayList<AccFeedBack> getAccFeedBack() {
+        return this.AccFeedBack;
+    }
+
+    public void setAccFeedBack(ArrayList<AccFeedBack> AccFeedBack) {
+        this.AccFeedBack = AccFeedBack;
+    }
 }

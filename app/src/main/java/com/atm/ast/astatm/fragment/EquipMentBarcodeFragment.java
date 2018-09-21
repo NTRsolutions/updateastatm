@@ -53,26 +53,24 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
     private AppCompatEditText etRemarks;
     private AppCompatEditText etQrCodeScreen;
     private Button btnSubmit;
-    private String strCapacity, strSerailNumber, strcapacitypanel, strSCMCode, strSCMDiscription, strQrCodeScreen, stretRemarks;
+    private String  strmakeSpinner,strCapacity, strSerailNumber, strcapacitypanel, strSCMCode, strSCMDiscription, strQrCodeScreen, stretRemarks;
     private String strUserId, strSiteId;
     private SharedPreferences userPref;
     private ImageView qrCodeImage;
     private List<Data> allDataList;
     private ATMDBHelper atmdbHelper;
-
+    Spinner makeSpinner;
     private View view;
     private Context context;
     int qty;
-  int  makeID;
+    int makeID;
     String Equipmentdataa;
     int capacityId;
     EquipmnetContentData contentDataa;
     Equipment equipmentdata;
-
     @SuppressLint("ValidFragment")
-    public EquipMentBarcodeFragment(String Equipmentdata,int makeid) {
+    public EquipMentBarcodeFragment(String Equipmentdata) {
         this.Equipmentdataa = Equipmentdata;
-        this.makeID=makeid;
     }
 
     @Override
@@ -94,6 +92,7 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
         this.etQrCodeScreen = view.findViewById(R.id.etQrCodeScreen);
         this.etRemarks = view.findViewById(R.id.etRemarks);
         qrCodeImage = view.findViewById(R.id.qrCodeImage);
+        makeSpinner = view.findViewById(R.id.makeSpinner);
         //this.btnSubmit = findViewById(R.id.btnSubmit);
         equipmentdata = new Gson().fromJson(Equipmentdataa, Equipment.class);
     }
@@ -118,17 +117,47 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
             }
 
         }
+        setMakeData();
 
-        setcpacityData();
+    }
+
+    /**
+     * set Make Data Spinner value
+     */
+
+    public void setMakeData() {
+        ArrayList<String> makeList = new ArrayList<>();
+        ArrayList<Integer> makeIdList = new ArrayList<>();
+            for (Make make : contentDataa.getMake()) {
+                if (equipmentdata.getId() == make.getEqId()) {
+                    makeList.add(make.getName());
+                    makeIdList.add(make.getId());
+                }
+
+        }
+        ArrayAdapter<String> homeadapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_row, makeList);
+        makeSpinner.setAdapter(homeadapter);
+        makeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int postion, long arg3) {
+                makeID = makeIdList.get(postion);
+                Log.d(Contants.LOG_TAG, "makelist.get(arg2)" + makeIdList.get(postion));
+                setCpacityData();
+
+            }
+
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
     }
 
     /**
      * set Capacity Data Spinner value
      */
 
-    public void setcpacityData() {
-       // makeID = equipmentdata.getMakeID();
-
+    public void setCpacityData() {
         ArrayList<String> capacityList = new ArrayList<>();
         ArrayList<Integer> capacityIdList = new ArrayList<>();
         for (Capacity capacity : contentDataa.getCapacity()) {
@@ -142,9 +171,9 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
 
 
         etCapacity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                capacityId = capacityIdList.get(arg2);
-                Log.d(Contants.LOG_TAG, "capacityIdList.get(arg2)8888888888" + capacityIdList.get(arg2));
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int postion, long arg3) {
+                capacityId = capacityIdList.get(postion);
+                Log.d(Contants.LOG_TAG, "capacityIdList.get(arg2)8888888888" + capacityIdList.get(postion));
                 setScMCodeData();
                 setscmcodeiscriptionData();
             }
@@ -207,6 +236,7 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
 
 
     public boolean isValidate() {
+
         strCapacity = FNObjectUtil.getTextFromView(this.etCapacity);
         strSerailNumber = FNObjectUtil.getTextFromView(this.etSerailNumber);
         strSCMCode = FNObjectUtil.getTextFromView(this.etSCMCode);
@@ -256,4 +286,5 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
             }
         }
     }
+
 }

@@ -34,6 +34,36 @@
                     android:layout_marginLeft="@dimen/_5dp"
                     android:layout_marginTop="@dimen/_10dp"
                     android:gravity="left"
+                    android:padding="@dimen/_5dp"
+                    android:text="Select Make"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/makeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_5dp"
+                    android:layout_marginTop="@dimen/_10dp"
+                    android:gravity="left"
+                    android:padding="@dimen/_5dp"
+                    android:text="Select Make"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_1dp"
+                    android:layout_marginRight="@dimen/_10dp"
+                    android:background="@color/backgroundColor" />
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_5dp"
+                    android:layout_marginTop="@dimen/_10dp"
+                    android:gravity="left"
                     android:text="Select Capacity"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
@@ -49,6 +79,7 @@
                     android:text="Select Capacity"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_1dp"
@@ -110,12 +141,12 @@
                     android:text="Select SCM Code"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_1dp"
                     android:layout_marginRight="@dimen/_10dp"
                     android:background="@color/backgroundColor" />
-
 
 
             </LinearLayout>
@@ -147,6 +178,7 @@
                     android:text="Select SCM Discription"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_1dp"

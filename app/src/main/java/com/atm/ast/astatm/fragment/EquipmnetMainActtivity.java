@@ -27,10 +27,9 @@ import java.util.List;
 public class EquipmnetMainActtivity extends AppCompatActivity implements View.OnClickListener {
     SwitchViewPager mPager;
     int qty;
-    int equID, makeID;
     TextView previous, next;
     private Toolbar toolbar;
-
+    int equID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,9 +53,6 @@ public class EquipmnetMainActtivity extends AppCompatActivity implements View.On
     protected void getArgs() {
         qty = getIntent().getIntExtra("qty", 0);
         equID = getIntent().getIntExtra("equipmentId", 0);
-        makeID = getIntent().getIntExtra("makeID", 0);
-
-
     }
 
     protected void loadView() {
@@ -81,11 +77,10 @@ public class EquipmnetMainActtivity extends AppCompatActivity implements View.On
     protected void dataToView() {
         getArgs();
         Equipment equipment = new Equipment();
-        equipment.setId(equID);
         equipment.setQty(qty);
-        equipment.setMakeID(makeID);
+        equipment.setId(equID);
         List<Equipment> equipmentist = new ArrayList<Equipment>();
-        EqupmentPagerAdapter mAdapter = new EqupmentPagerAdapter(getSupportFragmentManager(), "", makeID);
+        EqupmentPagerAdapter mAdapter = new EqupmentPagerAdapter(getSupportFragmentManager(), "");
         mPager.setAdapter(mAdapter);
         mPager.setOffscreenPageLimit(qty);
         for (int i = 0; i < qty; i++) {
