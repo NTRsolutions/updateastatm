@@ -29,6 +29,8 @@ import com.atm.ast.astatm.model.newmodel.ActivitySheetModel;
 import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.atm.ast.astatm.utils.GCM_Registration;
+import com.atm.ast.astatm.utils.UpdateAppFromPlayStore;
+import com.google.android.gms.security.ProviderInstaller;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -57,7 +59,8 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
         // checkForceUpdateStatus();
-        getCurrentVersion();
+        UpdateAppFromPlayStore appFromPlayStore = new UpdateAppFromPlayStore(SplashScreen.this);
+        appFromPlayStore.execute();
         ApplicationHelper.application().initIcons();
         pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
         String userId = pref.getString("userId", "");
@@ -123,55 +126,5 @@ public class SplashScreen extends AppCompatActivity {
 */
 
 
-    private void getCurrentVersion() {
-        PackageManager pm = this.getPackageManager();
-        PackageInfo pInfo = null;
-        try {
-            pInfo = pm.getPackageInfo(this.getPackageName(), 0);
-        } catch (PackageManager.NameNotFoundException e1) {
-            e1.printStackTrace();
-        }
-        currentVersion = pInfo.versionName;
-        new GetLatestVersion().execute();
-    }
-
-    private class GetLatestVersion extends AsyncTask<String, String, JSONObject> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected JSONObject doInBackground(String... params) {
-            try {
-                String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.atm.ast.astatm";
-                Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
-                latestVersion = doc.getElementsByClass("htlgb").get(6).text();
-            } catch (Exception e) {
-                e.printStackTrace();
-
-            }
-
-            return new JSONObject();
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            if (latestVersion != null) {
-                if (!currentVersion.equalsIgnoreCase(latestVersion)) {
-                    if (!isFinishing()) { //This would help to prevent Error : BinderProxy@45d459c0 is not valid; is your activity running? error
-                        AstAppUgradeDlgActivity fnAppUgradeDlgActivity = new AstAppUgradeDlgActivity(SplashScreen.this) {
-                            @Override
-                            public void onSkip() {
-                                ASTUIUtil.showToast("Please Update your App");
-                            }
-                        };
-                        fnAppUgradeDlgActivity.show();
-                    }
-                }
-            } else
-                super.onPostExecute(jsonObject);
-        }
-    }
 
 }

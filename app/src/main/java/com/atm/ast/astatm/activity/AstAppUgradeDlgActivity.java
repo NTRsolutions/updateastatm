@@ -2,6 +2,7 @@ package com.atm.ast.astatm.activity;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,9 +18,9 @@ import com.atm.ast.astatm.utils.ASTUIUtil;
  */
 public class AstAppUgradeDlgActivity extends Dialog implements View.OnClickListener {
     private boolean isStopPrevVersion;
-    private Activity activity;
+    private Context activity;
 
-    public AstAppUgradeDlgActivity(Activity activity1) {
+    public AstAppUgradeDlgActivity(Context activity1) {
         super(activity1);
         this.activity = activity1;
     }
