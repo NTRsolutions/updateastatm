@@ -33,7 +33,6 @@ public class EquipmentListAdapter extends RecyclerView.Adapter<EquipmentListAdap
     private Context mCtx;
     private ArrayList<Equipment> equipmentList;
     private List<Data> allDataList;
-    private int makeId;
 
     public EquipmentListAdapter(Context mCtx, ArrayList<Equipment> equipmentList, List<Data> allDataList) {
         this.mCtx = mCtx;
@@ -115,56 +114,22 @@ public class EquipmentListAdapter extends RecyclerView.Adapter<EquipmentListAdap
         final View myview = LayoutInflater.from(mCtx).inflate(R.layout.quntity_dilaog, null);
         final EditText edt_inputqty = myview.findViewById(R.id.edit_quantity);
         int equID = equipmentList.get(postion).getId();
-        Spinner makeSpinner = myview.findViewById(R.id.makeSpinner);
         Button btnLogIn = myview.findViewById(R.id.btnLogIn);
         Button btncancel = myview.findViewById(R.id.btncancel);
-        ArrayList<String> makeList = new ArrayList<>();
-        ArrayList<Integer> makeIdList = new ArrayList<>();
-        EquipmnetContentData contentDataa = new EquipmnetContentData();
-        if (allDataList != null) {
-            for (Data dataModel : allDataList) {
-                contentDataa = dataModel.getEquipmnetContentData();
-            }
-
-            for (Make make : contentDataa.getMake()) {
-                if (equipmentList.get(postion).getId() == make.getEqId())
-                    makeList.add(make.getName());
-                makeIdList.add(make.getId());
-            }
-        }
-        ArrayAdapter<String> homeadapter = new ArrayAdapter<String>(mCtx, R.layout.spinner_row, makeList);
-        makeSpinner.setAdapter(homeadapter);
-        makeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            public void onItemSelected(AdapterView<?> arg0, View arg1, int postion, long arg3) {
-                makeId = makeIdList.get(postion);
-
-            }
-
-            public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-
         final AlertDialog alertDialog = new AlertDialog.Builder(mCtx).setIcon(R.drawable.bell_icon).setCancelable(false)
                 .setView(myview).create();
         btnLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if (edt_inputqty.getText().toString().length() == 0) {
                     ASTUIUtil.showToast("Please enter Item quantity Name!");
                 } else {
-                    //  EquipmnetMainActtivity equipmnetMainFragment = new EquipmnetMainActtivity();
-
                     Intent intent = new Intent(mCtx, EquipmnetMainActtivity.class);
                     intent.putExtra("headerTxt", "Equipment Info");
                     intent.putExtra("showMenuButton", false);
                     int qty = Integer.parseInt(edt_inputqty.getText().toString());
                     intent.putExtra("qty", qty);
                     intent.putExtra("equipmentId", equID);
-                    intent.putExtra("makeID", makeId);
                     //  ApplicationHelper.application().getActivity().updateFragment(equipmnetMainFragment, bundle);
                     mCtx.startActivity(intent);
                     alertDialog.dismiss();

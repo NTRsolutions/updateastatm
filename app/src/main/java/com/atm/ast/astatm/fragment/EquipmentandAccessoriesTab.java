@@ -4,6 +4,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.widget.Button;
 
 import com.atm.ast.astatm.R;
 
@@ -13,6 +14,7 @@ import java.util.List;
 public class EquipmentandAccessoriesTab extends MainFragment {
     ViewPager viewPager;
     TabLayout tabLayout;
+    Button btnSubmit;
 
     @Override
     protected int fragmentLayout() {
@@ -27,11 +29,12 @@ public class EquipmentandAccessoriesTab extends MainFragment {
     protected void loadView() {
         viewPager = findViewById(R.id.pager);
         tabLayout = findViewById(R.id.tabs);
+        btnSubmit = this.findViewById(R.id.btnSubmit);
     }
 
     @Override
     protected void setClickListeners() {
-
+        btnSubmit.setOnClickListener(this);
     }
 
     @Override

@@ -19,7 +19,7 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_40dp"
+                android:layout_height="@dimen/_45dp"
                 android:background="@color/appTheamColor"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
 
@@ -121,6 +121,8 @@
                         android:textSize="16sp"
                         android:visibility="gone" />
                 </LinearLayout>
+
+
             </android.support.v7.widget.CardView>
 
 

@@ -3,6 +3,7 @@ package com.atm.ast.astatm.fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.adapter.AccessoriesAdapter;
 import com.atm.ast.astatm.adapter.EquipmentListAdapter;
@@ -11,6 +12,7 @@ import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
+import com.atm.ast.astatm.model.newmodel.AccFeedBack;
 import com.atm.ast.astatm.model.newmodel.Accessories;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.Equipment;
@@ -18,13 +20,15 @@ import com.atm.ast.astatm.model.newmodel.EquipmnetContentData;
 import com.atm.ast.astatm.model.newmodel.Make;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class AccessoriesFragment extends MainFragment {
     private List<Data> allDataList;
-    ArrayList<Accessories> accessoriesArrayList;
+      ArrayList<Accessories> accessoriesArrayList;
+    ArrayList<AccFeedBack> accFeedBacks;
     private RecyclerView recyclerView;
     private ATMDBHelper atmdbHelper;
 
@@ -102,10 +106,11 @@ public class AccessoriesFragment extends MainFragment {
                         for (Data dataModel : allDataList) {
                             EquipmnetContentData contentDataa = dataModel.getEquipmnetContentData();
                             accessoriesArrayList = new ArrayList<Accessories>(Arrays.asList(contentDataa.getAccessories()));
+                            accFeedBacks = contentDataa.getAccFeedBack();
 
                         }
-                        if (accessoriesArrayList != null) {
-                            AccessoriesAdapter adapter = new AccessoriesAdapter(getContext(), accessoriesArrayList);
+                        if (accessoriesArrayList != null || accFeedBacks != null) {
+                            AccessoriesAdapter adapter = new AccessoriesAdapter(getContext(), accessoriesArrayList, accFeedBacks);
                             recyclerView.setAdapter(adapter);
                         }
                     }

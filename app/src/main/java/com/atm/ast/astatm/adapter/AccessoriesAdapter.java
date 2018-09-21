@@ -19,7 +19,9 @@ import android.widget.TextView;
 
 import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.R;
+import com.atm.ast.astatm.model.newmodel.AccFeedBack;
 import com.atm.ast.astatm.model.newmodel.Accessories;
+import com.atm.ast.astatm.model.newmodel.Make;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +30,12 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
 
     private Context mCtx;
     private ArrayList<Accessories> accessoriesArrayList;
+    ArrayList<AccFeedBack> accFeedBack;
 
-    public AccessoriesAdapter(Context mCtx, ArrayList<Accessories> accessoriesArrayList) {
+    public AccessoriesAdapter(Context mCtx, ArrayList<Accessories> accessoriesArrayList, ArrayList<AccFeedBack> accFeedBacks) {
         this.mCtx = mCtx;
         this.accessoriesArrayList = accessoriesArrayList;
+        accFeedBack = accFeedBacks;
     }
 
     @Override
@@ -51,6 +55,18 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
                 holder.accessoriesSpinner.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             }
         });
+
+
+        ArrayList<String> accText = new ArrayList<>();
+        ArrayList<Integer> accId = new ArrayList<>();
+
+        for (AccFeedBack accFeedBack : accFeedBack) {
+            accText.add(accFeedBack.getText());
+            accId.add(accFeedBack.getId());
+        }
+
+        ArrayAdapter<String> homeadapter = new ArrayAdapter<String>(mCtx, R.layout.spinner_row, accText);
+        holder.accSpinner.setAdapter(homeadapter);
     }
 
 
@@ -65,6 +81,7 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
         ImageView imageView;
         CheckBox checkBox;
         LinearLayout accessoriesSpinner;
+        Spinner accSpinner;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
@@ -72,8 +89,14 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
             imageView = itemView.findViewById(R.id.itemImage);
             checkBox = itemView.findViewById(R.id.selectItemCheckBox);
             accessoriesSpinner = itemView.findViewById(R.id.accessoriesSpinner);
-
+            accSpinner = itemView.findViewById(R.id.accSpinner);
         }
+    }
+
+
+    public void setSpinnerValue() {
+
+
     }
 
 

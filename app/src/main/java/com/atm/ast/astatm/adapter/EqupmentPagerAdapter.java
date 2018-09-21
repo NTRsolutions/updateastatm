@@ -13,8 +13,8 @@ import java.util.List;
 
 public class EqupmentPagerAdapter extends FragmentStatePagerAdapter {
 
-    List<Equipment> mKeyList = new ArrayList<Equipment>();
-    String ticketNo = "";
+    private List<Equipment> mKeyList = new ArrayList<Equipment>();
+    private String ticketNo = "";
 
     public EqupmentPagerAdapter(FragmentManager fm, String ticketNo) {
         super(fm);
