@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.R;
@@ -28,12 +29,16 @@ import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.model.newmodel.Capacity;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.Equipment;
+import com.atm.ast.astatm.model.newmodel.EquipmentInfo;
 import com.atm.ast.astatm.model.newmodel.EquipmnetContentData;
 import com.atm.ast.astatm.model.newmodel.Make;
 import com.atm.ast.astatm.model.newmodel.SCMCode;
 import com.atm.ast.astatm.model.newmodel.SCMDescription;
+import com.atm.ast.astatm.utils.ASTObjectUtil;
 import com.atm.ast.astatm.utils.ASTReqResCode;
+import com.atm.ast.astatm.utils.ASTStringUtil;
 import com.atm.ast.astatm.utils.ASTUIUtil;
+import com.atm.ast.astatm.utils.ASTUtil;
 import com.atm.ast.astatm.utils.FNObjectUtil;
 import com.google.gson.Gson;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -53,7 +58,7 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
     private AppCompatEditText etRemarks;
     private AppCompatEditText etQrCodeScreen;
     private Button btnSubmit;
-    private String  strmakeSpinner,strCapacity, strSerailNumber, strcapacitypanel, strSCMCode, strSCMDiscription, strQrCodeScreen, stretRemarks;
+    private String strmakeSpinner, strCapacity, strSerailNumber, strcapacitypanel, strSCMCode, strSCMDiscription, strQrCodeScreen, stretRemarks;
     private String strUserId, strSiteId;
     private SharedPreferences userPref;
     private ImageView qrCodeImage;
@@ -62,15 +67,18 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
     Spinner makeSpinner;
     private View view;
     private Context context;
-    int qty;
     int makeID;
     String Equipmentdataa;
     int capacityId;
     EquipmnetContentData contentDataa;
     Equipment equipmentdata;
+    int id;
+    TextView previous, next;
+
     @SuppressLint("ValidFragment")
-    public EquipMentBarcodeFragment(String Equipmentdata) {
+    public EquipMentBarcodeFragment(String Equipmentdata, int postion) {
         this.Equipmentdataa = Equipmentdata;
+        this.id = postion;
     }
 
     @Override
@@ -95,14 +103,19 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
         makeSpinner = view.findViewById(R.id.makeSpinner);
         //this.btnSubmit = findViewById(R.id.btnSubmit);
         equipmentdata = new Gson().fromJson(Equipmentdataa, Equipment.class);
+        previous = view.findViewById(R.id.previous);
+        next = view.findViewById(R.id.next);
     }
 
     protected void setClickListeners() {
         qrCodeImage.setOnClickListener(this);
+        next.setOnClickListener(this);
+        previous.setOnClickListener(this);
     }
 
     protected void setAccessibility() {
-
+        previous.setVisibility(id == 1 ? View.INVISIBLE : View.VISIBLE);
+        next.setVisibility(id <1 ? View.INVISIBLE : View.VISIBLE);
     }
 
 
@@ -118,7 +131,7 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
 
         }
         setMakeData();
-
+        setAccessibility();
     }
 
     /**
@@ -128,11 +141,11 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
     public void setMakeData() {
         ArrayList<String> makeList = new ArrayList<>();
         ArrayList<Integer> makeIdList = new ArrayList<>();
-            for (Make make : contentDataa.getMake()) {
-                if (equipmentdata.getId() == make.getEqId()) {
-                    makeList.add(make.getName());
-                    makeIdList.add(make.getId());
-                }
+        for (Make make : contentDataa.getMake()) {
+            if (equipmentdata.getId() == make.getEqId()) {
+                makeList.add(make.getName());
+                makeIdList.add(make.getId());
+            }
 
         }
         ArrayAdapter<String> homeadapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_row, makeList);
@@ -231,38 +244,50 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
             scanIntegrator.initiateScan();*/
             IntentIntegrator.forSupportFragment(EquipMentBarcodeFragment.this).initiateScan();
             ASTUIUtil.showToast("granteed");
+        } else if (view.getId() == R.id.previous) {
+            if (isValidate()) {
+                saveScreenData(false, false);
+            }
+        } else if (view.getId() == R.id.next) {
+            if (isValidate()) {
+                saveScreenData(true, false);
+            }
         }
     }
 
 
     public boolean isValidate() {
-
-        strCapacity = FNObjectUtil.getTextFromView(this.etCapacity);
+        strmakeSpinner = makeSpinner.getSelectedItem().toString();
+        strCapacity = etCapacity.getSelectedItem().toString();
         strSerailNumber = FNObjectUtil.getTextFromView(this.etSerailNumber);
-        strSCMCode = FNObjectUtil.getTextFromView(this.etSCMCode);
-        strSCMDiscription = FNObjectUtil.getTextFromView(this.etSCMDiscription);
+        //strSCMCode = etSCMCode.getSelectedItem().toString();
+        strSCMCode = "33";
+        strSCMDiscription = this.etSCMDiscription.getSelectedItem().toString();
         strQrCodeScreen = FNObjectUtil.getTextFromView(this.etQrCodeScreen);
         stretRemarks = FNObjectUtil.getTextFromView(this.etRemarks);
-        if (isEmptyStr(strCapacity)) {
+        if (ASTObjectUtil.isEmptyStr(strCapacity)) {
             ASTUIUtil.shownewErrorIndicator(getContext(), "Please Enter Capacity");
+            ASTUIUtil.showToast("Please Enter Capacity");
             return false;
-        } else if (isEmptyStr(strSerailNumber)) {
+        } else if (ASTObjectUtil.isEmptyStr(strSerailNumber)) {
             ASTUIUtil.shownewErrorIndicator(getContext(), "Please Enter SerailNumber");
+            ASTUIUtil.showToast("Please Enter SerailNumber");
             return false;
-        } else if (isEmptyStr(strcapacitypanel)) {
-            ASTUIUtil.shownewErrorIndicator(getContext(), "Please Enter Capacity panel");
+        }  else if (ASTObjectUtil.isEmptyStr(strSCMCode)) {
+            ASTUIUtil.shownewErrorIndicator(getContext(), "Please Select No  SCM Code");
+            ASTUIUtil.showToast("Please  Select No  SCM Code");
             return false;
-        } else if (isEmptyStr(strSCMCode)) {
-            ASTUIUtil.shownewErrorIndicator(getContext(), "Please Enter No  SCM Code");
-            return false;
-        } else if (isEmptyStr(strSCMDiscription)) {
+        } else if (ASTObjectUtil.isEmptyStr(strSCMDiscription)) {
             ASTUIUtil.shownewErrorIndicator(getContext(), "Please Enter No  SCMDiscription");
+            ASTUIUtil.showToast("Please Enter SCMDiscription");
             return false;
-        } else if (isEmptyStr(strQrCodeScreen)) {
+        } else if (ASTObjectUtil.isEmptyStr(strQrCodeScreen)) {
             ASTUIUtil.shownewErrorIndicator(getContext(), "Please Enter No QrCodeScreen ");
+            ASTUIUtil.showToast("Please Enter QrCodeScreen");
             return false;
-        } else if (isEmptyStr(stretRemarks)) {
+        } else if (ASTObjectUtil.isEmptyStr(stretRemarks)) {
             ASTUIUtil.shownewErrorIndicator(getContext(), "Please Enter No  Qr Code store)");
+            ASTUIUtil.showToast("Please Enter  Qr Code store");
             return false;
         }
 
@@ -285,6 +310,41 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
                 ASTUIUtil.showToast("no bar");
             }
         }
+    }
+
+    //save data into db
+    private void saveEquipmentInfo(String EquipId, String MakeId, String CapacityId, String SerialNo,
+                                   String SCMDescId, String SCMCodeId, String QRCode, String remarke) {
+        EquipmentInfo equipmentInfo = new EquipmentInfo();
+        equipmentInfo.setId(id);
+        equipmentInfo.setEquipId(EquipId);
+        equipmentInfo.setMakeId(MakeId);
+        equipmentInfo.setCapacityId(CapacityId);
+        equipmentInfo.setSerialNo(SerialNo);
+        equipmentInfo.setSCMDescId(SCMDescId);
+        equipmentInfo.setSCMCodeId(SCMCodeId);
+        equipmentInfo.setQRCode(QRCode);
+        equipmentInfo.setRemarke(remarke);
+        atmdbHelper.upsertEquipmentInfoData(equipmentInfo);//save in data base
+    }
+
+    private void saveScreenData(boolean NextPreviousFlag, boolean DoneFlag) {
+/*        String ActivityId = "";
+        String PlanId = "";
+        String SiteId = "";
+        String FeId = "";*/
+        Intent intent = new Intent("ViewPageChange");
+      /*  intent.putExtra("ActivityId", ActivityId);
+        intent.putExtra("PlanId", PlanId);
+        intent.putExtra("SiteId", SiteId);
+        intent.putExtra("FeId", FeId);*/
+        intent.putExtra("NextPreviousFlag", NextPreviousFlag);
+        intent.putExtra("DoneFlag", DoneFlag);
+        saveEquipmentInfo(equipmentdata.getId() + "", strmakeSpinner, strCapacity, strSerailNumber, strSCMDiscription, strSCMCode,
+                strQrCodeScreen, stretRemarks);
+
+        getActivity().sendBroadcast(intent);
+
     }
 
 }

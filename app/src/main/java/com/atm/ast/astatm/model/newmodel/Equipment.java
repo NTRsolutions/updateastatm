@@ -1,8 +1,11 @@
 package com.atm.ast.astatm.model.newmodel;
 
-public class Equipment {
+import java.io.Serializable;
+
+public class Equipment implements Serializable {
     private int Id;
     private String Name;
+    boolean isSelectedOrNote = false;
 
     public int getId() {
         return Id;
@@ -37,5 +40,13 @@ public class Equipment {
 
     public void setMakeID(int makeID) {
         this.makeID = makeID;
+    }
+
+    public boolean isSelectedOrNote() {
+        return isSelectedOrNote;
+    }
+
+    public void setSelectedOrNote(boolean selectedOrNote) {
+        isSelectedOrNote = selectedOrNote;
     }
 }

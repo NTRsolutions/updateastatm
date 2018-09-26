@@ -59,5 +59,8 @@ public class Contants {
     public static final String OFFLINE_MESSAGE = "Oops! You are Offline. Please check your Internet Connection.";
     public static final String Error = "Server Side error!";
 
+    public static String DISPATCH_EQUIPMENT = "Equipment/GetDispatchEquipment?";
+
+
 }
 

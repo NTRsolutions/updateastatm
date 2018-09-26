@@ -31,6 +31,7 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
     private Context mCtx;
     private ArrayList<Accessories> accessoriesArrayList;
     ArrayList<AccFeedBack> accFeedBack;
+    String statusstr,straccId,straccStatusId;
 
     public AccessoriesAdapter(Context mCtx, ArrayList<Accessories> accessoriesArrayList, ArrayList<AccFeedBack> accFeedBacks) {
         this.mCtx = mCtx;
@@ -67,6 +68,8 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
 
         ArrayAdapter<String> homeadapter = new ArrayAdapter<String>(mCtx, R.layout.spinner_row, accText);
         holder.accSpinner.setAdapter(homeadapter);
+
+        statusstr = holder.accSpinner.getSelectedItem().toString();
     }
 
 

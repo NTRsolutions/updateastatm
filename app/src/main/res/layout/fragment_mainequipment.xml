@@ -32,11 +32,11 @@
                         android:id="@+id/back"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical"
                         android:layout_weight="0.2"
+                        android:gravity="center_vertical"
                         android:text=""
                         android:textColor="#fff"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="center_vertical"
                         android:textSize="@dimen/_20dp"
                         android:textStyle="bold"
                         android:visibility="visible" />
@@ -45,10 +45,10 @@
                         android:id="@+id/title"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="0.8"
-                        android:text="Equipment Info"
-                        android:gravity="center_vertical"
                         android:layout_gravity="center"
+                        android:layout_weight="0.8"
+                        android:gravity="center_vertical"
+                        android:text="Equipment Info"
                         android:textColor="#fff"
                         android:textSize="@dimen/_16dp" />
 
@@ -57,7 +57,7 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/app_bar"
@@ -71,62 +71,19 @@
                 android:layout_weight="1" />
 
 
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/_3dp"
-                app:cardElevation="@dimen/_6dp">
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/addMoreEqi"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="@dimen/_17dp"
+                android:layout_below="@+id/view"
+                android:layout_centerInParent="true"
+                android:backgroundTint="@color/white"
+                android:src="@drawable/ic_add_button_inside_black_circle" />
 
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#fff"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/previous"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="left|center"
-                        android:padding="10dp"
-                        android:text="Previous"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="22sp" />
-
-
-                    <TextView
-                        android:id="@+id/next"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="right|center"
-                        android:padding="10dp"
-                        android:text="Next"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="22sp" />
-
-
-                    <TextView
-                        android:id="@+id/done"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:paddingBottom="16dp"
-                        android:paddingRight="20dp"
-                        android:paddingTop="16dp"
-                        android:text="Confirm"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="16sp"
-                        android:visibility="gone" />
-                </LinearLayout>
-
-
-            </android.support.v7.widget.CardView>
-
-
-        </LinearLayout>
+        </RelativeLayout>
     </RelativeLayout>
 
 

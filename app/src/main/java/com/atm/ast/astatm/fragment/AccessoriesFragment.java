@@ -32,6 +32,7 @@ public class AccessoriesFragment extends MainFragment {
     private RecyclerView recyclerView;
     private ATMDBHelper atmdbHelper;
 
+
     @Override
     protected int fragmentLayout() {
         return R.layout.recyclerview_layout;

@@ -22,6 +22,7 @@ import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.District;
 import com.atm.ast.astatm.model.newmodel.Equipment;
+import com.atm.ast.astatm.model.newmodel.EquipmentInfo;
 import com.atm.ast.astatm.model.newmodel.EquipmnetContentData;
 import com.atm.ast.astatm.model.newmodel.FieldEngineer;
 import com.atm.ast.astatm.model.newmodel.Header;
@@ -187,6 +188,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         String CREATE_EquipmentList_TABLE = "CREATE TABLE EquipmentList(equip_id INTEGER,equip_name TEXT, updated_time TEXT,parent_id TEXT)";
         db.execSQL(CREATE_EquipmentList_TABLE);
 
+
         String CREATE_FE_TRACKER_TABLE = "CREATE TABLE " + TABLE_FE_TRACKER + "("
                 + "id INTEGER PRIMARY KEY," + FE_ID + " TEXT, "
                 + FE_NAME + " TEXT, " + FE_CONTACT_NO + " TEXT, "
@@ -260,7 +262,21 @@ public class ATMDBHelper extends SQLiteOpenHelper {
 
         String CREATE_AddSiteAddress_TABLE = "CREATE TABLE AddSiteAddress(id INTEGER PRIMARY KEY autoincrement,site_id TEXT,site_customer_id TEXT,site_name TEXT,branch_name TEXT,branch_code TEXT,city TEXT,pincode TEXT,on_of_site TEXT,address TEXT,circle_id TEXT,district_id TEXT,tehsil_id TEXT,start_time TEXT,end_time TEXT,lat TEXT,lon TEXT,last_updated_date TEXT)";
         db.execSQL(CREATE_AddSiteAddress_TABLE);
+
+
+        String CREATE_Equipment_TABLE = "CREATE TABLE EquipmentInfo(id INTEGER, EquipId TEXT,MakeId TEXT, CapacityId TEXT,SerialNo TEXT,SCMDescId TEXT,SCMCodeId TEXT,QRCode TEXT,remarke TEXT)";
+        db.execSQL(CREATE_Equipment_TABLE);
+
+
+        String CREATE_Accessories_TABLE = "CREATE TABLE AccessoriesInfo(id INTEGER, accId TEXT,accStatus TEXT)";
+        db.execSQL(CREATE_Accessories_TABLE);
+
+
+        String CREATE_DISPATCHEQUIPMENT_TABLE = "CREATE TABLE DispatchEquipment(SiteId TEXT, EquipId TEXT,MakeId TEXT, CapacityId TEXT,SerialNo TEXT,SCMDescId TEXT,SCMCodeId TEXT,QRCode TEXT,remarke TEXT)";
+        db.execSQL(CREATE_DISPATCHEQUIPMENT_TABLE);
+
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
@@ -289,6 +305,9 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS EquipmentList");
         db.execSQL("DROP TABLE IF EXISTS LocationTracker");
         db.execSQL("DROP TABLE IF EXISTS AddSiteAddress");
+        db.execSQL("DROP TABLE IF EXISTS EquipmentInfo");
+        db.execSQL("DROP TABLE IF EXISTS AccessoriesInfo");
+        db.execSQL("DROP TABLE IF EXISTS DispatchEquipment");
         onCreate(db);
     }
 
@@ -2178,6 +2197,288 @@ public class ATMDBHelper extends SQLiteOpenHelper {
             while (cursor.isAfterLast() == false) {
                 FillSiteActivityModel ob = new FillSiteActivityModel();
                 populateAddSiteAddress(cursor, ob);
+                list.add(ob);
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        return list;
+    }
+
+
+    // Equipment Info Data
+    public boolean upsertEquipmentInfoData(EquipmentInfo ob) {
+        boolean done = false;
+        EquipmentInfo data = null;
+        if (ob.getEquipId() != null) {
+            data = getEquipmentInfoDataByID(ob.getId(), ob.getEquipId());
+            if (data == null) {
+                done = insertEquipmentInfoData(ob);
+            } else {
+                done = updateEquipmentInfoData(ob);
+            }
+        }
+        return done;
+    }
+
+    public EquipmentInfo getEquipmentInfoDataByID(int id, String eqtid) {
+        String query = "Select * FROM EquipmentInfo WHERE EquipId  = '" + eqtid + "' AND  id  = '" + id + "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        EquipmentInfo ob = new EquipmentInfo();
+        if (cursor.moveToFirst()) {
+            cursor.moveToFirst();
+            populateEquipmentInfoData(cursor, ob);
+            cursor.close();
+        } else {
+            ob = null;
+        }
+        db.close();
+        return ob;
+    }
+
+
+    private void populateEquipmentInfoData(Cursor cursor, EquipmentInfo ob) {
+        ob.setId(cursor.getInt(0));
+        ob.setEquipId(cursor.getString(1));
+        ob.setMakeId(cursor.getString(2));
+        ob.setCapacityId(cursor.getString(3));
+        ob.setSerialNo(cursor.getString(4));
+        ob.setSCMDescId(cursor.getString(5));
+        ob.setSCMCodeId(cursor.getString(6));
+        ob.setQRCode(cursor.getString(7));
+        ob.setRemarke(cursor.getString(8));
+    }
+
+
+    public boolean insertEquipmentInfoData(EquipmentInfo ob) {
+        ContentValues values = new ContentValues();
+        populateEquipmentInfoValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = db.insert("EquipmentInfo", null, values);
+        db.close();
+        return i > 0;
+    }
+
+
+    public void populateEquipmentInfoValueData(ContentValues values, EquipmentInfo ob) {
+        values.put("(id ", ob.getId());
+        values.put("EquipId", ob.getEquipId());
+        values.put("MakeId", ob.getMakeId());
+        values.put("CapacityId", ob.getCapacityId());
+        values.put("SerialNo", ob.getSerialNo());
+        values.put("SCMDescId", ob.getSCMDescId());
+        values.put("SCMCodeId", ob.getSCMCodeId());
+        values.put("QRCode", ob.getQRCode());
+        values.put("remarke", ob.getRemarke());
+    }
+
+
+    public boolean updateEquipmentInfoData(EquipmentInfo ob) {
+        ContentValues values = new ContentValues();
+        populateEquipmentInfoValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = 0;
+        i = db.update("EquipmentInfo", values, " id = '" + ob.getId() + "' AND EquipId  = '" + ob.getEquipId() + "'", null);
+        db.close();
+        return i > 0;
+    }
+
+    public ArrayList<EquipmentInfo> getEquipmentInfoData() {
+        String query = "Select *  FROM EquipmentInfo";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<EquipmentInfo> list = new ArrayList<EquipmentInfo>();
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+                EquipmentInfo ob = new EquipmentInfo();
+                populateEquipmentInfoData(cursor, ob);
+                list.add(ob);
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        return list;
+    }
+
+    // save  All Accessories_
+
+    public boolean upsertAccessoriesInfoData(EquipmentInfo ob) {
+        boolean done = false;
+        EquipmentInfo data = null;
+        if (ob.getAccId() != null) {
+            data = getAccessoriesInfoDataByID(ob.getId());
+            if (data == null) {
+                done = insertAccessoriesInfoData(ob);
+            } else {
+                done = updateAccessoriesInfoData(ob);
+            }
+        }
+        return done;
+    }
+
+    public EquipmentInfo getAccessoriesInfoDataByID(int id) {
+        String query = "Select * FROM AccessoriesInfo WHERE id  = '" + id + "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        EquipmentInfo ob = new EquipmentInfo();
+        if (cursor.moveToFirst()) {
+            cursor.moveToFirst();
+            populateEquipmentInfoData(cursor, ob);
+            cursor.close();
+        } else {
+            ob = null;
+        }
+        db.close();
+        return ob;
+    }
+
+
+    private void populateAccessoriesInfoData(Cursor cursor, EquipmentInfo ob) {
+        ob.setId(cursor.getInt(0));
+        ob.setAccId(cursor.getString(1));
+        ob.setAccStatus(cursor.getString(2));
+    }
+
+
+    public boolean insertAccessoriesInfoData(EquipmentInfo ob) {
+        ContentValues values = new ContentValues();
+        populateAccessoriesInfoValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = db.insert("AccessoriesInfo", null, values);
+        db.close();
+        return i > 0;
+    }
+
+
+    public void populateAccessoriesInfoValueData(ContentValues values, EquipmentInfo ob) {
+        values.put("(id ", ob.getId());
+        values.put("accId", ob.getAccId());
+        values.put("accStatus", ob.getAccStatus());
+    }
+
+
+    public boolean updateAccessoriesInfoData(EquipmentInfo ob) {
+        ContentValues values = new ContentValues();
+        populateEquipmentInfoValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = 0;
+        i = db.update("AccessoriesInfo", values, " id = '" + ob.getId() + "'", null);
+        db.close();
+        return i > 0;
+    }
+
+    public ArrayList<EquipmentInfo> geAccessoriesInfoData() {
+        String query = "Select *  FROM AccessoriesInfo ";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<EquipmentInfo> list = new ArrayList<EquipmentInfo>();
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+                EquipmentInfo ob = new EquipmentInfo();
+                populateEquipmentInfoData(cursor, ob);
+                list.add(ob);
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        return list;
+    }
+
+
+    /**
+     *   Dispatch Equipment Data  All DB Action
+     * @param ob
+     * @return
+     */
+
+
+    public boolean upsertDispatchEquipmentData(EquipmentInfo ob) {
+        boolean done = false;
+        EquipmentInfo data = null;
+        if (ob.getEquipId() != null) {
+            data = getDispatchEquipmentDataByID(ob.getSiteId(), ob.getEquipId());
+            if (data == null) {
+                done = insertDispatchEquipmentData(ob);
+            } else {
+                done = updateDispatchEquipmentData(ob);
+            }
+        }
+        return done;
+    }
+
+
+    public EquipmentInfo getDispatchEquipmentDataByID(String SiteId, String eqtid) {
+        String query = "Select * FROM DispatchEquipment WHERE SiteId  = '" + SiteId + "' AND  id  = '" + eqtid + "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        EquipmentInfo ob = new EquipmentInfo();
+        if (cursor.moveToFirst()) {
+            cursor.moveToFirst();
+            populateDispatchEquipmentData(cursor, ob);
+            cursor.close();
+        } else {
+            ob = null;
+        }
+        db.close();
+        return ob;
+    }
+
+
+    private void populateDispatchEquipmentData(Cursor cursor, EquipmentInfo ob) {
+        ob.setSiteId(cursor.getString(0));
+        ob.setEquipId(cursor.getString(1));
+        ob.setMakeId(cursor.getString(2));
+        ob.setCapacityId(cursor.getString(3));
+        ob.setSerialNo(cursor.getString(4));
+        ob.setSCMDescId(cursor.getString(5));
+        ob.setSCMCodeId(cursor.getString(6));
+        ob.setQRCode(cursor.getString(7));
+        ob.setRemarke(cursor.getString(8));
+    }
+
+
+    public boolean insertDispatchEquipmentData(EquipmentInfo ob) {
+        ContentValues values = new ContentValues();
+        populateDispatchEquipmentValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = db.insert("DispatchEquipment", null, values);
+        db.close();
+        return i > 0;
+    }
+
+
+    public void populateDispatchEquipmentValueData(ContentValues values, EquipmentInfo ob) {
+        values.put("(SiteId ", ob.getId());
+        values.put("EquipId", ob.getEquipId());
+        values.put("MakeId", ob.getMakeId());
+        values.put("CapacityId", ob.getCapacityId());
+        values.put("SerialNo", ob.getSerialNo());
+        values.put("SCMDescId", ob.getSCMDescId());
+        values.put("SCMCodeId", ob.getSCMCodeId());
+        values.put("QRCode", ob.getQRCode());
+        values.put("remarke", ob.getRemarke());
+    }
+
+
+    public boolean updateDispatchEquipmentData(EquipmentInfo ob) {
+        ContentValues values = new ContentValues();
+        populateEquipmentInfoValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = 0;
+        i = db.update("DispatchEquipment", values, " SiteId = '" + ob.getSiteId() + "' AND EquipId  = '" + ob.getEquipId() + "'", null);
+        db.close();
+        return i > 0;
+    }
+    public ArrayList<EquipmentInfo> getDispatchEquipmentData(String SiteId) {
+        String query = "Select *  FROM DispatchEquipment  WHERE SiteId = '" + SiteId + "' ";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<EquipmentInfo> list = new ArrayList<EquipmentInfo>();
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+                EquipmentInfo ob = new EquipmentInfo();
+                populateDispatchEquipmentData(cursor, ob);
                 list.add(ob);
                 cursor.moveToNext();
             }

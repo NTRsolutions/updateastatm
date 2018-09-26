@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.atm.ast.astatm.fragment.EquipMentBarcodeFragment;
 import com.atm.ast.astatm.model.newmodel.Equipment;
+import com.atm.ast.astatm.model.newmodel.EquipmentInfo;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class EqupmentPagerAdapter extends FragmentStatePagerAdapter {
 
-    private List<Equipment> mKeyList = new ArrayList<Equipment>();
+    private List<EquipmentInfo> mKeyList = new ArrayList<EquipmentInfo>();
     private String ticketNo = "";
 
     public EqupmentPagerAdapter(FragmentManager fm, String ticketNo) {
@@ -29,7 +30,7 @@ public class EqupmentPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         String Equipmentdata = new Gson().toJson(mKeyList.get(position));
-        EquipMentBarcodeFragment tab1 = new EquipMentBarcodeFragment(Equipmentdata);
+        EquipMentBarcodeFragment tab1 = new EquipMentBarcodeFragment(Equipmentdata, position + 1);
         return tab1;
     }
 
@@ -43,7 +44,7 @@ public class EqupmentPagerAdapter extends FragmentStatePagerAdapter {
         return "SCOUT " + (getCount() - position);
     }
 
-    public void add(int position, Equipment equipment) {
+    public void add(int position, EquipmentInfo equipment) {
         mKeyList.add(position, equipment);
         notifyDataSetChanged();
     }

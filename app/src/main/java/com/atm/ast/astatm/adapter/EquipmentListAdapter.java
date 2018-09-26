@@ -3,6 +3,7 @@ package com.atm.ast.astatm.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,7 @@ import com.atm.ast.astatm.model.newmodel.Equipment;
 import com.atm.ast.astatm.model.newmodel.EquipmnetContentData;
 import com.atm.ast.astatm.model.newmodel.Make;
 import com.atm.ast.astatm.utils.ASTUIUtil;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,12 +34,10 @@ public class EquipmentListAdapter extends RecyclerView.Adapter<EquipmentListAdap
 
     private Context mCtx;
     private ArrayList<Equipment> equipmentList;
-    private List<Data> allDataList;
 
-    public EquipmentListAdapter(Context mCtx, ArrayList<Equipment> equipmentList, List<Data> allDataList) {
+    public EquipmentListAdapter(Context mCtx, ArrayList<Equipment> equipmentList) {
         this.mCtx = mCtx;
         this.equipmentList = equipmentList;
-        this.allDataList = allDataList;
     }
 
     @Override
@@ -72,14 +72,34 @@ public class EquipmentListAdapter extends RecyclerView.Adapter<EquipmentListAdap
         } else if (equipmentList.get(position).getId() == 1004) {
             holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_battery_with));
         }
+        if (equipmentList.get(position).isSelectedOrNote()) {
+            holder.checkBox.setChecked(true);
+            holder.checkBox.setEnabled(false);
+        } else {
+            holder.checkBox.setChecked(false);
+            holder.checkBox.setEnabled(false);
+        }
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if (isChecked) {
-                    showEquipmentDetailsInputDialog(position);
+                    //  showEquipmentDetailsInputDialog(position);
                 }
             }
         });
+        holder.cardViewLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int equID = equipmentList.get(position).getId();
+                Intent intent = new Intent(mCtx, EquipmnetMainActtivity.class);
+                intent.putExtra("headerTxt", "Equipment Info");
+                intent.putExtra("showMenuButton", false);
+                intent.putExtra("equipmentId", equID);
+                //  ApplicationHelper.application().getActivity().updateFragment(equipmnetMainFragment, bundle);
+                mCtx.startActivity(intent);
+            }
+        });
+
     }
 
 
@@ -93,12 +113,14 @@ public class EquipmentListAdapter extends RecyclerView.Adapter<EquipmentListAdap
         TextView name;
         ImageView imageView;
         CheckBox checkBox;
+        CardView cardViewLayout;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.itemName);
             imageView = itemView.findViewById(R.id.itemImage);
             checkBox = itemView.findViewById(R.id.selectItemCheckBox);
+            cardViewLayout = itemView.findViewById(R.id.cardViewLayout);
 
         }
     }
@@ -110,7 +132,7 @@ public class EquipmentListAdapter extends RecyclerView.Adapter<EquipmentListAdap
      */
 
 
-    public void showEquipmentDetailsInputDialog(int postion) {
+ /*   public void showEquipmentDetailsInputDialog(int postion) {
         final View myview = LayoutInflater.from(mCtx).inflate(R.layout.quntity_dilaog, null);
         final EditText edt_inputqty = myview.findViewById(R.id.edit_quantity);
         int equID = equipmentList.get(postion).getId();
@@ -146,7 +168,7 @@ public class EquipmentListAdapter extends RecyclerView.Adapter<EquipmentListAdap
         });
         alertDialog.show();
 
-    }
+    }*/
 
 
 }
