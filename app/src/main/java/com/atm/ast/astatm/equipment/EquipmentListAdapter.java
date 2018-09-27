@@ -1,6 +1,5 @@
-package com.atm.ast.astatm.adapter;
+package com.atm.ast.astatm.equipment;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
@@ -8,27 +7,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.atm.ast.astatm.R;
-import com.atm.ast.astatm.fragment.EquipmnetMainActtivity;
-import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.Equipment;
-import com.atm.ast.astatm.model.newmodel.EquipmnetContentData;
-import com.atm.ast.astatm.model.newmodel.Make;
-import com.atm.ast.astatm.utils.ASTUIUtil;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class EquipmentListAdapter extends RecyclerView.Adapter<EquipmentListAdapter.ItemViewHolder> {
 
@@ -91,11 +78,10 @@ public class EquipmentListAdapter extends RecyclerView.Adapter<EquipmentListAdap
             @Override
             public void onClick(View view) {
                 int equID = equipmentList.get(position).getId();
-                Intent intent = new Intent(mCtx, EquipmnetMainActtivity.class);
+                Intent intent = new Intent(mCtx, EquipmentBarActivity.class);
                 intent.putExtra("headerTxt", "Equipment Info");
                 intent.putExtra("showMenuButton", false);
                 intent.putExtra("equipmentId", equID);
-                //  ApplicationHelper.application().getActivity().updateFragment(equipmnetMainFragment, bundle);
                 mCtx.startActivity(intent);
             }
         });
@@ -146,7 +132,7 @@ public class EquipmentListAdapter extends RecyclerView.Adapter<EquipmentListAdap
                 if (edt_inputqty.getText().toString().length() == 0) {
                     ASTUIUtil.showToast("Please enter Item quantity Name!");
                 } else {
-                    Intent intent = new Intent(mCtx, EquipmnetMainActtivity.class);
+                    Intent intent = new Intent(mCtx, EquipmentBarActivity.class);
                     intent.putExtra("headerTxt", "Equipment Info");
                     intent.putExtra("showMenuButton", false);
                     int qty = Integer.parseInt(edt_inputqty.getText().toString());

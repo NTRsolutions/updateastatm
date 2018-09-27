@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -31,7 +32,8 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
     private Context mCtx;
     private ArrayList<Accessories> accessoriesArrayList;
     ArrayList<AccFeedBack> accFeedBack;
-    String statusstr,straccId,straccStatusId;
+    String straccId, straccStatusId;
+    public ArrayList<AccFeedBack> selectedAccFeedbackList = new ArrayList<AccFeedBack>();
 
     public AccessoriesAdapter(Context mCtx, ArrayList<Accessories> accessoriesArrayList, ArrayList<AccFeedBack> accFeedBacks) {
         this.mCtx = mCtx;
@@ -53,25 +55,67 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+
                 holder.accessoriesSpinner.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+                if (isChecked) {
+                    AccFeedBack selectAccFeedBack = new AccFeedBack();
+                    selectAccFeedBack.setParentId(item.getId());//add Accessories id
+
+                    ArrayList<String> accText = new ArrayList<>();
+                    ArrayList<Integer> accId = new ArrayList<>();
+
+                    for (AccFeedBack accFeedBack : accFeedBack) {
+                        accText.add(accFeedBack.getText());
+                        accId.add(accFeedBack.getId());
+                    }
+
+                    ArrayAdapter<String> homeadapter = new ArrayAdapter<String>(mCtx, R.layout.spinner_row, accText);
+                    holder.accSpinner.setAdapter(homeadapter);
+                    holder.accSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                            selectAccFeedBack.setId(accId.get(i));//add FeedBack id
+                            selectAccessoriesExistOrNot(item.getId(), true, selectAccFeedBack);
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> adapterView) {
+
+                        }
+                    });
+                } else {
+                    selectAccessoriesExistOrNot(item.getId(), false, null);
+                }
             }
         });
 
 
-        ArrayList<String> accText = new ArrayList<>();
-        ArrayList<Integer> accId = new ArrayList<>();
-
-        for (AccFeedBack accFeedBack : accFeedBack) {
-            accText.add(accFeedBack.getText());
-            accId.add(accFeedBack.getId());
-        }
-
-        ArrayAdapter<String> homeadapter = new ArrayAdapter<String>(mCtx, R.layout.spinner_row, accText);
-        holder.accSpinner.setAdapter(homeadapter);
-
-        statusstr = holder.accSpinner.getSelectedItem().toString();
     }
 
+    //check if select Accessories Exist Or Not in list
+    private void selectAccessoriesExistOrNot(int acceId, boolean addOrNor, AccFeedBack selectAccFeedBack) {
+        if (selectedAccFeedbackList != null && selectedAccFeedbackList.size() > 0) {
+            if (isAccessoriesExistOrNot(acceId)) {
+                if (addOrNor) {
+                    selectedAccFeedbackList.remove(accFeedBack);
+                    selectedAccFeedbackList.add(selectAccFeedBack);
+                } else {
+                    selectedAccFeedbackList.remove(accFeedBack);
+                }
+            }
+        } else {
+            selectedAccFeedbackList.add(selectAccFeedBack);
+        }
+    }
+
+    private boolean isAccessoriesExistOrNot(int acceId) {
+        for (AccFeedBack accFeedBack : selectedAccFeedbackList) {
+            if (acceId == accFeedBack.getParentId()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public int getItemCount() {
@@ -95,12 +139,5 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
             accSpinner = itemView.findViewById(R.id.accSpinner);
         }
     }
-
-
-    public void setSpinnerValue() {
-
-
-    }
-
 
 }

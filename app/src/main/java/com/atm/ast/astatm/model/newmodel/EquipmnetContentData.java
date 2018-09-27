@@ -86,11 +86,6 @@ public class EquipmnetContentData {
         this.Make = Make;
     }
 
-    @Override
-    public String toString() {
-        return "ClassPojo [Status = " + Status + ", SCMCode = " + SCMCode + ", Equipment = " + Equipment + ", Accessories = " + Accessories + ", Message = " + Message + ", SCMDescription = " + SCMDescription + ", Capacity = " + Capacity + ", Make = " + Make + "]";
-    }
-
     private ArrayList<AccFeedBack> AccFeedBack;
 
     public ArrayList<AccFeedBack> getAccFeedBack() {
@@ -100,4 +95,58 @@ public class EquipmnetContentData {
     public void setAccFeedBack(ArrayList<AccFeedBack> AccFeedBack) {
         this.AccFeedBack = AccFeedBack;
     }
+
+
+    private long FeId;
+    private long SiteId;
+    private long PlanId;
+    private long ActivityId;
+    private long UserId;
+
+    public long getFeId() {
+        return FeId;
+    }
+
+    public void setFeId(long feId) {
+        FeId = feId;
+    }
+
+    public long getSiteId() {
+        return SiteId;
+    }
+
+    public void setSiteId(long siteId) {
+        SiteId = siteId;
+    }
+
+    public long getPlanId() {
+        return PlanId;
+    }
+
+    public void setPlanId(long planId) {
+        PlanId = planId;
+    }
+
+    public long getActivityId() {
+        return ActivityId;
+    }
+
+    public void setActivityId(long activityId) {
+        ActivityId = activityId;
+    }
+
+    public long getUserId() {
+        return UserId;
+    }
+
+    public void setUserId(long userId) {
+        UserId = userId;
+    }
+
+    @Override
+    public String toString() {
+        return "ClassPojo [Status = " + Status + ", SCMCode = " + SCMCode + ", Equipment = " + Equipment + ", Accessories = " + Accessories + ", Message = " + Message + ", SCMDescription = " + SCMDescription + ", Capacity = " + Capacity + ", Make = " + Make + "]";
+    }
+
+
 }

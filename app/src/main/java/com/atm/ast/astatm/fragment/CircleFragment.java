@@ -51,6 +51,7 @@ import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.atm.ast.astatm.utils.ASTUtil;
 import com.atm.ast.astatm.utils.LogAnalyticsHelper;
 import com.atm.ast.astatm.utils.TooltipWindow;
+import com.atm.ast.astatm.utils.UpdateAppFromPlayStore;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -154,7 +155,9 @@ public class CircleFragment extends MainFragment {
         }
         //check latest app available or not
         if (ASTUIUtil.isOnline(getContext())) {
-            getLatestAppName();
+            //getLatestAppName();
+            //UpdateAppFromPlayStore appFromPlayStore = new UpdateAppFromPlayStore(getContext());
+            //appFromPlayStore.execute();
         }
         if (fcmRegID.equalsIgnoreCase("")) {
             final FirebaseInstanceIDService fcmClass = new FirebaseInstanceIDService();

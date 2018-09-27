@@ -2387,32 +2387,33 @@ public class ATMDBHelper extends SQLiteOpenHelper {
 
 
     /**
-     *   Dispatch Equipment Data  All DB Action
+     * Dispatch Equipment Data  All DB Action
+     *
      * @param ob
      * @return
      */
 
 
-    public boolean upsertDispatchEquipmentData(EquipmentInfo ob) {
+    public boolean upsertDispatchEquipmentData(Equipment ob, long siteId) {
         boolean done = false;
-        EquipmentInfo data = null;
-        if (ob.getEquipId() != null) {
-            data = getDispatchEquipmentDataByID(ob.getSiteId(), ob.getEquipId());
+        Equipment data = null;
+        if (ob.getEquipId() != 0) {
+            data = getDispatchEquipmentDataByID(siteId, ob.getEquipId());
             if (data == null) {
-                done = insertDispatchEquipmentData(ob);
+                done = insertDispatchEquipmentData(ob, siteId);
             } else {
-                done = updateDispatchEquipmentData(ob);
+                done = updateDispatchEquipmentData(ob, siteId);
             }
         }
         return done;
     }
 
 
-    public EquipmentInfo getDispatchEquipmentDataByID(String SiteId, String eqtid) {
-        String query = "Select * FROM DispatchEquipment WHERE SiteId  = '" + SiteId + "' AND  id  = '" + eqtid + "'";
+    public Equipment getDispatchEquipmentDataByID(long SiteId, long eqtid) {
+        String query = "Select * FROM DispatchEquipment WHERE SiteId  = '" + SiteId + "' AND  EquipId  = '" + eqtid + "'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
-        EquipmentInfo ob = new EquipmentInfo();
+        Equipment ob = new Equipment();
         if (cursor.moveToFirst()) {
             cursor.moveToFirst();
             populateDispatchEquipmentData(cursor, ob);
@@ -2425,22 +2426,22 @@ public class ATMDBHelper extends SQLiteOpenHelper {
     }
 
 
-    private void populateDispatchEquipmentData(Cursor cursor, EquipmentInfo ob) {
-        ob.setSiteId(cursor.getString(0));
-        ob.setEquipId(cursor.getString(1));
-        ob.setMakeId(cursor.getString(2));
-        ob.setCapacityId(cursor.getString(3));
+    private void populateDispatchEquipmentData(Cursor cursor, Equipment ob) {
+        ob.setSiteId(Integer.parseInt(cursor.getString(0)));
+        ob.setEquipId(Long.parseLong(cursor.getString(1)));
+        ob.setMakeId(Long.parseLong(cursor.getString(2)));
+        ob.setCapacityId(Long.parseLong(cursor.getString(3)));
         ob.setSerialNo(cursor.getString(4));
-        ob.setSCMDescId(cursor.getString(5));
-        ob.setSCMCodeId(cursor.getString(6));
+        ob.setSCMDescId(Integer.parseInt(cursor.getString(5)));
+        ob.setSCMCodeId(Integer.parseInt(cursor.getString(6)));
         ob.setQRCode(cursor.getString(7));
-        ob.setRemarke(cursor.getString(8));
+        ob.setRemark(cursor.getString(8));
     }
 
 
-    public boolean insertDispatchEquipmentData(EquipmentInfo ob) {
+    public boolean insertDispatchEquipmentData(Equipment ob, long siteId) {
         ContentValues values = new ContentValues();
-        populateDispatchEquipmentValueData(values, ob);
+        populateDispatchEquipmentValueData(values, ob, siteId);
         SQLiteDatabase db = this.getWritableDatabase();
         long i = db.insert("DispatchEquipment", null, values);
         db.close();
@@ -2448,8 +2449,8 @@ public class ATMDBHelper extends SQLiteOpenHelper {
     }
 
 
-    public void populateDispatchEquipmentValueData(ContentValues values, EquipmentInfo ob) {
-        values.put("(SiteId ", ob.getId());
+    public void populateDispatchEquipmentValueData(ContentValues values, Equipment ob, long siteId) {
+        values.put("SiteId", siteId);
         values.put("EquipId", ob.getEquipId());
         values.put("MakeId", ob.getMakeId());
         values.put("CapacityId", ob.getCapacityId());
@@ -2457,27 +2458,28 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         values.put("SCMDescId", ob.getSCMDescId());
         values.put("SCMCodeId", ob.getSCMCodeId());
         values.put("QRCode", ob.getQRCode());
-        values.put("remarke", ob.getRemarke());
+        values.put("remarke", ob.getRemark());
     }
 
 
-    public boolean updateDispatchEquipmentData(EquipmentInfo ob) {
+    public boolean updateDispatchEquipmentData(Equipment ob, long siteId) {
         ContentValues values = new ContentValues();
-        populateEquipmentInfoValueData(values, ob);
+        populateDispatchEquipmentValueData(values, ob, siteId);
         SQLiteDatabase db = this.getWritableDatabase();
         long i = 0;
-        i = db.update("DispatchEquipment", values, " SiteId = '" + ob.getSiteId() + "' AND EquipId  = '" + ob.getEquipId() + "'", null);
+        i = db.update("DispatchEquipment", values, " SiteId = '" + siteId + "' AND EquipId  = '" + ob.getEquipId() + "'", null);
         db.close();
         return i > 0;
     }
-    public ArrayList<EquipmentInfo> getDispatchEquipmentData(String SiteId) {
+
+    public ArrayList<Equipment> getDispatchEquipmentData(long SiteId) {
         String query = "Select *  FROM DispatchEquipment  WHERE SiteId = '" + SiteId + "' ";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
-        ArrayList<EquipmentInfo> list = new ArrayList<EquipmentInfo>();
+        ArrayList<Equipment> list = new ArrayList<Equipment>();
         if (cursor.moveToFirst()) {
             while (cursor.isAfterLast() == false) {
-                EquipmentInfo ob = new EquipmentInfo();
+                Equipment ob = new Equipment();
                 populateDispatchEquipmentData(cursor, ob);
                 list.add(ob);
                 cursor.moveToNext();

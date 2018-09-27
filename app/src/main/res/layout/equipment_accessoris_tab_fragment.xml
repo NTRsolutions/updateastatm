@@ -52,7 +52,7 @@
             android:gravity="center"
             android:padding="10dp"
             android:text="Submit"
-            android:textSize="@dimen/_12dp" />
+            android:textSize="@dimen/_14dp" />
 
     </android.support.v7.widget.CardView>
 

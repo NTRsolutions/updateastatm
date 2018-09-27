@@ -1,16 +1,12 @@
-package com.atm.ast.astatm.fragment;
+package com.atm.ast.astatm.equipment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatEditText;
-import android.support.v7.widget.AppCompatTextView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
@@ -35,10 +30,7 @@ import com.atm.ast.astatm.model.newmodel.Make;
 import com.atm.ast.astatm.model.newmodel.SCMCode;
 import com.atm.ast.astatm.model.newmodel.SCMDescription;
 import com.atm.ast.astatm.utils.ASTObjectUtil;
-import com.atm.ast.astatm.utils.ASTReqResCode;
-import com.atm.ast.astatm.utils.ASTStringUtil;
 import com.atm.ast.astatm.utils.ASTUIUtil;
-import com.atm.ast.astatm.utils.ASTUtil;
 import com.atm.ast.astatm.utils.FNObjectUtil;
 import com.google.gson.Gson;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -48,7 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.atm.ast.astatm.utils.FNObjectUtil.isEmptyStr;
 
 @SuppressLint("ValidFragment")
 public class EquipMentBarcodeFragment extends Fragment implements View.OnClickListener {
@@ -62,30 +53,30 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
     private String strUserId, strSiteId;
     private SharedPreferences userPref;
     private ImageView qrCodeImage;
-    private List<Data> allDataList;
+    private List<Data> allEquipmentList;
     private ATMDBHelper atmdbHelper;
     Spinner makeSpinner;
     private View view;
     private Context context;
     int makeID;
-    String Equipmentdataa;
+    String EquipmentdataStr;
     int capacityId;
-    EquipmnetContentData contentDataa;
-    Equipment equipmentdata;
-    int id;
-    TextView previous, next;
+    EquipmnetContentData equipmentData;
+    Equipment selectedEquipmentdData;
+    int screenPosition;
+    TextView previous, next, done;
 
     @SuppressLint("ValidFragment")
     public EquipMentBarcodeFragment(String Equipmentdata, int postion) {
-        this.Equipmentdataa = Equipmentdata;
-        this.id = postion;
+        this.EquipmentdataStr = Equipmentdata;
+        this.screenPosition = postion;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.eqibarcode_fragment, container, false);
+        view = inflater.inflate(R.layout.equipment_barcode_fragment, container, false);
         loadView();
         dataToView();
         setClickListeners();
@@ -102,36 +93,38 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
         qrCodeImage = view.findViewById(R.id.qrCodeImage);
         makeSpinner = view.findViewById(R.id.makeSpinner);
         //this.btnSubmit = findViewById(R.id.btnSubmit);
-        equipmentdata = new Gson().fromJson(Equipmentdataa, Equipment.class);
+        selectedEquipmentdData = new Gson().fromJson(EquipmentdataStr, Equipment.class);
         previous = view.findViewById(R.id.previous);
         next = view.findViewById(R.id.next);
+        done = view.findViewById(R.id.done);
+
     }
 
     protected void setClickListeners() {
         qrCodeImage.setOnClickListener(this);
         next.setOnClickListener(this);
         previous.setOnClickListener(this);
+        done.setOnClickListener(this);
     }
 
     protected void setAccessibility() {
-        previous.setVisibility(id == 1 ? View.INVISIBLE : View.VISIBLE);
-        next.setVisibility(id <1 ? View.INVISIBLE : View.VISIBLE);
+        previous.setVisibility(screenPosition == 1 ? View.INVISIBLE : View.VISIBLE);
     }
 
 
     protected void dataToView() {
         getUserPref();
         atmdbHelper = new ATMDBHelper(getContext());
-        allDataList = new ArrayList<>();
-        allDataList = atmdbHelper.getAllEquipmentListData();
-        if (allDataList != null) {
-            for (Data dataModel : allDataList) {
-                contentDataa = dataModel.getEquipmnetContentData();
+        allEquipmentList = new ArrayList<>();
+        allEquipmentList = atmdbHelper.getAllEquipmentListData();
+        if (allEquipmentList != null) {
+            for (Data dataModel : allEquipmentList) {
+                equipmentData = dataModel.getEquipmnetContentData();
             }
-
+            setMakeData();
+            setAccessibility();
         }
-        setMakeData();
-        setAccessibility();
+
     }
 
     /**
@@ -141,28 +134,29 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
     public void setMakeData() {
         ArrayList<String> makeList = new ArrayList<>();
         ArrayList<Integer> makeIdList = new ArrayList<>();
-        for (Make make : contentDataa.getMake()) {
-            if (equipmentdata.getId() == make.getEqId()) {
-                makeList.add(make.getName());
-                makeIdList.add(make.getId());
+        if (equipmentData.getMake() != null) {
+            for (Make make : equipmentData.getMake()) {
+                if (selectedEquipmentdData.getId() == make.getEqId()) {
+                    makeList.add(make.getName());
+                    makeIdList.add(make.getId());
+                }
             }
+            ArrayAdapter<String> homeadapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_row, makeList);
+            makeSpinner.setAdapter(homeadapter);
+            makeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                public void onItemSelected(AdapterView<?> arg0, View arg1, int postion, long arg3) {
+                    makeID = makeIdList.get(postion);
+                    Log.d(Contants.LOG_TAG, "makelist.get(arg2)" + makeIdList.get(postion));
+                    setCpacityData();
 
+                }
+
+                public void onNothingSelected(AdapterView<?> arg0) {
+                    // TODO Auto-generated method stub
+
+                }
+            });
         }
-        ArrayAdapter<String> homeadapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_row, makeList);
-        makeSpinner.setAdapter(homeadapter);
-        makeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> arg0, View arg1, int postion, long arg3) {
-                makeID = makeIdList.get(postion);
-                Log.d(Contants.LOG_TAG, "makelist.get(arg2)" + makeIdList.get(postion));
-                setCpacityData();
-
-            }
-
-            public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
-
-            }
-        });
 
     }
 
@@ -173,52 +167,52 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
     public void setCpacityData() {
         ArrayList<String> capacityList = new ArrayList<>();
         ArrayList<Integer> capacityIdList = new ArrayList<>();
-        for (Capacity capacity : contentDataa.getCapacity()) {
-            if (makeID == capacity.getMakeId()) {
-                capacityList.add(capacity.getName());
-                capacityIdList.add(capacity.getId());
+        if (equipmentData.getCapacity() != null) {
+            for (Capacity capacity : equipmentData.getCapacity()) {
+                if (makeID == capacity.getMakeId()) {
+                    capacityList.add(capacity.getName());
+                    capacityIdList.add(capacity.getId());
+                }
             }
+            ArrayAdapter<String> capacityAdtapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_row, capacityList);
+            etCapacity.setAdapter(capacityAdtapter);
+
+
+            etCapacity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                public void onItemSelected(AdapterView<?> arg0, View arg1, int postion, long arg3) {
+                    capacityId = capacityIdList.get(postion);
+                    Log.d(Contants.LOG_TAG, "capacityIdList.get(arg2)8888888888" + capacityIdList.get(postion));
+                    setScMCodeData();
+                    setscmcodeiscriptionData();
+                }
+
+                public void onNothingSelected(AdapterView<?> arg0) {
+                    // TODO Auto-generated method stub
+
+                }
+            });
         }
-        ArrayAdapter<String> capacityAdtapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_row, capacityList);
-        etCapacity.setAdapter(capacityAdtapter);
-
-
-        etCapacity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> arg0, View arg1, int postion, long arg3) {
-                capacityId = capacityIdList.get(postion);
-                Log.d(Contants.LOG_TAG, "capacityIdList.get(arg2)8888888888" + capacityIdList.get(postion));
-                setScMCodeData();
-                setscmcodeiscriptionData();
-            }
-
-            public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
-
-            }
-        });
 
     }
 
     /**
-     * set Data
+     * set scm code Data
      */
     public void setScMCodeData() {
         ArrayList<String> scmcodeList = new ArrayList<>();
-        for (SCMCode scmCode : contentDataa.getSCMCode()) {
+        for (SCMCode scmCode : equipmentData.getSCMCode()) {
             if (capacityId == scmCode.getCapcityId()) {
                 scmcodeList.add(scmCode.getName());
             }
         }
         ArrayAdapter<String> scmeadapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_row, scmcodeList);
         etSCMCode.setAdapter(scmeadapter);
-
-
     }
 
 
     public void setscmcodeiscriptionData() {
         ArrayList<String> scmcodeiscriptionList = new ArrayList<>();
-        for (SCMDescription scmDescription : contentDataa.getSCMDescription()) {
+        for (SCMDescription scmDescription : equipmentData.getSCMDescription()) {
             if (capacityId == scmDescription.getCapcityId()) {
                 scmcodeiscriptionList.add(scmDescription.getName());
             }
@@ -245,24 +239,22 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
             IntentIntegrator.forSupportFragment(EquipMentBarcodeFragment.this).initiateScan();
             ASTUIUtil.showToast("granteed");
         } else if (view.getId() == R.id.previous) {
-            if (isValidate()) {
-                saveScreenData(false, false);
-            }
+            saveScreenData(false);
         } else if (view.getId() == R.id.next) {
-            if (isValidate()) {
+           /* if (isValidate()) {
                 saveScreenData(true, false);
-            }
+            }*/
+            saveScreenData(true);
         }
     }
 
 
     public boolean isValidate() {
-        strmakeSpinner = makeSpinner.getSelectedItem().toString();
-        strCapacity = etCapacity.getSelectedItem().toString();
+        // strmakeSpinner = makeSpinner.getSelectedItem().toString();
+        //strCapacity = etCapacity.getSelectedItem().toString();
         strSerailNumber = FNObjectUtil.getTextFromView(this.etSerailNumber);
-        //strSCMCode = etSCMCode.getSelectedItem().toString();
-        strSCMCode = "33";
-        strSCMDiscription = this.etSCMDiscription.getSelectedItem().toString();
+        // strSCMCode = etSCMCode.getSelectedItem().toString();
+        // strSCMDiscription = this.etSCMDiscription.getSelectedItem().toString();
         strQrCodeScreen = FNObjectUtil.getTextFromView(this.etQrCodeScreen);
         stretRemarks = FNObjectUtil.getTextFromView(this.etRemarks);
         if (ASTObjectUtil.isEmptyStr(strCapacity)) {
@@ -273,7 +265,7 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
             ASTUIUtil.shownewErrorIndicator(getContext(), "Please Enter SerailNumber");
             ASTUIUtil.showToast("Please Enter SerailNumber");
             return false;
-        }  else if (ASTObjectUtil.isEmptyStr(strSCMCode)) {
+        } else if (ASTObjectUtil.isEmptyStr(strSCMCode)) {
             ASTUIUtil.shownewErrorIndicator(getContext(), "Please Select No  SCM Code");
             ASTUIUtil.showToast("Please  Select No  SCM Code");
             return false;
@@ -316,7 +308,7 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
     private void saveEquipmentInfo(String EquipId, String MakeId, String CapacityId, String SerialNo,
                                    String SCMDescId, String SCMCodeId, String QRCode, String remarke) {
         EquipmentInfo equipmentInfo = new EquipmentInfo();
-        equipmentInfo.setId(id);
+        equipmentInfo.setId(screenPosition);
         equipmentInfo.setEquipId(EquipId);
         equipmentInfo.setMakeId(MakeId);
         equipmentInfo.setCapacityId(CapacityId);
@@ -328,19 +320,11 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
         atmdbHelper.upsertEquipmentInfoData(equipmentInfo);//save in data base
     }
 
-    private void saveScreenData(boolean NextPreviousFlag, boolean DoneFlag) {
-/*        String ActivityId = "";
-        String PlanId = "";
-        String SiteId = "";
-        String FeId = "";*/
+    private void saveScreenData(boolean NextPreviousFlag) {
         Intent intent = new Intent("ViewPageChange");
-      /*  intent.putExtra("ActivityId", ActivityId);
-        intent.putExtra("PlanId", PlanId);
-        intent.putExtra("SiteId", SiteId);
-        intent.putExtra("FeId", FeId);*/
         intent.putExtra("NextPreviousFlag", NextPreviousFlag);
-        intent.putExtra("DoneFlag", DoneFlag);
-        saveEquipmentInfo(equipmentdata.getId() + "", strmakeSpinner, strCapacity, strSerailNumber, strSCMDiscription, strSCMCode,
+        intent.putExtra("screenPosition", screenPosition);
+        saveEquipmentInfo(selectedEquipmentdData.getId() + "", strmakeSpinner, strCapacity, strSerailNumber, strSCMDiscription, strSCMCode,
                 strQrCodeScreen, stretRemarks);
 
         getActivity().sendBroadcast(intent);
