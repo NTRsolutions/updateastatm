@@ -68,6 +68,8 @@
         </LinearLayout>
     </LinearLayout>
 
+
+
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
@@ -75,7 +77,9 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main_screen"
-        app:menu="@menu/activity_main_screen_drawer"
-        />
+        app:itemIconTint="@color/colorPrimary"
+        app:itemTextColor="@color/colorPrimary"
+        app:menu="@menu/activity_main_screen_drawer" />
+
 
 </android.support.v4.widget.DrawerLayout>
