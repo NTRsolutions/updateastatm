@@ -23,6 +23,7 @@ import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
+import com.atm.ast.astatm.equipment.EquipmentandAccessoriesTab;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
 import com.atm.ast.astatm.model.newmodel.ActivitySheetModel;
@@ -111,6 +112,9 @@ public class PMCheckLIstFragment extends MainFragment {
     String planId;
     ActivitySheetModel sheetModel;
     ATMDBHelper atmdbHelper;
+    private String activityId = "";
+    private String siteId = "";
+    boolean qrCodeFlag = false;
 
     @Override
     protected int fragmentLayout() {
@@ -204,6 +208,8 @@ public class PMCheckLIstFragment extends MainFragment {
     protected void getArgs() {
         super.getArgs();
         planId = this.getArguments().getString("PlanId");
+        activityId = this.getArguments().getString("activityId");
+        siteId = this.getArguments().getString("siteId");
     }
 
     @Override
@@ -213,6 +219,21 @@ public class PMCheckLIstFragment extends MainFragment {
 
     @Override
     protected void dataToView() {
+        /*  714	Sign Off     m         nm
+        1282 Commisioning Rework    m    nm
+        749	PM    m     nm
+        1180 Special Project    m    nm*/
+
+        //for these case QRCode screen non mandatory to open
+        if (activityId.equals("714") || activityId.equals("1282") || activityId.equals("749") || activityId.equals("1180")) {
+            btnDone.setText("Submit");
+            qrCodeFlag = false;
+        } else {
+            qrCodeFlag = true;
+            btnDone.setText("Next");
+        }
+
+
         atmdbHelper = new ATMDBHelper(getContext());
         final ArrayList<String> yesNoList = new ArrayList<>();
         yesNoList.add("Yes");
@@ -524,7 +545,11 @@ public class PMCheckLIstFragment extends MainFragment {
                     }*/
                     atmdbHelper.deleteActivtyFormDataByPlanId(savePlanId);
                     ASTUIUtil.showToast("Activity Form Data Saved on Server");
-                    openPlannedActivityListTabScreen();
+                    if (qrCodeFlag) {
+                        openQRCodeScreen();
+                    } else {
+                        openPlannedActivityListTabScreen();
+                    }
                 } else if (jsonStatus.equals("0")) {
 
                 }
@@ -545,7 +570,12 @@ public class PMCheckLIstFragment extends MainFragment {
         localData.setActivityFormData(activityData);
         atmdbHelper.upsertActivtyFormData(localData);
         ASTUIUtil.showToast("Activity Data is Saved Locally");
-        openPlannedActivityListTabScreen();
+
+        if (qrCodeFlag) {
+            openQRCodeScreen();
+        } else {
+            openPlannedActivityListTabScreen();
+        }
     }
 
     //open openPlannedActivityListTabfragment screen
@@ -556,5 +586,15 @@ public class PMCheckLIstFragment extends MainFragment {
         getHostActivity().updateFragment(plannedActivityListTabFragment, bundle);
     }
 
+    //open QR code screen
+    private void openQRCodeScreen() {
+        EquipmentandAccessoriesTab qrFragment = new EquipmentandAccessoriesTab();
+        Bundle bundle = new Bundle();
+        bundle.putString("headerTxt", "Equipments");
+        bundle.putString("activityId", activityId);
+        bundle.putString("siteId", siteId);
+        bundle.putString("planId", planId);
+        getHostActivity().updateFragment(qrFragment, bundle);
+    }
 
 }

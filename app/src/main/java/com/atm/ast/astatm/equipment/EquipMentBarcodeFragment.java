@@ -237,14 +237,12 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
          /*   IntentIntegrator scanIntegrator = new IntentIntegrator(getActivity());
             scanIntegrator.initiateScan();*/
             IntentIntegrator.forSupportFragment(EquipMentBarcodeFragment.this).initiateScan();
-            ASTUIUtil.showToast("granteed");
         } else if (view.getId() == R.id.previous) {
             saveScreenData(false);
         } else if (view.getId() == R.id.next) {
-           /* if (isValidate()) {
-                saveScreenData(true, false);
-            }*/
-            saveScreenData(true);
+            if (isValidate()) {
+                saveScreenData(true);
+            }
         }
     }
 
@@ -306,7 +304,7 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
 
     //save data into db
     private void saveEquipmentInfo(String EquipId, String MakeId, String CapacityId, String SerialNo,
-                                   String SCMDescId, String SCMCodeId, String QRCode, String remarke) {
+                                   String SCMDescId, String SCMCodeId, String QRCode, String remarke, boolean NextPreviousFlag) {
         EquipmentInfo equipmentInfo = new EquipmentInfo();
         equipmentInfo.setId(screenPosition);
         equipmentInfo.setEquipId(EquipId);
@@ -318,17 +316,16 @@ public class EquipMentBarcodeFragment extends Fragment implements View.OnClickLi
         equipmentInfo.setQRCode(QRCode);
         equipmentInfo.setRemarke(remarke);
         atmdbHelper.upsertEquipmentInfoData(equipmentInfo);//save in data base
-    }
 
-    private void saveScreenData(boolean NextPreviousFlag) {
         Intent intent = new Intent("ViewPageChange");
         intent.putExtra("NextPreviousFlag", NextPreviousFlag);
         intent.putExtra("screenPosition", screenPosition);
-        saveEquipmentInfo(selectedEquipmentdData.getId() + "", strmakeSpinner, strCapacity, strSerailNumber, strSCMDiscription, strSCMCode,
-                strQrCodeScreen, stretRemarks);
-
         getActivity().sendBroadcast(intent);
+    }
 
+    private void saveScreenData(boolean NextPreviousFlag) {
+        saveEquipmentInfo(selectedEquipmentdData.getId() + "", strmakeSpinner, strCapacity, strSerailNumber, strSCMDiscription, strSCMCode,
+                strQrCodeScreen, stretRemarks, NextPreviousFlag);
     }
 
 }

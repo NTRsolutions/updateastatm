@@ -1,5 +1,7 @@
 package com.atm.ast.astatm.equipment;
 
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -12,8 +14,11 @@ import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.fragment.MainFragment;
+import com.atm.ast.astatm.fragment.PlannedActivityListTabFragment;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
+import com.atm.ast.astatm.model.newmodel.AccFeedBack;
+import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.Equipment;
 import com.atm.ast.astatm.model.newmodel.EquipmentInfo;
@@ -21,8 +26,14 @@ import com.atm.ast.astatm.model.newmodel.EquipmnetContentData;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class EquipmentandAccessoriesTab extends MainFragment {
     ViewPager viewPager;
@@ -30,6 +41,12 @@ public class EquipmentandAccessoriesTab extends MainFragment {
     Button btnSubmit;
     ATMDBHelper atmdbHelper;
     ViewPagerAdapter adapter;
+    SharedPreferences pref;
+    String userId, userRole, userAccess;
+    String userName = "";
+    private String activityId = "";
+    private String siteId = "";
+    String planId;
 
     @Override
     protected int fragmentLayout() {
@@ -38,6 +55,9 @@ public class EquipmentandAccessoriesTab extends MainFragment {
 
     @Override
     protected void getArgs() {
+        planId = this.getArguments().getString("PlanId");
+        activityId = this.getArguments().getString("activityId");
+        siteId = this.getArguments().getString("siteId");
     }
 
     @Override
@@ -60,6 +80,7 @@ public class EquipmentandAccessoriesTab extends MainFragment {
 
     @Override
     protected void dataToView() {
+        getSharedPrefData();
         atmdbHelper = new ATMDBHelper(getContext());
         if (ASTUIUtil.isOnline(getContext())) {
             getSiteEquipListData();
@@ -67,6 +88,13 @@ public class EquipmentandAccessoriesTab extends MainFragment {
         } else {
             setPage();
         }
+    }
+
+    public void getSharedPrefData() {
+        pref = getContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+        userId = pref.getString("userId", "");
+        userName = pref.getString("userName", "");
+        userAccess = pref.getString("userAccess", "");
     }
 
     private void setPage() {
@@ -209,20 +237,101 @@ public class EquipmentandAccessoriesTab extends MainFragment {
         }
     }
 
+    //send equipment detail into server
     private void saveEquipmentData() {
-        List<EquipmentInfo> allDataList = atmdbHelper.getEquipmentInfoData();
-        if (allDataList != null) {
-            for (EquipmentInfo equipmentInfo : allDataList) {
-               /* EquipId = equipmentInfo.getEquipId();
-                MakeId = equipmentInfo.getMakeId();
-                CapacityId = equipmentInfo.getCapacityId();
-                SerialNo = equipmentInfo.getSerialNo();
-                SCMDescId = equipmentInfo.getSCMDescId();
-                SCMCodeId = equipmentInfo.getSCMCodeId();
-                QRCode = equipmentInfo.getQRCode();
-                remarke = equipmentInfo.getRemarke();*/
-            }
+        JSONObject mainObject = new JSONObject();
+        try {
+            mainObject.put("ActivityId", activityId);
+            mainObject.put("PlanId", planId);
+            mainObject.put("SiteId", siteId);
+            mainObject.put("FeId", userId);
 
+            JSONArray EquipmentArray = new JSONArray();
+            JSONArray feedBackArray = new JSONArray();
+            List<EquipmentInfo> equipmentList = atmdbHelper.getEquipmentInfoData();
+            ArrayList<AccFeedBack> accessoriesList = atmdbHelper.getSelectedAccessoriesInfo();
+            if (equipmentList != null) {
+                for (EquipmentInfo equipmentInfo : equipmentList) {
+                    JSONObject EquipmentObject = new JSONObject();
+                    EquipmentObject.put("EquipId", equipmentInfo.getEquipId());
+                    EquipmentObject.put("MakeId", equipmentInfo.getMakeId());
+                    EquipmentObject.put("CapacityId", equipmentInfo.getCapacityId());
+                    EquipmentObject.put("SerialNo", equipmentInfo.getSerialNo());
+                    EquipmentObject.put("SCMDescId", equipmentInfo.getSCMDescId());
+                    EquipmentObject.put("SCMCodeId", equipmentInfo.getSCMCodeId());
+                    EquipmentObject.put("QRCode", equipmentInfo.getQRCode());
+                    EquipmentObject.put("remarke", equipmentInfo.getRemarke());
+                    EquipmentArray.put(EquipmentObject);
+                }
+            }
+            //set accessories value into json object
+            if (accessoriesList != null) {
+                for (AccFeedBack feedBack : accessoriesList) {
+                    JSONObject feedBackObject = new JSONObject();
+                    feedBackObject.put("accId", feedBack.getParentId());
+                    feedBackObject.put("accStatus", feedBack.getId());
+                    feedBackArray.put(feedBackObject);
+                }
+            }
+            mainObject.put("Equipment", EquipmentArray);
+            mainObject.put("Accessories", feedBackArray);
+            if (equipmentList != null && equipmentList.size() > 0) {
+                if (ASTUIUtil.isOnline(getContext())) {
+                    saveEquipmentDataService(mainObject);
+                } else {
+                    //String qrdata = new Gson().toJson(mainObject.toString());
+                    ContentLocalData localData = new ContentLocalData();
+                    localData.setPlanId(planId);
+                    localData.setQREquipmentData(mainObject.toString());
+                    atmdbHelper.upsertQREquipmentData(localData);
+                    ASTUIUtil.showToast("Equipment Data Save");
+                }
+            } else {
+                ASTUIUtil.showToast("Please select atleast one Equipment and filled all data!");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+    }
+
+    //save equipement data into server
+    public void saveEquipmentDataService(JSONObject mainObject) {
+        ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
+        _progrssBar.show();
+        ServiceCaller serviceCaller = new ServiceCaller(getContext());
+        String serviceURL = Contants.BASE_URL_API + Contants.InstallEquipment;
+        serviceCaller.CallCommanServiceMethod(serviceURL, mainObject, "saveEquipmentDataService", new IAsyncWorkCompletedCallback() {
+            @Override
+            public void onDone(String result, boolean isComplete) {
+                if (isComplete) {
+                    JSONObject jsonRootObject = null;
+                    try {
+                        jsonRootObject = new JSONObject(result);
+                        String jsonStatus = jsonRootObject.optString("Status").toString();
+                        if (jsonStatus.equals("2")) {
+                            atmdbHelper.deleteAllRows("EquipmentInfo");
+                            atmdbHelper.deleteAllRows("SelectedAccessoriesInfo");
+                            openPlannedActivityListTabScreen();
+                        } else {
+                            ASTUIUtil.showToast("Equpiment Detail save.");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    ASTUIUtil.showToast("Server Side error!");
+                }
+                _progrssBar.dismiss();
+            }
+        });
+    }
+
+    //open openPlannedActivityListTabfragment screen
+    private void openPlannedActivityListTabScreen() {
+        PlannedActivityListTabFragment plannedActivityListTabFragment = new PlannedActivityListTabFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("headerTxt", "Activity Monitor");
+        getHostActivity().updateFragment(plannedActivityListTabFragment, bundle);
     }
 }

@@ -113,37 +113,38 @@ public class ActivitySheetFragment extends MainFragment {
         taskId = this.getArguments().getString("TASK_ID");
         complaintMessage = this.getArguments().getString("COMPLAINT_MESSAGE");
 
-        /*708	Survey   nm
-        710	Civil  nm
-        711	Electrical   M
-        712	Material Shifting WH to Site  nm
-        713	Dismantling nm
-        714	Sign Off     m
-        715	Material Shifting Site to WH nm  new
-        716	Others   nm
-        878	Rework (Civil and Electrical)    m
-        885	Site Upgrade     m
-        890	Dismantling and Reinstallation    m
-        1168 Electrical+Civil     m
-        1179 Material Shifting Site to Site    nm
-        1282 Commisioning Rework    m
-        1371 Long Distance Travel    nm
-        1380 System Upgrade    m
 
-        845	Other     nm
-        858	Leave    nm
-        859	Absent   nm
-        860	No Plan   nm
-        730	Joint Visit  nm
-        749	PM    m
-        750	CM     m
-        886	Recivil Repair   nm
-        1180 Special Project    m
-        1238 Material Shifting WH to Site    nm
-        1239 Material Shifting Site to WH  nm
-        1281 WH  nm
-        1303 Material Shifting Site to Site   nm
-        1372 Long Distance Travel       nm*/
+        /*708	Survey   nm     nm
+        710	Civil  nm          nm
+        711	Electrical   M     m
+        712	Material Shifting WH to Site  nm       nm
+        713	Dismantling nm         nm
+        714	Sign Off     m         nm
+        715	Material Shifting Site to WH nm  nm
+        716	Others   nm     nm
+        878	Rework (Civil and Electrical)    m     m
+        885	Site Upgrade     m     m
+        890	Dismantling and Reinstallation    m    m
+        1168 Electrical+Civil     m         m
+        1179 Material Shifting Site to Site    nm     nm
+        1282 Commisioning Rework    m    nm
+        1371 Long Distance Travel    nm   nm
+        1380 System Upgrade    m        m
+
+        845	Other     nm    nm
+        858	Leave    nm     nm
+        859	Absent   nm     nm
+        860	No Plan   nm    nm
+        730	Joint Visit  nm    nm
+        749	PM    m     nm
+        750	CM     m    m
+        886	Recivil Repair   nm    nm
+        1180 Special Project    m    nm
+        1238 Material Shifting WH to Site    nm     nm
+        1239 Material Shifting Site to WH  nm     nm
+        1281 WH  nm     nm
+        1303 Material Shifting Site to Site   nm    nm
+        1372 Long Distance Travel       nm     nm*/
 
 
     }
@@ -944,6 +945,8 @@ public class ActivitySheetFragment extends MainFragment {
         Bundle bundle = new Bundle();
         bundle.putString("headerTxt", "PM CheckList");
         bundle.putString("PlanId", planId);
+        bundle.putString("activityId", activityId);
+        bundle.putString("siteId", siteId);
         getHostActivity().updateFragment(pmCheckLIstFragment, bundle);
     }
 
@@ -977,7 +980,7 @@ public class ActivitySheetFragment extends MainFragment {
         Button btnSyncData;
         ArrayList<ActivitySheetModel> activityFormList = new ArrayList<>();
         ArrayList<ContentLocalData> contentLocalData = atmdbHelper.getAllActivtyFormData();
-        lvTransit =  unsyncedDialog.findViewById(R.id.lvTransit);
+        lvTransit = unsyncedDialog.findViewById(R.id.lvTransit);
         btnSyncData = unsyncedDialog.findViewById(R.id.btnSyncData);
         Button cancel = unsyncedDialog.findViewById(R.id.cancel);
         if (contentLocalData != null && contentLocalData.size() > 0) {

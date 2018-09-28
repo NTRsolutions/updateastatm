@@ -937,6 +937,10 @@ public class CircleFragment extends MainFragment {
             for (FillSiteActivityModel siteActivityModel : siteList) {
                 saveFillSiteAddress(siteActivityModel);
             }
+            ArrayList<ContentLocalData> qrEquipementList = atmdbHelper.getAllQREquipmentData();
+            for (ContentLocalData localData : qrEquipementList) {
+                saveEquipmentDataService(localData);
+            }
         }
     }
 
@@ -1151,5 +1155,35 @@ public class CircleFragment extends MainFragment {
                 e.printStackTrace();
             }
         }
+    }
+
+    //save equipement data into server
+    public void saveEquipmentDataService(ContentLocalData localData) {
+        JSONObject mainObject = null;
+        try {
+            mainObject = new JSONObject(localData.getQREquipmentData());
+            ServiceCaller serviceCaller = new ServiceCaller(getContext());
+            String serviceURL = Contants.BASE_URL_API + Contants.InstallEquipment;
+            serviceCaller.CallCommanServiceMethod(serviceURL, mainObject, "saveEquipmentDataService", new IAsyncWorkCompletedCallback() {
+                @Override
+                public void onDone(String result, boolean isComplete) {
+                    if (isComplete) {
+                        JSONObject jsonRootObject = null;
+                        try {
+                            jsonRootObject = new JSONObject(result);
+                            String jsonStatus = jsonRootObject.optString("Status").toString();
+                            if (jsonStatus.equals("2")) {
+                                atmdbHelper.deleteQREquipmentDataByPlanId(localData.getPlanId());
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
