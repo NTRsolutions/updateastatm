@@ -1,5 +1,7 @@
 package com.atm.ast.astatm.equipment;
 
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -12,9 +14,11 @@ import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.fragment.MainFragment;
+import com.atm.ast.astatm.fragment.PlannedActivityListTabFragment;
 import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
 import com.atm.ast.astatm.framework.ServiceCaller;
 import com.atm.ast.astatm.model.newmodel.AccFeedBack;
+import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.Equipment;
 import com.atm.ast.astatm.model.newmodel.EquipmentInfo;
@@ -29,12 +33,20 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class EquipmentandAccessoriesTab extends MainFragment {
     ViewPager viewPager;
     TabLayout tabLayout;
     Button btnSubmit;
     ATMDBHelper atmdbHelper;
     ViewPagerAdapter adapter;
+    SharedPreferences pref;
+    String userId, userRole, userAccess;
+    String userName = "";
+    private String activityId = "";
+    private String siteId = "";
+    String planId;
 
     @Override
     protected int fragmentLayout() {
@@ -43,6 +55,9 @@ public class EquipmentandAccessoriesTab extends MainFragment {
 
     @Override
     protected void getArgs() {
+        planId = this.getArguments().getString("PlanId");
+        activityId = this.getArguments().getString("activityId");
+        siteId = this.getArguments().getString("siteId");
     }
 
     @Override
@@ -65,6 +80,7 @@ public class EquipmentandAccessoriesTab extends MainFragment {
 
     @Override
     protected void dataToView() {
+        getSharedPrefData();
         atmdbHelper = new ATMDBHelper(getContext());
         if (ASTUIUtil.isOnline(getContext())) {
             getSiteEquipListData();
@@ -72,6 +88,13 @@ public class EquipmentandAccessoriesTab extends MainFragment {
         } else {
             setPage();
         }
+    }
+
+    public void getSharedPrefData() {
+        pref = getContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+        userId = pref.getString("userId", "");
+        userName = pref.getString("userName", "");
+        userAccess = pref.getString("userAccess", "");
     }
 
     private void setPage() {
@@ -218,10 +241,10 @@ public class EquipmentandAccessoriesTab extends MainFragment {
     private void saveEquipmentData() {
         JSONObject mainObject = new JSONObject();
         try {
-            mainObject.put("ActivityId", 1);
-            mainObject.put("PlanId", 1);
-            mainObject.put("SiteId", 1);
-            mainObject.put("FeId", 1);
+            mainObject.put("ActivityId", activityId);
+            mainObject.put("PlanId", planId);
+            mainObject.put("SiteId", siteId);
+            mainObject.put("FeId", userId);
 
             JSONArray EquipmentArray = new JSONArray();
             JSONArray feedBackArray = new JSONArray();
@@ -255,6 +278,13 @@ public class EquipmentandAccessoriesTab extends MainFragment {
             if (equipmentList != null && equipmentList.size() > 0) {
                 if (ASTUIUtil.isOnline(getContext())) {
                     saveEquipmentDataService(mainObject);
+                } else {
+                    //String qrdata = new Gson().toJson(mainObject.toString());
+                    ContentLocalData localData = new ContentLocalData();
+                    localData.setPlanId(planId);
+                    localData.setQREquipmentData(mainObject.toString());
+                    atmdbHelper.upsertQREquipmentData(localData);
+                    ASTUIUtil.showToast("Equipment Data Save");
                 }
             } else {
                 ASTUIUtil.showToast("Please select atleast one Equipment and filled all data!");
@@ -275,14 +305,33 @@ public class EquipmentandAccessoriesTab extends MainFragment {
             @Override
             public void onDone(String result, boolean isComplete) {
                 if (isComplete) {
-                    // parseandsaveSiteEquipListData(result);
-                    //atmdbHelper.deleteAllRows();
-                    // atmdbHelper.deleteAllRows();
+                    JSONObject jsonRootObject = null;
+                    try {
+                        jsonRootObject = new JSONObject(result);
+                        String jsonStatus = jsonRootObject.optString("Status").toString();
+                        if (jsonStatus.equals("2")) {
+                            atmdbHelper.deleteAllRows("EquipmentInfo");
+                            atmdbHelper.deleteAllRows("SelectedAccessoriesInfo");
+                            openPlannedActivityListTabScreen();
+                        } else {
+                            ASTUIUtil.showToast("Equpiment Detail save.");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 } else {
-                    ASTUIUtil.showToast("Data Not Availabale");
+                    ASTUIUtil.showToast("Server Side error!");
                 }
                 _progrssBar.dismiss();
             }
         });
+    }
+
+    //open openPlannedActivityListTabfragment screen
+    private void openPlannedActivityListTabScreen() {
+        PlannedActivityListTabFragment plannedActivityListTabFragment = new PlannedActivityListTabFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("headerTxt", "Activity Monitor");
+        getHostActivity().updateFragment(plannedActivityListTabFragment, bundle);
     }
 }

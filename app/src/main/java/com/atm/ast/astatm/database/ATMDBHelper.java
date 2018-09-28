@@ -267,16 +267,12 @@ public class ATMDBHelper extends SQLiteOpenHelper {
 
         String CREATE_Equipment_TABLE = "CREATE TABLE EquipmentInfo(id INTEGER, EquipId TEXT,MakeId TEXT, CapacityId TEXT,SerialNo TEXT,SCMDescId TEXT,SCMCodeId TEXT,QRCode TEXT,remarke TEXT)";
         db.execSQL(CREATE_Equipment_TABLE);
-
-        String CREATE_Accessories_TABLE = "CREATE TABLE AccessoriesInfo(id INTEGER, accId TEXT,accStatus TEXT)";
-        db.execSQL(CREATE_Accessories_TABLE);
-
         String CREATE_DISPATCHEQUIPMENT_TABLE = "CREATE TABLE DispatchEquipment(SiteId TEXT, EquipId TEXT,MakeId TEXT, CapacityId TEXT,SerialNo TEXT,SCMDescId TEXT,SCMCodeId TEXT,QRCode TEXT,remarke TEXT)";
         db.execSQL(CREATE_DISPATCHEQUIPMENT_TABLE);
-
         String CREATE_SelectedAccessoriesInfo_TABLE = "CREATE TABLE SelectedAccessoriesInfo(accessorieId INTEGER, feedbackId INTEGER)";
         db.execSQL(CREATE_SelectedAccessoriesInfo_TABLE);
-
+        String CREATE_QREquipment_TABLE = "CREATE TABLE QREquipment(planId TEXT,QREquipmentData TEXT)";
+        db.execSQL(CREATE_QREquipment_TABLE);
     }
 
 
@@ -311,6 +307,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS AccessoriesInfo");
         db.execSQL("DROP TABLE IF EXISTS DispatchEquipment");
         db.execSQL("DROP TABLE IF EXISTS SelectedAccessoriesInfo");
+        db.execSQL("DROP TABLE IF EXISTS QREquipment");
         onCreate(db);
     }
 
@@ -708,7 +705,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
                 cursor.moveToNext();
             }
         }
-        //db.close();
+        db.close();
         return list;
     }
 
@@ -913,12 +910,11 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             cursor.moveToFirst();
             populateActivityDropdownData(cursor, ob);
-            cursor.close();
         } else {
             ob = null;
         }
-        //cursor.close();
-        // db.close();
+        cursor.close();
+        db.close();
         return ob;
     }
 
@@ -2265,7 +2261,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
 
 
     public void populateEquipmentInfoValueData(ContentValues values, EquipmentInfo ob) {
-        values.put("(id ", ob.getId());
+        values.put("id", ob.getId());
         values.put("EquipId", ob.getEquipId());
         values.put("MakeId", ob.getMakeId());
         values.put("CapacityId", ob.getCapacityId());
@@ -2303,92 +2299,6 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return list;
     }
-
-    // save  All Accessories_
-
-    public boolean upsertAccessoriesInfoData(EquipmentInfo ob) {
-        boolean done = false;
-        EquipmentInfo data = null;
-        if (ob.getAccId() != null) {
-            data = getAccessoriesInfoDataByID(ob.getId());
-            if (data == null) {
-                done = insertAccessoriesInfoData(ob);
-            } else {
-                done = updateAccessoriesInfoData(ob);
-            }
-        }
-        return done;
-    }
-
-    public EquipmentInfo getAccessoriesInfoDataByID(int id) {
-        String query = "Select * FROM AccessoriesInfo WHERE id  = '" + id + "'";
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        EquipmentInfo ob = new EquipmentInfo();
-        if (cursor.moveToFirst()) {
-            cursor.moveToFirst();
-            populateEquipmentInfoData(cursor, ob);
-            cursor.close();
-        } else {
-            ob = null;
-        }
-        db.close();
-        return ob;
-    }
-
-
-    private void populateAccessoriesInfoData(Cursor cursor, EquipmentInfo ob) {
-        ob.setId(cursor.getInt(0));
-        ob.setAccId(cursor.getString(1));
-        ob.setAccStatus(cursor.getString(2));
-    }
-
-
-    public boolean insertAccessoriesInfoData(EquipmentInfo ob) {
-        ContentValues values = new ContentValues();
-        populateAccessoriesInfoValueData(values, ob);
-        SQLiteDatabase db = this.getWritableDatabase();
-        long i = db.insert("AccessoriesInfo", null, values);
-        db.close();
-        return i > 0;
-    }
-
-
-    public void populateAccessoriesInfoValueData(ContentValues values, EquipmentInfo ob) {
-        values.put("(id ", ob.getId());
-        values.put("accId", ob.getAccId());
-        values.put("accStatus", ob.getAccStatus());
-    }
-
-
-    public boolean updateAccessoriesInfoData(EquipmentInfo ob) {
-        ContentValues values = new ContentValues();
-        populateEquipmentInfoValueData(values, ob);
-        SQLiteDatabase db = this.getWritableDatabase();
-        long i = 0;
-        i = db.update("AccessoriesInfo", values, " id = '" + ob.getId() + "'", null);
-        db.close();
-        return i > 0;
-    }
-
-    public ArrayList<EquipmentInfo> geAccessoriesInfoData() {
-        String query = "Select *  FROM AccessoriesInfo ";
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-        ArrayList<EquipmentInfo> list = new ArrayList<EquipmentInfo>();
-        if (cursor.moveToFirst()) {
-            while (cursor.isAfterLast() == false) {
-                EquipmentInfo ob = new EquipmentInfo();
-                populateEquipmentInfoData(cursor, ob);
-                list.add(ob);
-                cursor.moveToNext();
-            }
-        }
-        db.close();
-        return list;
-    }
-
-
     /**
      * Dispatch Equipment Data  All DB Action
      *
@@ -2575,6 +2485,91 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("SelectedAccessoriesInfo", " accessorieId = '" + ob.getParentId() + "' ",
                 null);
+        db.close();
+    }
+
+
+    //------------------QR Equipment Details for local save ----------------
+    public boolean upsertQREquipmentData(ContentLocalData ob) {
+        boolean done = false;
+        ContentLocalData data = null;
+        if (ob.getPlanId() != null && !ob.getPlanId().equals("") && !ob.getPlanId().equals("0")) {
+            data = getQREquipmentByID(ob.getPlanId());
+            if (data == null) {
+                done = inserQREquipmentData(ob);
+            } else {
+                done = updateQREquipmentData(ob);
+            }
+        }
+        return done;
+    }
+    //get and check QREquipment Data by id
+    public ContentLocalData getQREquipmentByID(String id) {
+        String query = "Select * FROM QREquipment WHERE planId = '" + id + "' ";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ContentLocalData ob = new ContentLocalData();
+        if (cursor.moveToFirst()) {
+            cursor.moveToFirst();
+            populateQREquipmentData(cursor, ob);
+            cursor.close();
+        } else {
+            ob = null;
+        }
+        db.close();
+        return ob;
+    }
+    //populate QREquipment Data
+    private void populateQREquipmentData(Cursor cursor, ContentLocalData ob) {
+        ob.setPlanId(cursor.getString(0));
+        ob.setQREquipmentData(cursor.getString(1));
+    }
+
+    public boolean inserQREquipmentData(ContentLocalData ob) {
+        ContentValues values = new ContentValues();
+        populateQREquipmentValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = db.insert("QREquipment", null, values);
+        db.close();
+        return i > 0;
+    }
+
+    public boolean updateQREquipmentData(ContentLocalData ob) {
+        ContentValues values = new ContentValues();
+        populateQREquipmentValueData(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = 0;
+        i = db.update("QREquipment", values, " planId = '" + ob.getPlanId() + "'", null);
+        db.close();
+        return i > 0;
+    }
+    public void populateQREquipmentValueData(ContentValues values, ContentLocalData ob) {
+        values.put("planId", ob.getPlanId());
+        values.put("QREquipmentData", ob.getQREquipmentData());
+    }
+    //get all QREquipment Data
+    public ArrayList<ContentLocalData> getAllQREquipmentData() {
+        String query = "Select *  FROM QREquipment ";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<ContentLocalData> list = new ArrayList<ContentLocalData>();
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+                ContentLocalData ob = new ContentLocalData();
+                populateQREquipmentData(cursor, ob);
+                list.add(ob);
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        return list;
+    }
+    public void deleteQREquipmentDataByPlanId(String planId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String condition = " planId = '" + planId + "'";
+        db.delete("QREquipment", condition, null);
         db.close();
     }
 }

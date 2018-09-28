@@ -19,4 +19,13 @@ public class ContentLocalData {
     public void setPlanId(String planId) {
         this.planId = planId;
     }
+    private String QREquipmentData;
+
+    public String getQREquipmentData() {
+        return QREquipmentData;
+    }
+
+    public void setQREquipmentData(String QREquipmentData) {
+        this.QREquipmentData = QREquipmentData;
+    }
 }
