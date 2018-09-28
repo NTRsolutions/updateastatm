@@ -40,9 +40,13 @@ public class AccessoriesFragment extends MainFragment {
     protected void loadView() {
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(linearLayoutManager);
+       // LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+       // linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+      //  recyclerView.setLayoutManager(linearLayoutManager);
+
+        StaggeredGridLayoutManager gaggeredGridLayoutManager = new StaggeredGridLayoutManager(1, LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(gaggeredGridLayoutManager);
+
     }
 
     @Override
