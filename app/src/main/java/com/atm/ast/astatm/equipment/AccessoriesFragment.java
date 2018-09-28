@@ -76,9 +76,4 @@ public class AccessoriesFragment extends MainFragment {
         }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        ArrayList<AccFeedBack> selectedAccFeedbackList = adapter.selectedAccFeedbackList;
-    }
 }

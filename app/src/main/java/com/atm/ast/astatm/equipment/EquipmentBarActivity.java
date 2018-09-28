@@ -126,8 +126,6 @@ public class EquipmentBarActivity extends AppCompatActivity implements View.OnCl
                 boolean NextPreviousFlag = intent.getBooleanExtra("NextPreviousFlag", false);
                 int screenPosition = intent.getIntExtra("screenPosition", 0);
 
-
-
                     int currentPage = mPager.getCurrentItem();
                     if (NextPreviousFlag) {
                         if (equipmentlist.size() == screenPosition) {

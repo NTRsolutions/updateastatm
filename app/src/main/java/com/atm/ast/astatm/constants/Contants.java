@@ -54,12 +54,13 @@ public class Contants {
     public static String EXPENSE_SCREEN_URL = "Expense/FEExpenseReport";
 
     public static String SEND_BUG_REPORT = "addbugreport";
-    public static String LOG_TAG="ASTAtm";
-    public static boolean IS_DEBUG_LOG=true;
+    public static String LOG_TAG = "ASTAtm";
+    public static boolean IS_DEBUG_LOG = true;
     public static final String OFFLINE_MESSAGE = "Oops! You are Offline. Please check your Internet Connection.";
     public static final String Error = "Server Side error!";
 
     public static String DISPATCH_EQUIPMENT = "Equipment/GetDispatchEquipment?";
+    public static String InstallEquipment = "Equipment/InstallEquipment";
 
 
 }

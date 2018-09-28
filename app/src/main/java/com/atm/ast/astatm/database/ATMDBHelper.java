@@ -17,6 +17,7 @@ import com.atm.ast.astatm.model.FeTrackerEmployeeModel;
 import com.atm.ast.astatm.model.FillSiteActivityModel;
 import com.atm.ast.astatm.model.LocationTrackingDataModel;
 import com.atm.ast.astatm.model.TransitDataModel;
+import com.atm.ast.astatm.model.newmodel.AccFeedBack;
 import com.atm.ast.astatm.model.newmodel.Activity;
 import com.atm.ast.astatm.model.newmodel.ContentLocalData;
 import com.atm.ast.astatm.model.newmodel.Data;
@@ -267,13 +268,14 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         String CREATE_Equipment_TABLE = "CREATE TABLE EquipmentInfo(id INTEGER, EquipId TEXT,MakeId TEXT, CapacityId TEXT,SerialNo TEXT,SCMDescId TEXT,SCMCodeId TEXT,QRCode TEXT,remarke TEXT)";
         db.execSQL(CREATE_Equipment_TABLE);
 
-
         String CREATE_Accessories_TABLE = "CREATE TABLE AccessoriesInfo(id INTEGER, accId TEXT,accStatus TEXT)";
         db.execSQL(CREATE_Accessories_TABLE);
 
-
         String CREATE_DISPATCHEQUIPMENT_TABLE = "CREATE TABLE DispatchEquipment(SiteId TEXT, EquipId TEXT,MakeId TEXT, CapacityId TEXT,SerialNo TEXT,SCMDescId TEXT,SCMCodeId TEXT,QRCode TEXT,remarke TEXT)";
         db.execSQL(CREATE_DISPATCHEQUIPMENT_TABLE);
+
+        String CREATE_SelectedAccessoriesInfo_TABLE = "CREATE TABLE SelectedAccessoriesInfo(accessorieId INTEGER, feedbackId INTEGER)";
+        db.execSQL(CREATE_SelectedAccessoriesInfo_TABLE);
 
     }
 
@@ -308,6 +310,7 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS EquipmentInfo");
         db.execSQL("DROP TABLE IF EXISTS AccessoriesInfo");
         db.execSQL("DROP TABLE IF EXISTS DispatchEquipment");
+        db.execSQL("DROP TABLE IF EXISTS SelectedAccessoriesInfo");
         onCreate(db);
     }
 
@@ -2393,7 +2396,6 @@ public class ATMDBHelper extends SQLiteOpenHelper {
      * @return
      */
 
-
     public boolean upsertDispatchEquipmentData(Equipment ob, long siteId) {
         boolean done = false;
         Equipment data = null;
@@ -2407,7 +2409,6 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         }
         return done;
     }
-
 
     public Equipment getDispatchEquipmentDataByID(long SiteId, long eqtid) {
         String query = "Select * FROM DispatchEquipment WHERE SiteId  = '" + SiteId + "' AND  EquipId  = '" + eqtid + "'";
@@ -2425,7 +2426,6 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         return ob;
     }
 
-
     private void populateDispatchEquipmentData(Cursor cursor, Equipment ob) {
         ob.setSiteId(Integer.parseInt(cursor.getString(0)));
         ob.setEquipId(Long.parseLong(cursor.getString(1)));
@@ -2438,7 +2438,6 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         ob.setRemark(cursor.getString(8));
     }
 
-
     public boolean insertDispatchEquipmentData(Equipment ob, long siteId) {
         ContentValues values = new ContentValues();
         populateDispatchEquipmentValueData(values, ob, siteId);
@@ -2447,7 +2446,6 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         db.close();
         return i > 0;
     }
-
 
     public void populateDispatchEquipmentValueData(ContentValues values, Equipment ob, long siteId) {
         values.put("SiteId", siteId);
@@ -2460,7 +2458,6 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         values.put("QRCode", ob.getQRCode());
         values.put("remarke", ob.getRemark());
     }
-
 
     public boolean updateDispatchEquipmentData(Equipment ob, long siteId) {
         ContentValues values = new ContentValues();
@@ -2487,5 +2484,97 @@ public class ATMDBHelper extends SQLiteOpenHelper {
         }
         db.close();
         return list;
+    }
+
+
+    /**
+     * Selected Accessories Info
+     *
+     * @param ob
+     * @return
+     */
+
+    public boolean upsertSelectedAccessoriesInfo(AccFeedBack ob) {
+        boolean done = false;
+        AccFeedBack data = null;
+        if (ob.getParentId() != 0) {
+            data = getSelectedAccessoriesInfoByID(ob);
+            if (data == null) {
+                done = insertSelectedAccessoriesInfo(ob);
+            } else {
+                done = updateSelectedAccessoriesInfo(ob);
+            }
+        }
+        return done;
+    }
+
+    public AccFeedBack getSelectedAccessoriesInfoByID(AccFeedBack ob) {
+        String query = "Select * FROM SelectedAccessoriesInfo WHERE accessorieId  = '" + ob.getParentId() + "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        AccFeedBack obj = new AccFeedBack();
+        if (cursor.moveToFirst()) {
+            cursor.moveToFirst();
+            populateSelectedAccessoriesInfo(cursor, obj);
+            cursor.close();
+        } else {
+            ob = null;
+        }
+        db.close();
+        return ob;
+    }
+
+    private void populateSelectedAccessoriesInfo(Cursor cursor, AccFeedBack ob) {
+        ob.setParentId(cursor.getInt(0));
+        ob.setId(cursor.getInt(1));
+    }
+
+    public boolean insertSelectedAccessoriesInfo(AccFeedBack ob) {
+        ContentValues values = new ContentValues();
+        populateSelectedAccessoriesInfoValue(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = db.insert("SelectedAccessoriesInfo", null, values);
+        db.close();
+        return i > 0;
+    }
+
+    public void populateSelectedAccessoriesInfoValue(ContentValues values, AccFeedBack ob) {
+        values.put("accessorieId", ob.getParentId());
+        values.put("feedbackId", ob.getId());
+    }
+
+    public boolean updateSelectedAccessoriesInfo(AccFeedBack ob) {
+        ContentValues values = new ContentValues();
+        populateSelectedAccessoriesInfoValue(values, ob);
+        SQLiteDatabase db = this.getWritableDatabase();
+        long i = 0;
+        i = db.update("SelectedAccessoriesInfo", values, " accessorieId = '" + ob.getParentId() + "'", null);
+        db.close();
+        return i > 0;
+    }
+
+    public ArrayList<AccFeedBack> getSelectedAccessoriesInfo() {
+        String query = "Select *  FROM SelectedAccessoriesInfo ";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<AccFeedBack> list = new ArrayList<AccFeedBack>();
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+                AccFeedBack ob = new AccFeedBack();
+                populateSelectedAccessoriesInfo(cursor, ob);
+                list.add(ob);
+                cursor.moveToNext();
+            }
+        }
+        db.close();
+        return list;
+    }
+
+    //delete unselect value
+    public void deleteSelectedAccessoriesInfo(AccFeedBack ob) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("SelectedAccessoriesInfo", " accessorieId = '" + ob.getParentId() + "' ",
+                null);
+        db.close();
     }
 }

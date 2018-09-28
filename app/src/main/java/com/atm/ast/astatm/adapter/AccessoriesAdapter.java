@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.R;
+import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.model.newmodel.AccFeedBack;
 import com.atm.ast.astatm.model.newmodel.Accessories;
 import com.atm.ast.astatm.model.newmodel.Make;
@@ -32,13 +33,15 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
     private Context mCtx;
     private ArrayList<Accessories> accessoriesArrayList;
     ArrayList<AccFeedBack> accFeedBack;
-    String straccId, straccStatusId;
     public ArrayList<AccFeedBack> selectedAccFeedbackList = new ArrayList<AccFeedBack>();
+    int position;
+    private ATMDBHelper atmdbHelper;
 
     public AccessoriesAdapter(Context mCtx, ArrayList<Accessories> accessoriesArrayList, ArrayList<AccFeedBack> accFeedBacks) {
         this.mCtx = mCtx;
         this.accessoriesArrayList = accessoriesArrayList;
-        accFeedBack = accFeedBacks;
+        this.accFeedBack = accFeedBacks;
+        this.atmdbHelper = new ATMDBHelper(mCtx);
     }
 
     @Override
@@ -55,11 +58,10 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-
+                AccFeedBack selectAccFeedBack = new AccFeedBack();
+                selectAccFeedBack.setParentId(item.getId());//add Accessories id
                 holder.accessoriesSpinner.setVisibility(isChecked ? View.VISIBLE : View.GONE);
                 if (isChecked) {
-                    AccFeedBack selectAccFeedBack = new AccFeedBack();
-                    selectAccFeedBack.setParentId(item.getId());//add Accessories id
 
                     ArrayList<String> accText = new ArrayList<>();
                     ArrayList<Integer> accId = new ArrayList<>();
@@ -75,7 +77,7 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
                         @Override
                         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                             selectAccFeedBack.setId(accId.get(i));//add FeedBack id
-                            selectAccessoriesExistOrNot(item.getId(), true, selectAccFeedBack);
+                            selectAccessories(true, selectAccFeedBack);
                         }
 
                         @Override
@@ -84,7 +86,7 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
                         }
                     });
                 } else {
-                    selectAccessoriesExistOrNot(item.getId(), false, null);
+                    selectAccessories(false, selectAccFeedBack);
                 }
             }
         });
@@ -92,31 +94,13 @@ public class AccessoriesAdapter extends RecyclerView.Adapter<AccessoriesAdapter.
 
     }
 
-    //check if select Accessories Exist Or Not in list
-    private void selectAccessoriesExistOrNot(int acceId, boolean addOrNor, AccFeedBack selectAccFeedBack) {
-        if (selectedAccFeedbackList != null && selectedAccFeedbackList.size() > 0) {
-            if (isAccessoriesExistOrNot(acceId)) {
-                if (addOrNor) {
-                    selectedAccFeedbackList.remove(accFeedBack);
-                    selectedAccFeedbackList.add(selectAccFeedBack);
-                } else {
-                    selectedAccFeedbackList.remove(accFeedBack);
-                }
-            }
+    private void selectAccessories(boolean addOrNor, AccFeedBack selectAccFeedBack) {
+        if (addOrNor) {
+            atmdbHelper.upsertSelectedAccessoriesInfo(selectAccFeedBack);
         } else {
-            selectedAccFeedbackList.add(selectAccFeedBack);
+            atmdbHelper.deleteSelectedAccessoriesInfo(selectAccFeedBack);
         }
     }
-
-    private boolean isAccessoriesExistOrNot(int acceId) {
-        for (AccFeedBack accFeedBack : selectedAccFeedbackList) {
-            if (acceId == accFeedBack.getParentId()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public int getItemCount() {
         return accessoriesArrayList.size();
