@@ -184,15 +184,25 @@ public class EquipmentandAccessoriesTab extends MainFragment {
 
 
     /**
-     * Calling Web Service to get Site GetDispatchEquipment List Data
+     * Calling Web Service to get Site Get DispatchEquipment List Data
      */
 
     public void getDispatchEquipment() {
         ASTProgressBar _progrssBar = new ASTProgressBar(getContext());
         _progrssBar.show();
+        JSONObject object = new JSONObject();
+        try {
+            object.put("EquipId", 0);
+            object.put("SCMCode", 0);
+            object.put("SiteId", 0);
+            object.put("IsMSD", 0);//if 1 then get data from MSD, if 0 then get data from despatch
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         ServiceCaller serviceCaller = new ServiceCaller(getContext());
-        String serviceURL = Contants.BASE_URL_API + Contants.DISPATCH_EQUIPMENT + "siteid=" + 0;
-        serviceCaller.CallCommanServiceMethod(serviceURL, "getDispatchEquipment", new IAsyncWorkCompletedCallback() {
+        String serviceURL = Contants.BASE_URL_API + Contants.DISPATCH_EQUIPMENT;
+        serviceCaller.CallCommanServiceMethod(serviceURL, object, "getDispatchEquipment", new IAsyncWorkCompletedCallback() {
             @Override
             public void onDone(String result, boolean isComplete) {
                 if (isComplete) {

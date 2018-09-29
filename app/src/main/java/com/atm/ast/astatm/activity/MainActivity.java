@@ -31,9 +31,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.R;
+import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.filepicker.FNTextView;
 import com.atm.ast.astatm.fragment.AboutFragment;
 import com.atm.ast.astatm.fragment.CircleFragment;
@@ -43,12 +45,18 @@ import com.atm.ast.astatm.fragment.ExpenseSheetFragment;
 import com.atm.ast.astatm.fragment.HeaderFragment;
 import com.atm.ast.astatm.fragment.MainFragment;
 import com.atm.ast.astatm.fragment.TransitFragment;
+import com.atm.ast.astatm.framework.IAsyncWorkCompletedCallback;
+import com.atm.ast.astatm.framework.ServiceCaller;
 import com.atm.ast.astatm.runtimepermission.PermissionResultCallback;
 import com.atm.ast.astatm.runtimepermission.PermissionUtils;
 import com.atm.ast.astatm.fragment.PlannedActivityListTabFragment;
 import com.atm.ast.astatm.utils.ASTUIUtil;
 import com.atm.ast.astatm.utils.ASTReqResCode;
 import com.atm.ast.astatm.utils.CircularImage;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 

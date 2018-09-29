@@ -156,8 +156,15 @@ public class TransitFragment extends MainFragment {
                 getSiteIdPopup();//open site popup
             }
         } else if (view.getId() == R.id.btnLeftSite) {
-            getLocation();
-            LeftSiteAlertMessage();
+            SharedPreferences prefs = context.getSharedPreferences("saveFillActivityPlanPreferences", Context.MODE_PRIVATE);
+            if (prefs != null) {
+                if (prefs.getBoolean("fillActivityOrNotFlag", false)) {
+                    getLocation();
+                    LeftSiteAlertMessage();
+                } else {
+                    FillActivityFormForLeftSiteAlertMessage();
+                }
+            }
         } else if (view.getId() == R.id.btnReachedHome) {
             if (ASTUIUtil.checkGpsEnabled(context)) {
                 getLocation();
@@ -501,6 +508,7 @@ public class TransitFragment extends MainFragment {
                                                  String totalDistance = tvTotalDistance.getText().toString();
                                                  saveTransitDataIntoDB(finalFullAddress, siteId, tvTotalTravelCost.getText().toString(), totalDistance.substring(0, totalDistance.length() - 4), strActualKms, strActualTravelCost, strRemarks, strHotelExp, strActualHotelExp);
                                                  travelClaimDialog.dismiss();
+                                                 ASTUIUtil.saveReachedSiteOrNotDetail(getContext(), siteId, true);// for activity form fill
                                                  selectedButton();
                                              }
                                          }
@@ -645,6 +653,9 @@ public class TransitFragment extends MainFragment {
                             selectedButtonType = "3";
                             saveTransitDataIntoDB(transitAddress, siteId, "0", "0", "0", "0", "NA", "0", "0");
                             selectedButton();
+                            //clear leftsiteprefs after filling activity form
+                            SharedPreferences leftsiteprefs = getContext().getSharedPreferences("saveFillActivityPlanPreferences", Context.MODE_PRIVATE);
+                            leftsiteprefs.edit().clear().commit();
                         }
                         break;
 
@@ -659,6 +670,36 @@ public class TransitFragment extends MainFragment {
         builder.setMessage("Are you sure You Want to Submit?")
                 .setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
+    }
+
+    // fill activtiy form alert (without fill activity form you can not left site)
+    public void FillActivityFormForLeftSiteAlertMessage() {
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        openPlannedActivityListTabScreen();
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage("Please Fill Activity Form first then you can Left this site!")
+                .setPositiveButton("Fill Form", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+    }
+
+    //open openPlannedActivityListTabfragment screen
+    private void openPlannedActivityListTabScreen() {
+        PlannedActivityListTabFragment plannedActivityListTabFragment = new PlannedActivityListTabFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("headerTxt", "Activity Monitor");
+        getHostActivity().updateFragment(plannedActivityListTabFragment, bundle);
     }
 
     //get address through lat long

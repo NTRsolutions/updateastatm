@@ -590,15 +590,13 @@ public class ASTUIUtil {
 
 
     public static void showCustomConfirmDialog(Activity context, String msg, int imageResource, String positiveBtnCaption, String negativeBtnCaption,
-                                               final AlertDialogBoxClickInterface alertDialogBoxClickListener)
-    {
+                                               final AlertDialogBoxClickInterface alertDialogBoxClickListener) {
         TextView textViewMsg;
         ImageView imageView;
         TextView buttonPositive;
         TextView buttonNegative;
         AlertDialog alertDialog;
-        try
-        {
+        try {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             alertDialog = builder.create();
@@ -611,12 +609,9 @@ public class ASTUIUtil {
             textViewMsg.setText(msg);
 
             imageView = (ImageView) dialogView.findViewById(R.id.imageViewAlertImage);
-            if (imageResource == -1)
-            {
+            if (imageResource == -1) {
                 imageView.setVisibility(View.GONE);
-            }
-            else
-            {
+            } else {
                 imageView.setBackgroundResource(imageResource);
             }
 
@@ -632,30 +627,25 @@ public class ASTUIUtil {
 
             alertDialog.show();
             alertDialog.setContentView(dialogView);
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
 
         }
     }
 
     private static class CustomConfirmAlertButtonClickListener implements View.OnClickListener {
         private AlertDialogBoxClickInterface alertDialogClickListener;
-        private AlertDialog					alertDialog;
+        private AlertDialog alertDialog;
 
-        public CustomConfirmAlertButtonClickListener(AlertDialog alertDialog, AlertDialogBoxClickInterface alertDialogClickListener)
-        {
+        public CustomConfirmAlertButtonClickListener(AlertDialog alertDialog, AlertDialogBoxClickInterface alertDialogClickListener) {
             this.alertDialogClickListener = alertDialogClickListener;
             this.alertDialog = alertDialog;
         }
 
         @Override
-        public void onClick(View view)
-        {
+        public void onClick(View view) {
             int id = view.getId();
             boolean isPositiveButtonClicked;
-            switch (id)
-            {
+            switch (id) {
                 case R.id.buttonPositive:
                     isPositiveButtonClicked = true;
                     alertDialogClickListener.onButtonClicked(isPositiveButtonClicked);
@@ -672,57 +662,42 @@ public class ASTUIUtil {
         }
     }
 
-    public static void dismissDialog(Dialog dialog)
-    {
-        try
-        {
-            if (dialog != null && dialog.isShowing())
-            {
+    public static void dismissDialog(Dialog dialog) {
+        try {
+            if (dialog != null && dialog.isShowing()) {
                 dialog.dismiss();
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             // Consume it
         }
     }
 
-    public static void showView(View view)
-    {
+    public static void showView(View view) {
         view.setVisibility(View.VISIBLE);
     }
 
-    public static void hideView(View view)
-    {
+    public static void hideView(View view) {
         view.setVisibility(View.GONE);
     }
 
-    public static void hideViewByInvisible(View view)
-    {
+    public static void hideViewByInvisible(View view) {
         view.setVisibility(View.INVISIBLE);
     }
-    public static void showToastNotification(Context context, String message, String title, boolean isLongDuration)
-    {
+
+    public static void showToastNotification(Context context, String message, String title, boolean isLongDuration) {
         int duration = 0;
 
-        if (isLongDuration)
-        {
+        if (isLongDuration) {
             duration = Toast.LENGTH_LONG;
-        }
-        else
-        {
+        } else {
             duration = Toast.LENGTH_SHORT;
         }
 
-        if (message!=null && !message.isEmpty())
-        {
-            if (title != null)
-            {
+        if (message != null && !message.isEmpty()) {
+            if (title != null) {
                 String toastMessage = title + "\n\n" + message;
                 Toast.makeText(context, toastMessage, duration).show();
-            }
-            else
-            {
+            } else {
                 String toastMessage = message;
                 Toast.makeText(context, toastMessage, duration).show();
             }
@@ -1156,7 +1131,6 @@ public class ASTUIUtil {
     }
 
 
-
     public static byte[] getBytes(InputStream inputStream) throws IOException {
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
         int bufferSize = 1024;
@@ -1351,7 +1325,7 @@ public class ASTUIUtil {
         String phone;
         try {
             SharedPreferences prefs = context.getSharedPreferences("UserPhonePreferences", Context.MODE_PRIVATE);
-            phone = prefs.getString("Phonenumber","");
+            phone = prefs.getString("Phonenumber", "");
             return phone;
         } catch (Exception e) {
             Log.d(Contants.LOG_TAG, "Exception  - Phone" + e.getMessage());
@@ -1458,7 +1432,7 @@ public class ASTUIUtil {
         return result;
     }
 
-    public  static String getLocationAddress(Location location, Context context, String addressType) throws IOException {
+    public static String getLocationAddress(Location location, Context context, String addressType) throws IOException {
         String address = "";
 
 
@@ -1517,7 +1491,7 @@ public class ASTUIUtil {
         return (rad * 180 / Math.PI);
     }
 
-    public  static String getOsVersion() {
+    public static String getOsVersion() {
         /*String[] mapper = new String[]{
                 "1.0", "1.1", "1.2", "2.0",
                 "2.1", "2.1.1", "2.1.2", "2.2", "2.3",
@@ -1602,7 +1576,7 @@ public class ASTUIUtil {
         return formattedDate;
     }
 
-    public static  boolean checkGpsEnabled(final Context context) {
+    public static boolean checkGpsEnabled(final Context context) {
         final LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         boolean gpsEnabled = false;
 
@@ -1679,8 +1653,36 @@ public class ASTUIUtil {
                 .imageDirectory(appNameWithoutSpace(activity)) // captured image directory name ("Camera" folder by default)
                 .start(FNReqResCode.ATTACHMENT_REQUEST); // start image picker activity with request code
     }
+
     public static void shownewErrorIndicator(Context context, String errorMsg) {
         popupWindowDialog = new ASTErrorIndicator(context);
         popupWindowDialog.show(ApplicationHelper.application().getActivity().findViewById(R.id.headerFragment), errorMsg);
+    }
+
+    //set Save plan detail
+    public static void savePlanDetail(Context context, String siteId, boolean fillActivityOrNotFlag) {
+        try {
+            SharedPreferences prefs = context.getSharedPreferences("saveFillActivityPlanPreferences", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("siteId", siteId);
+            editor.putBoolean("fillActivityOrNotFlag", fillActivityOrNotFlag);
+            editor.commit();
+        } catch (Exception e) {
+            // should never happen
+            //   throw new RuntimeException("Could not get language: " + e);
+        }
+    }
+    //set Save reached site detail
+    public static void saveReachedSiteOrNotDetail(Context context, String siteId, boolean reachedOrNotFlag) {
+        try {
+            SharedPreferences prefs = context.getSharedPreferences("ReachedSitePreferences", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("siteId", siteId);
+            editor.putBoolean("reachedOrNotFlag", reachedOrNotFlag);
+            editor.commit();
+        } catch (Exception e) {
+            // should never happen
+            //   throw new RuntimeException("Could not get language: " + e);
+        }
     }
 }

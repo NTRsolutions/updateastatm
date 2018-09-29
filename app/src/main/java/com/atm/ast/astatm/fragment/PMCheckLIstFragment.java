@@ -1,9 +1,12 @@
 package com.atm.ast.astatm.fragment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -483,12 +486,27 @@ public class PMCheckLIstFragment extends MainFragment {
         sheetModel.setModemConn(strModemConn);
         sheetModel.setBattTopup(strBattTopup);
 
-        if (ASTUIUtil.isOnline(getContext())) {
-            activityFormDataServiceCall();
-        } else {
-            ASTUIUtil.showToast(Contants.OFFLINE_MESSAGE);
-            saveActivityFormDataIntoDb();
+
+        SharedPreferences prefs = getContext().getSharedPreferences("ReachedSitePreferences", Context.MODE_PRIVATE);
+        if (prefs != null) {
+            boolean reachedOrNotFlag = prefs.getBoolean("reachedOrNotFlag", false);
+            String transitSiteId = prefs.getString("siteId", "");
+            if (siteId.equals(transitSiteId)) {
+                if (reachedOrNotFlag) {
+                    if (ASTUIUtil.isOnline(getContext())) {
+                        activityFormDataServiceCall();
+                    } else {
+                        ASTUIUtil.showToast(Contants.OFFLINE_MESSAGE);
+                        saveActivityFormDataIntoDb();
+                    }
+                } else {
+                    reachedSiteFirstAlertMessage();
+                }
+            } else {
+                reachedSiteFirstAlertMessage();
+            }
         }
+
     }
 
     @Override
@@ -580,6 +598,11 @@ public class PMCheckLIstFragment extends MainFragment {
 
     //open openPlannedActivityListTabfragment screen
     private void openPlannedActivityListTabScreen() {
+        //clear reachedSiteprefs after click on reached site for submit activity form
+        SharedPreferences reachedSiteprefs = getContext().getSharedPreferences("ReachedSitePreferences", Context.MODE_PRIVATE);
+        reachedSiteprefs.edit().clear().commit();
+        ASTUIUtil.savePlanDetail(getContext(), siteId, true);// for transit left side
+
         PlannedActivityListTabFragment plannedActivityListTabFragment = new PlannedActivityListTabFragment();
         Bundle bundle = new Bundle();
         bundle.putString("headerTxt", "Activity Monitor");
@@ -597,4 +620,33 @@ public class PMCheckLIstFragment extends MainFragment {
         getHostActivity().updateFragment(qrFragment, bundle);
     }
 
+    // reached site first alert (without reached site you can not fill activity form)
+    public void reachedSiteFirstAlertMessage() {
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        openTransitScreenScreen();
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage("Please first Reached Site in Transit screen after that you can fill Activity form!")
+                .setPositiveButton("Fill Form", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+    }
+
+    //open transit screen
+    private void openTransitScreenScreen() {
+        TransitFragment transitFragment = new TransitFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("headerTxt", "Transit");
+        getHostActivity().updateFragment(transitFragment, bundle);
+    }
 }
