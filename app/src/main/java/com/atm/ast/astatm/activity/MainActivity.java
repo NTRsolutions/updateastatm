@@ -36,8 +36,9 @@ import android.widget.Toast;
 import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.component.ASTProgressBar;
+import com.atm.ast.astatm.equipment.replacementequiment.AllEquipmentList;
+import com.atm.ast.astatm.equipment.replacementequiment.EquipmentReplacementTab;
 import com.atm.ast.astatm.filepicker.FNTextView;
-import com.atm.ast.astatm.fragment.AboutFragment;
 import com.atm.ast.astatm.fragment.CircleFragment;
 import com.atm.ast.astatm.fragment.ComplaintFragment;
 import com.atm.ast.astatm.equipment.EquipmentandAccessoriesTab;
@@ -267,7 +268,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             bundle.putString("headerTxt", "Complaint");
             this.updateFragment(complaintFragment, bundle);
         } else if (id == R.id.nav_tvAbout) {
-            AboutFragment aboutFragment = new AboutFragment();
+        //    EquipmentandAccessoriesTab aboutFragment = new EquipmentandAccessoriesTab();
+            AllEquipmentList aboutFragment=new AllEquipmentList();
             bundle.putString("headerTxt", "About");
             this.updateFragment(aboutFragment, bundle);
         }
