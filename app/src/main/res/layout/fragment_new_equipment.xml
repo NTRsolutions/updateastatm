@@ -1,14 +1,334 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".equipment.replacementequiment.NewEquipment">
+    android:background="@color/white"
+    android:orientation="vertical"
+    app:cardElevation="@dimen/_8dp"
+    app:cardUseCompatPadding="true">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppBaseTheme"
+        android:visibility="visible">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_45dp"
+            android:background="@color/appTheamColor"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/back"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="0.2"
+                    android:gravity="center_vertical"
+                    android:text=""
+                    android:textColor="#fff"
+                    android:textSize="@dimen/_20dp"
+                    android:textStyle="bold"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.8"
+                    android:gravity="center_vertical"
+                    android:text="Equipment Info"
+                    android:textColor="#fff"
+                    android:textSize="@dimen/_16dp" />
+
+            </LinearLayout>
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+
+
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_weight="1"
+        android:layout_below="@+id/app_bar"
+        android:background="@color/white">
 
-</FrameLayout>
+        <LinearLayout
+            android:id="@+id/activity_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/_5dp">
+
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/_3dp"
+                app:cardCornerRadius="@dimen/_4dp"
+                app:cardElevation="@dimen/_6dp"
+                app:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="@dimen/_5dp">
+
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:padding="@dimen/_5dp"
+                        android:text="New Equiment"
+                        android:textAlignment="center"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_14dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/_4dp"
+                        android:minHeight="@dimen/_30dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center_vertical"
+                            android:text="Equiment Make"
+                            android:textColor="@color/blackMedium"
+                            android:textSize="@dimen/_14dp" />
+
+
+                        <Spinner
+                            android:id="@+id/equipmentMakeSpinnernew"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:popupBackground="@color/white" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_1dp"
+                            android:layout_marginRight="@dimen/_10dp"
+                            android:background="@color/gray" />
+
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/_4dp"
+                        android:minHeight="@dimen/_30dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center_vertical"
+                            android:text="Equiment Capacity"
+                            android:textColor="@color/blackMedium"
+                            android:textSize="@dimen/_14dp" />
+
+
+                        <Spinner
+                            android:id="@+id/equipmentCapacitySpinnernew"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:popupBackground="@color/white" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_1dp"
+                            android:layout_marginRight="@dimen/_10dp"
+                            android:background="@color/gray" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/_4dp"
+                        android:minHeight="@dimen/_30dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center_vertical"
+                            android:text="Equiment Sr. No."
+                            android:textColor="@color/blackMedium"
+                            android:textSize="@dimen/_14dp" />
+
+
+                        <Spinner
+                            android:id="@+id/equipmentsrnoSpinnernew"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:popupBackground="@color/white" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_1dp"
+                            android:layout_marginRight="@dimen/_10dp"
+                            android:background="@color/gray" />
+
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/_4dp"
+                        android:minHeight="@dimen/_30dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center_vertical"
+                            android:text="SCM Dispt"
+                            android:textColor="@color/blackMedium"
+                            android:textSize="@dimen/_14dp" />
+
+
+                        <Spinner
+                            android:id="@+id/equipmentscmSpinnernew"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:popupBackground="@color/white" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_1dp"
+                            android:layout_marginRight="@dimen/_10dp"
+                            android:background="@color/gray" />
+
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/_4dp"
+                        android:minHeight="@dimen/_30dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center_vertical"
+                            android:text="SCM Part No."
+                            android:textColor="@color/blackMedium"
+                            android:textSize="@dimen/_14dp" />
+
+
+                        <Spinner
+                            android:id="@+id/equipmentscmpartSpinnernew"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:popupBackground="@color/white" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_1dp"
+                            android:layout_marginRight="@dimen/_10dp"
+                            android:background="@color/gray" />
+
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/_4dp"
+                        android:minHeight="@dimen/_30dp"
+                        android:orientation="horizontal">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            android:layout_weight="1"
+                            app:counterOverflowTextAppearance="@style/CounterOverFlow"
+                            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                            <android.support.v7.widget.AppCompatEditText
+                                android:id="@+id/etequipmentqrcodenew"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:autoSizeTextType="uniform"
+                                android:hint="Qr Code Screen"
+                                android:inputType="numberDecimal"
+                                android:textSize="@dimen/_14dp" />
+                        </android.support.design.widget.TextInputLayout>
+
+                        <ImageView
+                            android:id="@+id/qrCodeImagenew"
+                            android:layout_width="@dimen/_40dp"
+                            android:layout_height="@dimen/_40dp"
+                            android:layout_gravity="center"
+                            android:layout_marginRight="@dimen/_5dp"
+                            android:padding="@dimen/_5dp"
+                            android:src="@drawable/ic_qr_code" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+
+        </LinearLayout>
+
+
+    </android.support.v4.widget.NestedScrollView>
+
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/_3dp"
+        app:cardElevation="@dimen/_6dp">
+
+        <Button
+            android:id="@+id/btnSubmit"
+            style="@style/DefaultButtonText"
+            android:layout_width="@dimen/_210dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/_10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/button_login"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="Submit"
+            android:textSize="@dimen/_12dp" />
+    </android.support.v7.widget.CardView>
+</LinearLayout>

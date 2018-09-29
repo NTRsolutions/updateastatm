@@ -37,7 +37,6 @@ import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.component.ASTProgressBar;
 import com.atm.ast.astatm.equipment.replacementequiment.AllEquipmentList;
-import com.atm.ast.astatm.equipment.replacementequiment.EquipmentReplacementTab;
 import com.atm.ast.astatm.filepicker.FNTextView;
 import com.atm.ast.astatm.fragment.CircleFragment;
 import com.atm.ast.astatm.fragment.ComplaintFragment;

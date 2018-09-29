@@ -47,17 +47,17 @@ public class EquipmentListAdapter extends RecyclerView.Adapter<EquipmentListAdap
         } else if (equipmentList.get(position).getId() == 608) {
             holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_solar_panels_couple_in_sunlight));
         } else if (equipmentList.get(position).getId() == 901) {
-            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_battery_with));
+            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_settings));
         } else if (equipmentList.get(position).getId() == 923) {
-            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_battery_with));
+            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_settings));
         } else if (equipmentList.get(position).getId() == 938) {
-            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_battery_with));
+            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_settings));
         } else if (equipmentList.get(position).getId() == 963) {
-            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_battery_with));
+            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_settings));
         } else if (equipmentList.get(position).getId() == 974) {
             holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_diagram));
         } else if (equipmentList.get(position).getId() == 1004) {
-            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_battery_with));
+            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_settings));
         }
         if (equipmentList.get(position).isSelectedOrNote()) {
             holder.checkBox.setChecked(true);

@@ -1,6 +1,7 @@
 package com.atm.ast.astatm.equipment.replacementequiment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -10,9 +11,11 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.model.newmodel.Equipment;
+
 import java.util.ArrayList;
 
 public class AllEquipmentListAdapter extends RecyclerView.Adapter<AllEquipmentListAdapter.ItemViewHolder> {
@@ -45,17 +48,17 @@ public class AllEquipmentListAdapter extends RecyclerView.Adapter<AllEquipmentLi
         } else if (equipmentList.get(position).getId() == 608) {
             holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_solar_panels_couple_in_sunlight));
         } else if (equipmentList.get(position).getId() == 901) {
-            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_battery_with));
+            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_settings));
         } else if (equipmentList.get(position).getId() == 923) {
-            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_battery_with));
+            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_settings));
         } else if (equipmentList.get(position).getId() == 938) {
-            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_battery_with));
+            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_settings));
         } else if (equipmentList.get(position).getId() == 963) {
-            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_battery_with));
+            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_settings));
         } else if (equipmentList.get(position).getId() == 974) {
             holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_diagram));
         } else if (equipmentList.get(position).getId() == 1004) {
-            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_battery_with));
+            holder.imageView.setImageDrawable(mCtx.getResources().getDrawable(R.drawable.ic_settings));
         }
         if (equipmentList.get(position).isSelectedOrNote()) {
             holder.checkBox.setChecked(true);
@@ -68,15 +71,16 @@ public class AllEquipmentListAdapter extends RecyclerView.Adapter<AllEquipmentLi
             @Override
             public void onClick(View view) {
                 int equID = equipmentList.get(position).getId();
-                Bundle bundle = new Bundle();
-                EquipmentReplacementTab equipmentReplacementTab = new EquipmentReplacementTab();
-                bundle.putString("headerTxt", "Equipment Add & Replacement");
-                bundle.putBoolean("showMenuButton", false);
-                bundle.putInt("equipmentId", equID);
-                ApplicationHelper.application().getActivity().updateFragment(equipmentReplacementTab, bundle);
+                EquipmentReplacementActivity equipmentReplacementActivity = new EquipmentReplacementActivity();
+                Intent intent = new Intent(mCtx, EquipmentReplacementActivity.class);
+                intent.putExtra("headerTxt", "Equipment Add & Replacement");
+                intent.putExtra("showMenuButton", false);
+                intent.putExtra("equipmentId", equID);
+                // ApplicationHelper.application().getActivity().updateFragment(equipmentReplacementActivity, bundle);
+                mCtx.startActivity(intent);
+
             }
         });
-
 
 
     }

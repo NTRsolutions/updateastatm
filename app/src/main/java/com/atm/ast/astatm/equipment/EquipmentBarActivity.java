@@ -48,19 +48,7 @@ public class EquipmentBarActivity extends AppCompatActivity implements View.OnCl
         setContentView(R.layout.activity_equipment_bar);
         loadView();
         setSupportActionBar(toolbar);
-        Typeface materialdesignicons_font = FontManager.getFontTypefaceMaterialDesignIcons(this, "fonts/materialdesignicons-webfont.otf");
-        TextView back = toolbar.findViewById(R.id.back);
-        back.setTypeface(materialdesignicons_font);
-        back.setText(Html.fromHtml("&#xf04e;"));
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-        setClickListeners();
     }
-
 
     protected void getArgs() {
         equID = getIntent().getIntExtra("equipmentId", 0);
@@ -176,7 +164,7 @@ public class EquipmentBarActivity extends AppCompatActivity implements View.OnCl
 
     public void addNewEquipmentScreen() {
         Equipment equipment = new Equipment();
-        equipment.setId(equID);
+        equipment.setId(5);
         //equipment.setLastPage(true);
         equipmentlist.add(equipment);
         mPager.setOffscreenPageLimit(equipmentlist.size());
