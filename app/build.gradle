@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "com.atm.ast.astatm"
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 26
         versionCode 1
         versionName '0'
         multiDexEnabled true
