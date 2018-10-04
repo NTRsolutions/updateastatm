@@ -8,7 +8,6 @@
         android:id="@+id/headerCardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/llActionBar"
         app:cardCornerRadius="@dimen/_2dp"
         app:cardElevation="@dimen/_10dp">
 
@@ -24,7 +23,6 @@
                 android:id="@+id/tvCurrentDate"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/llActionBar"
                 android:background="#078f4b"
                 android:padding="2dp"
                 android:layout_marginLeft="@dimen/_6dp"
