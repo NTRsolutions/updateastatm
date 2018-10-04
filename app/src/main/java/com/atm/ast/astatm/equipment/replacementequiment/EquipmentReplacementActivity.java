@@ -12,11 +12,15 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
-import com.atm.ast.astatm.ApplicationHelper;
 import com.atm.ast.astatm.R;
 import com.atm.ast.astatm.component.SwitchViewPager;
+import com.atm.ast.astatm.database.ATMDBHelper;
+import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.Equipment;
+import com.atm.ast.astatm.model.newmodel.EquipmnetContentData;
 import com.atm.ast.astatm.utils.FontManager;
+
+import java.util.ArrayList;
 
 public class EquipmentReplacementActivity extends AppCompatActivity implements View.OnClickListener {
     SwitchViewPager mPager;
@@ -27,7 +31,8 @@ public class EquipmentReplacementActivity extends AppCompatActivity implements V
     TextView title;
     String EquipId, MakeId, CapacityId, SerialNo, SCMDescId, SCMCodeId, QRCode, remarke;
     int noofPage = 5;
-
+    private ATMDBHelper atmdbHelper;
+    ArrayList<Equipment> equipmentlist;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,10 +76,35 @@ public class EquipmentReplacementActivity extends AppCompatActivity implements V
     protected void dataToView() {
         getArgs();
         getSharedPrefData();
+
+
+
+        atmdbHelper = new ATMDBHelper(EquipmentReplacementActivity.this);
+        equipmentlist = new ArrayList<Equipment>();
+        // equipmentlist = atmdbHelper.getDispatchEquipmentData(0);
+        ArrayList<Data> allEquipmentList = atmdbHelper.getAllEquipmentListData();
+        if (allEquipmentList != null) {
+            for (Data dataModel : allEquipmentList) {
+                EquipmnetContentData contentData = dataModel.getEquipmnetContentData();
+                if (contentData != null) {
+                    for (Equipment equipment : contentData.getEquipment()) {
+                        if (equipment.getId() == equID) {
+                            equipmentlist.add(equipment);
+                        }
+                    }
+                }
+            }
+        }
+
         mAdapter = new EqupmentReplacePagerAdapter(getSupportFragmentManager(), "", noofPage);
         mPager.setAdapter(mAdapter);
-        mPager.setOffscreenPageLimit(noofPage);
-        mAdapter.add(noofPage, equipment);
+        mPager.setOffscreenPageLimit(equipmentlist.size());
+        if (equipmentlist == null || equipmentlist.size() > 0) {
+            for (int i = 0; i < equipmentlist.size(); i++) {
+                mAdapter.add(i, equipmentlist.get(i));
+            }
+        }
+
     }
 
     //get use data

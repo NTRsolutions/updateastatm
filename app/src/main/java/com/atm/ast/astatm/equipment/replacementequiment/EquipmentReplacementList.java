@@ -6,19 +6,27 @@ import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.atm.ast.astatm.R;
+import com.atm.ast.astatm.constants.Contants;
 import com.atm.ast.astatm.database.ATMDBHelper;
 import com.atm.ast.astatm.equipment.EquipMentBarcodeFragment;
 import com.atm.ast.astatm.equipment.EquipmentListAdapter;
 import com.atm.ast.astatm.fragment.MainFragment;
+import com.atm.ast.astatm.model.newmodel.Capacity;
 import com.atm.ast.astatm.model.newmodel.Data;
 import com.atm.ast.astatm.model.newmodel.Equipment;
 import com.atm.ast.astatm.model.newmodel.EquipmentInfo;
 import com.atm.ast.astatm.model.newmodel.EquipmnetContentData;
+import com.atm.ast.astatm.model.newmodel.Make;
+import com.atm.ast.astatm.model.newmodel.SCMCode;
+import com.atm.ast.astatm.model.newmodel.SCMDescription;
 import com.google.zxing.integration.android.IntentIntegrator;
 
 import java.util.ArrayList;
@@ -27,22 +35,25 @@ import java.util.List;
 
 @SuppressLint("ValidFragment")
 public class EquipmentReplacementList extends MainFragment {
-    private RecyclerView recyclerView;
+    private List<Data> allEquipmentList;
+    private ATMDBHelper atmdbHelper;
     private Spinner equipmentMakeSpinnernew, equipmentCapacitySpinnernew, equipmentsrnoSpinnernew,
             equipmentscmSpinnernew, equipmentscmpartSpinnernew;
-
-    AppCompatEditText etequipmentqrcodenew;
+    private EquipmnetContentData equipmentData;
+    private AppCompatEditText etequipmentqrcodenew;
     private String equipmentMakestr, equipmentCapacitystr, equipmentsrnostr, equipmentscmstr, equipmentscmpartstr,
             equipmentqrstr,
             equipmentMakestrnew, equipmentCapacitystrnew, equipmentsrnostrnew,
             equipmentscmstrnew, equipmentscmpartstrnew,
             equipmentqrstrnew;
-    int screenPosition;
-    TextView previous, next, done,equipmentMakeSpinner, equipmentCapacitySpinner, equipmentsrnoSpinner, equipmentscmSpinner, equipmentscmpartSpinner,
+    private int screenPosition;
+    private TextView previous, next, done, equipmentMakeSpinner, equipmentCapacitySpinner, equipmentsrnoSpinner, equipmentscmSpinner, equipmentscmpartSpinner,
             etequipmentqrcode;
+    private String EquipmentdataStr;
 
     @SuppressLint("ValidFragment")
-    public EquipmentReplacementList(int postion) {
+    public EquipmentReplacementList(String Equipmentdata, int postion) {
+        this.EquipmentdataStr = Equipmentdata;
         this.screenPosition = postion;
     }
 
@@ -85,6 +96,9 @@ public class EquipmentReplacementList extends MainFragment {
 
     @Override
     protected void dataToView() {
+        atmdbHelper = new ATMDBHelper(getContext());
+        allEquipmentList = new ArrayList<>();
+        allEquipmentList = atmdbHelper.getAllEquipmentListData();
 
     }
 
@@ -113,5 +127,9 @@ public class EquipmentReplacementList extends MainFragment {
     private void saveScreenData(boolean NextPreviousFlag) {
         saveEquipmentInfo(NextPreviousFlag);
     }
+
+
+
+
 
 }

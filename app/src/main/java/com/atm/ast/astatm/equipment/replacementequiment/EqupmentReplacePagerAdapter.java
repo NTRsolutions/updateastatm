@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EqupmentReplacePagerAdapter extends FragmentStatePagerAdapter {
-
+    private List<Equipment> mKeyList = new ArrayList<Equipment>();
     private String ticketNo = "";
     int postion;
 
@@ -29,13 +29,14 @@ public class EqupmentReplacePagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        EquipmentReplacementList tab1 = new EquipmentReplacementList(postion);
+        String Equipmentdata = new Gson().toJson(mKeyList.get(position));
+        EquipmentReplacementList tab1 = new EquipmentReplacementList(Equipmentdata, position + 1);
         return tab1;
     }
 
     @Override
     public int getCount() {
-        return postion;
+        return mKeyList.size();
     }
 
     @Override
@@ -44,7 +45,7 @@ public class EqupmentReplacePagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public void add(int position, Equipment equipment) {
-    //    mKeyList.add(position, equipment);
+        mKeyList.add(position, equipment);
         notifyDataSetChanged();
     }
 }
